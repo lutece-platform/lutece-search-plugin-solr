@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+	<properties>
+		<title>Lutece Solr</title>
+	</properties>
+	<body>
+		<section name="Solr">
+			<subsection name="Introduction">
+				<p>Plugin to change the default search engine in Lutece (based on lucene) by Solr server.</p>
+				<p>Its major features include powerful full-text search, hit highlighting, faceted search, auto-suggest, spelling suggestions ...</p>
+			</subsection>
+			<subsection name="Install">
+				<p>Download Solr 1.4 from source : http://svn.apache.org/repos/asf/lucene/solr/tags/release-1.4.0</p>
+				<p>Apply <a href="http://issues.apache.org/jira/browse/SOLR-64">SOLR-64</a>
+				and <a href="http://issues.apache.org/jira/browse/SOLR-792">SOLR-792</a></p>
+			</subsection>
+		</section>
+		<section></section>
+	</body>
+</document>

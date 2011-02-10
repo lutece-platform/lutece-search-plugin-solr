@@ -1,0 +1,270 @@
+<#setting url_escaping_charset='ISO-8859-1'>
+
+<#-- facets -->
+<div class="span-5 prepend-1 append-0 append-bottom" >
+	
+	<#-- Historique -->
+	<div id="histoique" class="portlet -lutece-border-radius append-bottom">
+		<table>
+			<th>
+				#i18n{search.solr.display.result.raffinement.label}
+			</th>
+			<#list historique as fh>
+			<tr>
+				<td>
+					<a href="${fullUrl}?page=search-solr&query=${query}${fh.query}">${fh.name}</a>
+				</td>
+			</tr>
+			</#list>
+			<tr>
+				<td>
+					<a href="${fullUrl}?page=search-solr&query=${query}">#i18n{search.solr.display.result.raffinement.clear}</a>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<#-- facet refining -->
+	<div id="facets" class="portlet -lutece-border-radius append-bottom">
+		<#-- facets field -->
+		<#if facets??><#-- empty or null when no connection to server -->
+		<#list facets as facet>
+			<#if facet.values??>
+				<#-- when there is no result, facet is not null, but facet.values is -->
+				<table>
+					<th>
+						${solr_fields[facet.name].label}
+					</th>
+					<tr>
+						<td>
+							<ul>
+							<#list facet.values as count>
+								<li>
+									<a href="${fullUrl}?page=search-solr&query=${query}&facetlabel=${count.name}&facetname=${facet.name}&fq=${facet.name}:${count.name?url}${facetquery}">${count.name}(${count.count})</a>
+								</li>
+							</#list>
+							</ul>
+						</td>
+					</tr>
+				</table>
+			</#if>
+		</#list>
+		</#if>
+		
+		<#-- facets date refining -->
+		<#if facets_date??>
+		<#list facets_date as field>
+			<#if field.values??>
+				<#-- when there is no result, facet is not null, but facet.values is -->
+				<table>
+					<th>
+						${solr_fields[field.name].label}
+					</th>
+					<tr>
+						<td>
+							<ul>
+							<#list field.values as count>
+									<#if count.count != 0>
+									<li>
+										<#assign toDate = "${count.name}"?datetime("yyyy-MM-dd'T'HH:mm:ss'Z'")>
+										<#assign daterange = "${field.name}:[${count.name} TO ${count.name}+1MONTH]"?url>
+										<#assign toString = "${toDate?string('MMMM yyyy')}">
+										<a href="${fullUrl}?page=search-solr&query=${query}&facetlabel=${toString}&facetname=${field.name}&fq=${daterange}${facetquery}">${toString}(${count.count})</a>
+									</li>
+									</#if>
+							</#list>
+							</ul>
+						</td>
+					</tr>
+				</table>
+			</#if>
+		</#list>
+		</#if>	
+	</div>
+	
+	<#-- facets Intersection -->
+	<#if facet_tree??>
+	<div id="intersection" class="portlet -lutece-border-radius append-bottom">
+		<#list facet_tree?keys as key>
+			<table>
+			<th>
+				<#assign field1= "${key}"?split(",")[0] >
+				<#assign field2= "${key}"?split(",")[1] >
+				${solr_fields[field1].label} / ${solr_fields[field2].label}
+			</th>
+			<#list facet_tree[key] as facet>
+				<#if facet.values??>
+					<#-- when there is no result, facet is not null, but facet.values is -->
+					<tr>
+						<td>
+							<a href="${fullUrl}?page=search-solr&query=${query}&fq=${field1}:${facet.name?url}${facetquery}">${facet.name}</a>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<ul>
+							<#list facet.values as count>
+								<li>
+									<a href="${fullUrl}?page=search-solr&query=${query}&fq=${field1}:${facet.name?url}&fq=${field2}:${count.name?url}${facetquery}">${count.name}(${count.count})</a>
+								</li>
+							</#list>
+							</ul>
+						</td>
+					</tr>
+				</#if>
+			</#list>
+		</table>
+		</#list>
+	</div>
+	</#if>
+	
+	<#-- sort order -->
+	<#if sort_list??>
+	<div id="tri" class="portlet -lutece-border-radius append-bottom">
+		<table>
+			<th>
+				#i18n{search.solr.display.result.sort}
+			</th>
+			<#list sort_list as field>
+				<#if field.enableSort>
+					<tr>
+						<td>
+							<a href="${fullUrl}?page=search-solr&query=${query}${facetquery}&sort_name=${field.solrName}&sort_order=desc">${field.label} desc</a>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<a href="${fullUrl}?page=search-solr&query=${query}${facetquery}&sort_name=${field.solrName}&sort_order=asc">${field.label} asc</a>
+						</td>
+					</tr>
+				</#if>
+			</#list>
+		</table>
+	</div>
+	</#if>
+</div>
+
+<#-- results -->
+<div id="resultList" class="span-17 prepend-0 append-0 append-bottom">
+	<#-- new Search -->
+	<div id="newSearch" class="portlet -lutece-border-radius append-bottom">
+		<form name="search" method="get" action="${fullUrl}">
+			<div class="hide"><input type="hidden" name="page" value="search-solr" /></div>
+			<div style="text-align:center;">
+				<input type="text" name="query" size="35" value="${query?if_exists}" id="solr" /> 
+				<input type="submit" value="#i18n{portal.search.search_results.buttonSearch}" />
+			</div>
+			<div>
+				<#-- Number of documents per page selector -->
+				#i18n{portal.search.search_results.labelNbDocsPerPage}<br />
+				<@NbItemsPerPageSelectorRadioList nb_items_per_page />
+			</div>
+ 		</form>
+	</div>
+	<div id="resultList2" class="portlet -lutece-border-radius">
+		<div id="resultHeader" class="portlet-header">#i18n{portal.search.search_results.title}</div>
+		<#if error?has_content>
+			<div class="error">${error}</div>
+		</#if>
+		<div>#i18n{portal.search.search_results.labelResultsCount} : <strong>${paginator.itemsCount}</strong></div>
+		<div>#i18n{portal.search.search_results.labelResultsRange} : <strong>${paginator.rangeMin} - ${paginator.rangeMax}</strong></div>
+ 
+ 		<#-- spellChecker -->
+		<#if suggestion?has_content>
+		<div id="spellchecker">
+			<#assign newQuery="" >
+			#i18n{search.solr.display.result.spellchecker}<a href="${fullUrl}?page=search-solr&query=${suggestion?trim?url}${facetquery}">${suggestion?trim}</a>	
+		</div>
+		</#if>
+
+		<div>&nbsp;</div>
+		<div id="pagination" class="pagination">
+			<p>
+				<@pagination paginator=paginator />
+			</p>
+		</div>
+
+		<div id="resultItems" class="portlet-background">
+			<div>
+			<#list results_list as result>
+				<div id="item" >
+					<!-- <img src="document?id=${result.id}&id_attribute=79" style="float:left; margin-right:12px"/> -->
+					<div style="font-weight:bold; font-size:1.2em">${result.title}</div>
+					<!-- <a href="${result.url}&terms=${query}">${result.title}</a> -->
+					<#if result.summary??>${result.summary}</#if>
+					<br />
+					<#if result.highlight??>
+						<#-- get a extract from the "content" field where there is one (or more) of the searched words -->
+						<#if result.highlight.map["text"]??>
+						#i18n{search.solr.display.result.summary.extract} : 
+						<#list result.highlight.map["text"] as extrait>
+							${extrait}
+						</#list>
+						</#if>
+					</#if>
+					<br />
+					<div style="text-align:right; font-size:0.8em;" ><#if result.date?has_content>${result.date?date}</#if></div>
+				</div>
+				<div style="clear:both">&nbsp;</div>
+			</#list>
+			</div>
+		</div>
+	</div>
+</div>
+
+<#-- Freemarker macros -->
+
+<#-- Number of items per page selector - Combo Box implementation -->
+<#macro NbItemsPerPageSelectorCombo nb_items_per_page>
+	<select name="items_per_page">
+	<#list [ "10" , "20" , "50" , "100" ] as nb>
+	<#if nb_items_per_page = nb >
+	<option selected="selected" value="${nb}">${nb}</option>
+	<#else>
+	<option value="${nb}">${nb}</option>
+	</#if>
+	</#list>
+	</select>
+</#macro>
+
+<#-- Number of items per page selector - Radio List implementation -->
+<#macro NbItemsPerPageSelectorRadioList nb_items_per_page>
+	<#list [ "5" , "10" , "20" , "50" ] as nb>
+	<#if nb = nb_items_per_page > 
+	<input value="${nb}" id="items_per_page${nb}" name="items_per_page" class="radio" type="radio" checked /><label for="items_per_page${nb}">${nb}</label>
+	<#else>
+	<input value="${nb}" id="items_per_page${nb}" name="items_per_page" class="radio" type="radio" /><label for="items_per_page${nb}">${nb}</label>
+	</#if>
+	</#list>
+</#macro>
+
+<script>
+$(function() {
+
+	function formatForDisplay(doc) {
+		return doc.title;
+	}
+
+	$("#solr").autocomplete('@base_url@solrSuggest?', {
+		dataType : "jsonp",
+		width : 300,
+		minChars : 3,
+		parse : function(data) {
+			return $.map(data.response.docs, function(doc) {
+				return {
+					data : doc,
+					value : doc.uid.toString(),
+					result : doc.title
+				}
+			});
+		},
+		formatItem : function(doc) {
+			return formatForDisplay(doc);
+		}
+	}).result(
+			function(e, doc) {
+				$("#content").append(
+						"<p>selected " + formatForDisplay(doc) + "(" + doc.title + ")" + "</p>");
+			});
+});
+</script>

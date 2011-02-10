@@ -1,0 +1,35 @@
+<div class="content-box">
+    <h2>#i18n{search.solr.adminFeature.configuration.sort.title}</h2>
+	<p>#i18n{search.solr.adminFeature.configuration.sort.description}</p>
+<br/>
+<form method="get" name="doSort" action="jsp/admin/search/solr/DoSort.jsp" >
+	<table>
+		<#list field_list as field>
+			<#if field.isSort >
+				<tr>
+					<td>${field.label}</td>
+					<td>
+						<#if field.enableSort >
+							<input name="${field.idField}" class="checkbox" type="checkbox" value="${field.idField}" checked/>
+						<#else>
+							<input name="${field.idField}" class="checkbox" type="checkbox" value="${field.idField}" />
+						</#if>					
+						
+					</td>
+					<td>
+						<#if field.defaultSort >
+							<input name="default_sort" class="radio" type="radio" value="${field.idField}" checked/>
+						<#else>
+							<input name="default_sort" class="radio" type="radio" value="${field.idField}" />
+						</#if>					
+					</td>
+					<td>${field.description}</td>
+				</tr>
+			</#if>					
+		</#list>
+	</table>
+	<br/>
+    <input class="button" type="submit" value="#i18n{portal.util.labelValidate}" />
+    <input class="button" type="button" value="#i18n{portal.util.labelCancel}" onClick="javascript:history.go(-1);" />
+</form>
+</div>

@@ -1,0 +1,81 @@
+<#setting url_escaping_charset='ISO-8859-1'>
+<div class="content-box">
+	<#if create>
+    	<h2>#i18n{search.solr.adminFeature.fields.form.create.title}</h2>
+	<#else>
+    	<h2>#i18n{search.solr.adminFeature.fields.form.update.title}</h2>
+	</#if>
+<br/>
+<form method="get" name="doFields" action="jsp/admin/search/solr/ManageSolrFields.jsp" enctype="text/plain" accept-charset="ISO-8859-1">
+	<table>
+		<input type="hidden" name="id" value="${field.idField}" />
+		<tr>
+			<td>
+				#i18n{search.solr.adminFeature.fields.form.name} :
+			</td>
+			<td>
+				<input type="text" name="name" value="${field.name}"/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				#i18n{search.solr.adminFeature.fields.form.label} :
+			</td>
+			<td>
+				<input type="text" name="label" value="${field.label}"/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				#i18n{search.solr.adminFeature.fields.form.type} :
+			</td>
+			<td>
+				<SELECT name="type" size="1">
+					<#list attribute_types as att_type>
+						<OPTION <#if field.type=att_type.code> selected </#if> >${att_type.code}</OPTION>
+					</#list>
+				</SELECT>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				#i18n{search.solr.adminFeature.fields.form.facet} :
+			</td>
+			<td>
+				<#if field.isFacet>
+					<input type="checkbox" name="isfacet" checked />
+				<#else>
+					<input type="checkbox" name="isfacet" />
+				</#if>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				#i18n{search.solr.adminFeature.fields.form.sort} :
+			</td>
+			<td>
+				<#if field.isSort>
+					<input type="checkbox" name="issort" checked />
+				<#else>
+					<input type="checkbox" name="issort" />
+				</#if>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				#i18n{search.solr.adminFeature.fields.form.description} :
+			</td>
+			<td>
+				<input type="text" name="description" value="${field.description}"/>
+			</td>
+		</tr>
+	</table>
+	<br/>
+	<#if create>
+    	<input class="button" type="submit" value="Create" name="create"/>
+	<#else>
+    	<input class="button" type="submit" value="Update" name="update" />
+	</#if>
+    <input class="button" type="button" value="#i18n{portal.util.labelCancel}" onClick="javascript:history.go(-1);" />
+</form>
+</div>

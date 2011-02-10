@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+    <!--                  Data Access Objects (DAO)                   -->
+    <bean id="fieldDAO" class="fr.paris.lutece.plugins.search.solr.business.field.FieldDAO" />
+    <bean id="facetIntersectionDAO" class="fr.paris.lutece.plugins.search.solr.business.facetIntersection.FacetIntersectionDAO" />
+	
+</beans>

@@ -1,0 +1,53 @@
+<div class="content-box">
+    <h2>#i18n{search.solr.adminFeature.configuration.intersection.title}</h2>
+	<p>#i18n{search.solr.adminFeature.configuration.intersection.description}</p>
+<br/>
+	<table>
+		<th>#i18n{search.solr.adminFeature.configuration.intersection.field1}</th>
+		<th>#i18n{search.solr.adminFeature.configuration.intersection.field2}</th>
+		<th>#i18n{search.solr.adminFeature.fields.form.actions}</th>
+			<#list intersections as intersect>
+			<tr>
+				<form method="get" name="deleteIntersection" action="jsp/admin/search/solr/DoIntersection.jsp" >
+				<td>
+					<input type="hidden" name="field1" value="${intersect.field1.idField}" />
+					${intersect.field1.label}
+				</td>
+				<td>
+					<input type="hidden" name="field2" value="${intersect.field2.idField}" />
+					${intersect.field2.label}
+				</td>
+				<td>
+					<input class="button" type="submit" value="Delete" name="delete" />
+				</td>
+				</form>
+			</tr>
+			</#list>
+		<form method="get" name="addIntersection" action="jsp/admin/search/solr/DoIntersection.jsp" >
+			<tr>
+				<td>
+					<select name="field1" size="1">
+					<#list field_list as field>
+						<#if field.isFacet >
+							<option value="${field.idField}">${field.label}</option>
+						</#if>
+					</#list>
+					</select>
+				</td>
+				<td>
+					<select name="field2" size="1">
+					<#list field_list as field>
+						<#if field.isFacet >
+							<option value="${field.idField}">${field.label}</option>
+						</#if>
+					</#list>
+					</select>
+				</td>
+				<td>
+					<input class="button" type="submit" value="Add" name="add" />
+				</td>
+			</tr>
+		</form>
+	</table>
+	<br/>
+</div>
