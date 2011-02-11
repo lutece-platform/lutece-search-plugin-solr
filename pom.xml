@@ -64,6 +64,6 @@
     <scm>
         <connection>scm:svn:http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/technical/plugin-solr</connection>
         <developerConnection>scm:svn:https://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/technical/plugin-solr</developerConnection>
-        <url>http://dev.lutece.paris.fr/viewvc/portal/trunk/plugins/technical/plugin-solr</url>
+        <url>http://dev.lutece.paris.fr/viewvc/lutece/portal/trunk/plugins/technical/plugin-solr</url>
     </scm>
 </project>
