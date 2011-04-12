@@ -37,7 +37,8 @@ import fr.paris.lutece.plugins.search.solr.business.SolrServerService;
 import fr.paris.lutece.portal.business.page.Page;
 import fr.paris.lutece.portal.business.page.PageHome;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
-import fr.paris.lutece.portal.service.page.PageService;
+import fr.paris.lutece.portal.service.page.IPageService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.url.UrlItem;
@@ -71,6 +72,7 @@ public class SolrPageIndexer implements SolrIndexer
     private static final String PROPERTY_PAGE_BASE_URL = "document.documentIndexer.baseUrl";
     private static final String SITE_URL = AppPropertiesService.getProperty( PROPERTY_PAGE_BASE_URL );
     private static final String PROPERTY_INDEXER_ENABLE = "solr.indexer.page.enable";
+    private static final String BEAN_PAGE_SERVICE = "pageService";
 
     /**
      * Creates a new SolrPageIndexer
@@ -154,7 +156,7 @@ public class SolrPageIndexer implements SolrIndexer
         SolrItem item = new SolrItem(  );
 
         // indexing page content
-        String strPageContent = PageService.getInstance(  ).getPageContent( page.getId(  ), 0, null );
+        String strPageContent = ( (IPageService) SpringContextService.getBean( BEAN_PAGE_SERVICE ) ).getPageContent( page.getId(  ), 0, null );
         StringReader readerPage = new StringReader( strPageContent );
         HTMLParser parser = new HTMLParser( readerPage );
 
