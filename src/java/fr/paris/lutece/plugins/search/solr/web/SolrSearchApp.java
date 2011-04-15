@@ -42,6 +42,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.solr.client.solrj.response.SpellCheckResponse;
+
 import fr.paris.lutece.plugins.search.solr.business.SolrFacetedResult;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchResult;
@@ -208,7 +210,11 @@ public class SolrSearchApp implements XPageApplication
         model.put( MARK_HISTORIQUE, sfm.getCurrentFacet(  ) );
         if( strQuery != null && strQuery.compareToIgnoreCase( ALL_SEARCH_QUERY )!=0 )
         {
-        	model.put( MARK_SUGGESTION, engine.getSpellChecker( strQuery ).getCollatedResult(  ) );
+        	SpellCheckResponse checkResponse = engine.getSpellChecker( strQuery );
+        	if( checkResponse != null )
+        	{
+        		model.put( MARK_SUGGESTION, checkResponse.getCollatedResult(  ) );
+        	}
         }
         model.put( MARK_SORT_NAME, sort );
         model.put( MARK_SORT_ORDER, order );

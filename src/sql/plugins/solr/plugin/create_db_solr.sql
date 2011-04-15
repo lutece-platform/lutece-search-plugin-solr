@@ -7,7 +7,6 @@ CREATE TABLE solr_fields (
 	name varchar(30) default NULL,
 	label varchar(30) default NULL,
 	description varchar(255) default NULL,
-	type varchar(30) default NULL,
 	is_facet boolean default false,
 	enable_facet boolean default false,
 	is_sort boolean default false,

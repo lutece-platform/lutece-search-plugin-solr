@@ -59,36 +59,12 @@
 		</admin-feature>
 	</admin-features>
 	
-		<!-- Content Service -->
-	<content-services>
-		<content-service>
-			<content-service-class>
-				fr.paris.lutece.plugins.search.solr.business.document.SolrDocumentContentService
-			</content-service-class>
-		</content-service>
-	</content-services>
-	
-		<!-- Search Indexer Service -->
-	<!--<search-indexers>
-		<search-indexer>
-			<search-indexer-class>
-				fr.paris.lutece.plugins.search.solr.indexer.SolrPageIndexer
-			</search-indexer-class>
-		</search-indexer>
-		<search-indexer>
-			<search-indexer-class>
-				fr.paris.lutece.plugins.search.solr.indexer.SolrDocIndexer
-			</search-indexer-class>
-		</search-indexer>
-	</search-indexers>-->
-	
-	
 	<!-- Specific javascripts -->
     <javascript-files>
         <javascript-file>solr/jquery.autocomplete.js</javascript-file>
     </javascript-files>
 	
-	    <!-- Specific plugin CSS stylesheets -->
+	<!-- Specific plugin CSS stylesheets -->
     <css-stylesheets>
         <css-stylesheet>solr/jquery.autocomplete.css</css-stylesheet>
     </css-stylesheets>

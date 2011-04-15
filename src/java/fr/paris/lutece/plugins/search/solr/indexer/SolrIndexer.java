@@ -33,6 +33,11 @@
  */
 package fr.paris.lutece.plugins.search.solr.indexer;
 
+import java.util.List;
+import java.util.Map;
+
+import fr.paris.lutece.plugins.search.solr.business.field.Field;
+
 
 /**
  *
@@ -43,9 +48,9 @@ public interface SolrIndexer
 {
     /**
      * Indexes data.
-     * @return the logs.
+     * @return mapDatas Map wich associates logs to indexed datas.
      */
-    String index(  );
+	Map<String, SolrItem> index(  );
 
     /**
      * Returns the name of the indexer.
@@ -70,4 +75,10 @@ public interface SolrIndexer
      * @return true if enable, otherwise false
      */
     boolean isEnable(  );
+    
+    /**
+     * Returns the list of dynamic fields. The name of the fields must end with a {@link SolrItem} suffix (SolrItem.DYNAMIC_URL_FIELD_SUFFIX, SolrItem.DYNAMIC_TEXT_FIELD_SUFFIX ...)
+     * @return the list of additional indexed fields
+     */
+    List<Field> getAdditionalFields(  );
 }

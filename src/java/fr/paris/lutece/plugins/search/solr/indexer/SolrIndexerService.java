@@ -33,11 +33,21 @@
  */
 package fr.paris.lutece.plugins.search.solr.indexer;
 
-import fr.paris.lutece.portal.service.util.AppLogService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
-
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrInputDocument;
+
+import fr.paris.lutece.plugins.search.solr.business.SolrServerService;
+import fr.paris.lutece.plugins.search.solr.business.field.Field;
+import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
+import fr.paris.lutece.portal.service.search.SearchItem;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 
 
 /**
@@ -47,8 +57,8 @@ import java.util.List;
  */
 public final class SolrIndexerService
 {
+	private static final SolrServer SOLR_SERVER = SolrServerService.getInstance(  ).getSolrServer(  );
     private static final List<SolrIndexer> INDEXERS = initIndexersList(  );
-    private static final String PROPERTY_INDEXERS = "solr.indexers";
 
     /**
      * Empty private constructor
@@ -76,47 +86,90 @@ public final class SolrIndexerService
 
         for ( SolrIndexer solrIndexer : INDEXERS )
         {
-            sbLogs.append( solrIndexer.getName(  ) );
-            sbLogs.append( " " );
+        	Map<String, SolrItem> mapDatas = solrIndexer.index( );
+        	sbLogs.append( solrIndexer.getName(  ) );
+            sbLogs.append( SolrConstants.CONSTANT_SPACE );
             sbLogs.append( solrIndexer.getVersion(  ) );
-            sbLogs.append( "<br/>" );
-            sbLogs.append( solrIndexer.index(  ) );
-            sbLogs.append( "<br/>" );
+            sbLogs.append( SolrConstants.CONSTANT_BR_TAG );
+            for( String strLog : mapDatas.keySet() )
+            {
+            	try
+				{
+            		//Converts the SolrItem object to SolrInputDocument
+            		SolrInputDocument solrInputDocument = solrItem2SolrInputDocument( mapDatas.get( strLog ) );
+					SOLR_SERVER.add( solrInputDocument );
+					SOLR_SERVER.commit();
+	            	sbLogs.append( strLog );
+				}
+				catch ( IOException e )
+				{
+					AppLogService.error( e.getMessage(  ), e );
+				}
+				catch ( SolrServerException e )
+				{
+					AppLogService.error( e.getMessage(  ), e );
+				}
+            }
+            sbLogs.append( SolrConstants.CONSTANT_BR_TAG );
         }
-
+        
         return sbLogs.toString(  );
     }
 
+    /**
+     * Returns the list of all dynamic fields.
+     * @return the list of all additional fields
+     */
+    public static List<Field> getAdditionalFields(  )
+    {
+    	List<Field> lstFields = new ArrayList<Field>();
+    	for ( SolrIndexer solrIndexer : INDEXERS )
+        {
+    		lstFields.addAll( solrIndexer.getAdditionalFields() );
+        }
+    	
+    	return lstFields;
+    }
+    
+    /**
+     * Convert a {@link SolrItem} object into a {@link SolrInputDocument} object
+     * @param solrItem the item to convert
+     * @return A {@link SolrInputDocument} object corresponding to the item parameter
+     */
+    private static SolrInputDocument solrItem2SolrInputDocument( SolrItem solrItem )
+    {
+    	SolrInputDocument solrInputDocument = new SolrInputDocument();
+    	
+    	solrInputDocument.addField( SearchItem.FIELD_UID, solrItem.getUid() );
+    	solrInputDocument.addField( SearchItem.FIELD_DATE, solrItem.getDate() );
+    	solrInputDocument.addField( SearchItem.FIELD_TYPE, solrItem.getType(  ) );
+    	solrInputDocument.addField( SearchItem.FIELD_SUMMARY, solrItem.getSummary(  ) );
+    	solrInputDocument.addField( SearchItem.FIELD_TITLE, solrItem.getTitle(  ) );
+    	solrInputDocument.addField( SolrItem.FIELD_SITE, solrItem.getSite() );
+    	solrInputDocument.addField( SearchItem.FIELD_ROLE, solrItem.getRole() );
+    	solrInputDocument.addField( SolrItem.FIELD_XML_CONTENT, solrItem.getXmlContent() );
+    	solrInputDocument.addField( SearchItem.FIELD_URL, solrItem.getUrl() );
+    	solrInputDocument.addField( SolrItem.FIELD_HIERATCHY_DATE, solrItem.getHieDate() );
+    	solrInputDocument.addField( SolrItem.FIELD_CATEGORIE, solrItem.getCategorie() );
+    	solrInputDocument.addField( SolrItem.FIELD_CONTENT, solrItem.getContent() );
+
+    	// Add the dynamic fields
+    	// They must be declared into the schema.xml of the solr server
+    	Map<String, Object> mapDynamicFields = solrItem.getDynamicFields(); 
+		for( String strDynamicField : mapDynamicFields.keySet() )
+		{
+			solrInputDocument.addField( strDynamicField, mapDynamicFields.get( strDynamicField ) );
+		}
+    	
+    	return solrInputDocument;
+    }
+    
     /**
      * Initialize the indexers List.
      * @return the indexers List
      */
     private static List<SolrIndexer> initIndexersList(  )
     {
-        String strIndexers = AppPropertiesService.getProperty( PROPERTY_INDEXERS );
-        String[] indexersClasses = strIndexers.split( "," );
-        List<SolrIndexer> solrIndexers = new ArrayList<SolrIndexer>(  );
-
-        for ( String indexerClass : indexersClasses )
-        {
-            try
-            {
-                solrIndexers.add( (SolrIndexer) Class.forName( indexerClass ).newInstance(  ) );
-            }
-            catch ( InstantiationException e )
-            {
-                AppLogService.error( e.getMessage(  ), e );
-            }
-            catch ( IllegalAccessException e )
-            {
-                AppLogService.error( e.getMessage(  ), e );
-            }
-            catch ( ClassNotFoundException e )
-            {
-                AppLogService.error( e.getMessage(  ), e );
-            }
-        }
-
-        return solrIndexers;
+        return SpringContextService.getBeansOfType( SolrIndexer.class );
     }
 }

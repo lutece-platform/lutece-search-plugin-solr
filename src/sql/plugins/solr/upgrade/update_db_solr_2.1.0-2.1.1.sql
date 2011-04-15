@@ -1,0 +1,1 @@
+ALTER TABLE solr_fields DROP COLUMN type;

@@ -47,11 +47,11 @@ public final class FieldDAO implements IFieldDAO
 {
     // Constants
     private static final String SQL_QUERY_NEW_PK = "SELECT max( id_field ) FROM solr_fields";
-    private static final String SQL_QUERY_SELECT = "SELECT id_field, name, label, type, description, is_facet, enable_facet, is_sort, enable_sort, default_sort FROM solr_fields WHERE id_field = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO solr_fields ( id_field, name, label, type, description, is_facet, enable_facet, is_sort, enable_sort, default_sort ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_SELECT = "SELECT id_field, name, label, description, is_facet, enable_facet, is_sort, enable_sort, default_sort FROM solr_fields WHERE id_field = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO solr_fields ( id_field, name, label, description, is_facet, enable_facet, is_sort, enable_sort, default_sort ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM solr_fields WHERE id_field = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE solr_fields SET id_field = ?, name = ?, label = ?, type = ?, description = ?, is_facet = ?, enable_facet = ?, is_sort = ?, enable_sort = ?, default_sort = ? WHERE id_field = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_field, name, label, type, description, is_facet, enable_facet, is_sort, enable_sort, default_sort FROM solr_fields";
+    private static final String SQL_QUERY_UPDATE = "UPDATE solr_fields SET id_field = ?, name = ?, label = ?, description = ?, is_facet = ?, enable_facet = ?, is_sort = ?, enable_sort = ?, default_sort = ? WHERE id_field = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_field, name, label, description, is_facet, enable_facet, is_sort, enable_sort, default_sort FROM solr_fields";
 
     /**
      * Generates a new primary key
@@ -88,16 +88,16 @@ public final class FieldDAO implements IFieldDAO
 
         field.setIdField( newPrimaryKey( plugin ) );
 
-        daoUtil.setInt( 1, field.getIdField(  ) );
-        daoUtil.setString( 2, field.getName(  ) );
-        daoUtil.setString( 3, field.getLabel(  ) );
-        daoUtil.setString( 4, field.getType(  ) );
-        daoUtil.setString( 5, field.getDescription(  ) );
-        daoUtil.setBoolean( 6, field.getIsFacet(  ) );
-        daoUtil.setBoolean( 7, field.getEnableFacet(  ) );
-        daoUtil.setBoolean( 8, field.getIsSort(  ) );
-        daoUtil.setBoolean( 9, field.getEnableSort(  ) );
-        daoUtil.setBoolean( 10, field.getDefaultSort(  ) );
+        int i = 1;
+        daoUtil.setInt( i++, field.getIdField(  ) );
+        daoUtil.setString( i++, field.getName(  ) );
+        daoUtil.setString( i++, field.getLabel(  ) );
+        daoUtil.setString( i++, field.getDescription(  ) );
+        daoUtil.setBoolean( i++, field.getIsFacet(  ) );
+        daoUtil.setBoolean( i++, field.getEnableFacet(  ) );
+        daoUtil.setBoolean( i++, field.getIsSort(  ) );
+        daoUtil.setBoolean( i++, field.getEnableSort(  ) );
+        daoUtil.setBoolean( i++, field.getDefaultSort(  ) );
 
         daoUtil.executeUpdate(  );
         daoUtil.free(  );
@@ -121,16 +121,16 @@ public final class FieldDAO implements IFieldDAO
         {
             field = new Field(  );
 
-            field.setIdField( daoUtil.getInt( 1 ) );
-            field.setName( daoUtil.getString( 2 ) );
-            field.setLabel( daoUtil.getString( 3 ) );
-            field.setType( daoUtil.getString( 4 ) );
-            field.setDescription( daoUtil.getString( 5 ) );
-            field.setIsFacet( daoUtil.getBoolean( 6 ) );
-            field.setEnableFacet( daoUtil.getBoolean( 7 ) );
-            field.setIsSort( daoUtil.getBoolean( 8 ) );
-            field.setEnableSort( daoUtil.getBoolean( 9 ) );
-            field.setDefaultSort( daoUtil.getBoolean( 10 ) );
+            int i = 1;
+            field.setIdField( daoUtil.getInt( i++ ) );
+            field.setName( daoUtil.getString( i++ ) );
+            field.setLabel( daoUtil.getString( i++ ) );
+            field.setDescription( daoUtil.getString( i++ ) );
+            field.setIsFacet( daoUtil.getBoolean( i++ ) );
+            field.setEnableFacet( daoUtil.getBoolean( i++ ) );
+            field.setIsSort( daoUtil.getBoolean( i++ ) );
+            field.setEnableSort( daoUtil.getBoolean( i++ ) );
+            field.setDefaultSort( daoUtil.getBoolean( i++ ) );
         }
 
         daoUtil.free(  );
@@ -160,17 +160,17 @@ public final class FieldDAO implements IFieldDAO
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin );
 
-        daoUtil.setInt( 1, field.getIdField(  ) );
-        daoUtil.setString( 2, field.getName(  ) );
-        daoUtil.setString( 3, field.getLabel(  ) );
-        daoUtil.setString( 4, field.getType(  ) );
-        daoUtil.setString( 5, field.getDescription(  ) );
-        daoUtil.setBoolean( 6, field.getIsFacet(  ) );
-        daoUtil.setBoolean( 7, field.getEnableFacet(  ) );
-        daoUtil.setBoolean( 8, field.getIsSort(  ) );
-        daoUtil.setBoolean( 9, field.getEnableSort(  ) );
-        daoUtil.setBoolean( 10, field.getDefaultSort(  ) );
-        daoUtil.setInt( 11, field.getIdField(  ) );
+        int i = 1;
+        daoUtil.setInt( i++, field.getIdField(  ) );
+        daoUtil.setString( i++, field.getName(  ) );
+        daoUtil.setString( i++, field.getLabel(  ) );
+        daoUtil.setString( i++, field.getDescription(  ) );
+        daoUtil.setBoolean( i++, field.getIsFacet(  ) );
+        daoUtil.setBoolean( i++, field.getEnableFacet(  ) );
+        daoUtil.setBoolean( i++, field.getIsSort(  ) );
+        daoUtil.setBoolean( i++, field.getEnableSort(  ) );
+        daoUtil.setBoolean( i++, field.getDefaultSort(  ) );
+        daoUtil.setInt( i++, field.getIdField(  ) );
 
         daoUtil.executeUpdate(  );
         daoUtil.free(  );
@@ -191,16 +191,16 @@ public final class FieldDAO implements IFieldDAO
         {
             Field field = new Field(  );
 
-            field.setIdField( daoUtil.getInt( 1 ) );
-            field.setName( daoUtil.getString( 2 ) );
-            field.setLabel( daoUtil.getString( 3 ) );
-            field.setType( daoUtil.getString( 4 ) );
-            field.setDescription( daoUtil.getString( 5 ) );
-            field.setIsFacet( daoUtil.getBoolean( 6 ) );
-            field.setEnableFacet( daoUtil.getBoolean( 7 ) );
-            field.setIsSort( daoUtil.getBoolean( 8 ) );
-            field.setEnableSort( daoUtil.getBoolean( 9 ) );
-            field.setDefaultSort( daoUtil.getBoolean( 10 ) );
+            int i = 1;
+            field.setIdField( daoUtil.getInt( i++ ) );
+            field.setName( daoUtil.getString( i++ ) );
+            field.setLabel( daoUtil.getString( i++ ) );
+            field.setDescription( daoUtil.getString( i++ ) );
+            field.setIsFacet( daoUtil.getBoolean( i++ ) );
+            field.setEnableFacet( daoUtil.getBoolean( i++ ) );
+            field.setIsSort( daoUtil.getBoolean( i++ ) );
+            field.setEnableSort( daoUtil.getBoolean( i++ ) );
+            field.setDefaultSort( daoUtil.getBoolean( i++ ) );
 
             fieldList.add( field );
         }

@@ -161,6 +161,33 @@ public class SolrFieldManager
         return intersectionList;
     }
 
+    /**
+     * Adds all fields of the given parameter list if they are not already in databse. Two fields with the same name are equals 
+     * @param lstFields the fields list to add
+     */
+    public static void updateFields( List<Field> lstFields )
+    {
+    	List<Field> lstAllFields = FieldHome.getFieldsList();
+    	for( Field field : lstFields )
+    	{
+    		boolean bInsert = true;
+    		// Search the field with its name
+    		for( Field actualField : lstAllFields )
+    		{
+    			if( actualField.getName() != null && actualField.getName().equals( field.getName() ) )
+    			{
+    				// A field with the same name already exists => we don't insert it
+    				bInsert = false;
+    				break;
+    			}
+    		}
+    		if( bInsert )
+    		{
+    			FieldHome.create( field );
+    		}
+    	}
+    }
+    
     public class FacetHistorique
     {
         public String name;

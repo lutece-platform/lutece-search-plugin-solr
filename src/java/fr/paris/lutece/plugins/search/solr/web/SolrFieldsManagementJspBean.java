@@ -33,21 +33,19 @@
  */
 package fr.paris.lutece.plugins.search.solr.web;
 
-import fr.paris.lutece.plugins.document.business.attributes.AttributeTypeHome;
-import fr.paris.lutece.plugins.search.solr.business.field.Field;
-import fr.paris.lutece.plugins.search.solr.business.field.FieldHome;
-import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
-import fr.paris.lutece.portal.service.template.AppTemplateService;
-import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
-import fr.paris.lutece.util.html.HtmlTemplate;
-
 import java.io.UnsupportedEncodingException;
-
 import java.net.URLDecoder;
-
 import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
+
+import fr.paris.lutece.plugins.search.solr.business.field.Field;
+import fr.paris.lutece.plugins.search.solr.business.field.FieldHome;
+import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
+import fr.paris.lutece.plugins.search.solr.indexer.SolrIndexerService;
+import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
+import fr.paris.lutece.util.html.HtmlTemplate;
 
 
 /**
@@ -82,6 +80,10 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
 
     public String getPage( HttpServletRequest request )
     {
+    	// Update fields to add dynamic fields of indexers
+    	SolrFieldManager.updateFields( SolrIndexerService.getAdditionalFields() );
+    	SolrFieldManager.reloadField(  );
+    	
         StringBuffer htmlBuffer = new StringBuffer(  );
         htmlBuffer.append( this.getFieldList( request ) );
 
@@ -92,9 +94,6 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
     {
         HashMap<String, Object> model = new HashMap<String, Object>(  );
 
-        //load document attribute type(numerictext, listbox ...)
-        model.put( "attribute_types", AttributeTypeHome.findAll(  ) );
-
         //UPDATE
         if ( request.getParameter( "update" ) != null )
         {
@@ -104,10 +103,10 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
             Field updateField = FieldHome.findByPrimaryKey( Integer.parseInt( request.getParameter( "id" ) ) );
             model.put( "field", updateField );
 
-            //CREATE
         }
         else if ( request.getParameter( "create" ) != null )
         {
+        	//CREATE
             Field createField = new Field(  );
             model.put( "create", true );
             model.put( "field", createField );
@@ -164,7 +163,6 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
             e.printStackTrace(  );
         }
 
-        field.setType( request.getParameter( "type" ) );
         field.setIsFacet( request.getParameter( "isfacet" ) != null );
         field.setIsSort( request.getParameter( "issort" ) != null );
 
@@ -190,7 +188,6 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
             e.printStackTrace(  );
         }
 
-        field.setType( request.getParameter( "type" ) );
         field.setIsFacet( request.getParameter( "isfacet" ) != null );
         field.setEnableFacet( false );
         field.setIsSort( request.getParameter( "issort" ) != null );

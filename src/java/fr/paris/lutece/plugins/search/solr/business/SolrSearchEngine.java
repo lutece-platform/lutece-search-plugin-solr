@@ -254,7 +254,7 @@ public class SolrSearchEngine implements SearchEngine
                 results = SolrUtil.transformSolrItemsToSolrSearchResults( itemList, highlights );
 
                 //Date facet
-                if ( !response.getFacetDates(  ).isEmpty(  ) )
+                if ( response.getFacetDates(  ) != null && !response.getFacetDates(  ).isEmpty(  ) )
                 {
                     facetedResult.setFacetDateList( response.getFacetDates(  ) );
                 }

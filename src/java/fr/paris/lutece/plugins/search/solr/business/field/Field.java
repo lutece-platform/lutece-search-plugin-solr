@@ -43,7 +43,6 @@ public class Field
     private int _nIdField;
     private String _strName;
     private String _strLabel;
-    private String _strType;
     private String _strDescription;
     private boolean _IsFacet;
     private boolean _EnableFacet;
@@ -55,7 +54,6 @@ public class Field
     {
         this._strName = "";
         this._strLabel = "";
-        this._strType = "";
         this._strDescription = "";
         this._IsFacet = false;
         this._EnableFacet = false;
@@ -66,14 +64,7 @@ public class Field
 
     public String getSolrName(  )
     {
-        if ( "".equals( this._strType ) )
-        {
-            return this._strName;
-        }
-        else
-        {
-            return this._strName + "_" + this._strType;
-        }
+    	return this._strName;
     }
 
     /**
@@ -128,24 +119,6 @@ public class Field
     public void setLabel( String strLabel )
     {
         _strLabel = strLabel;
-    }
-
-    /**
-     * Returns the Type
-     * @return The Type
-     */
-    public String getType(  )
-    {
-        return _strType;
-    }
-
-    /**
-     * Sets the Type
-     * @param strType The Type
-     */
-    public void setType( String strType )
-    {
-        _strType = strType;
     }
 
     /**

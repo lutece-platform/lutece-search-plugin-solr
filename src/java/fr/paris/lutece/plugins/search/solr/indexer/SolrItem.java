@@ -33,13 +33,14 @@
  */
 package fr.paris.lutece.plugins.search.solr.indexer;
 
-import fr.paris.lutece.portal.service.search.SearchItem;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.solr.client.solrj.beans.Field;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import fr.paris.lutece.portal.service.search.SearchItem;
 
 
 /**
@@ -54,6 +55,14 @@ public class SolrItem
     public static final String FIELD_XML_CONTENT = "xml_content";
     public static final String FIELD_CATEGORIE = "categorie";
     public static final String FIELD_HIERATCHY_DATE = "hiedate";
+    public static final String FIELD_METADATA = "metadata";
+    public static final String DYNAMIC_STRING_FIELD_SUFFIX = "_string";
+    public static final String DYNAMIC_TEXT_FIELD_SUFFIX = "_text";
+    public static final String DYNAMIC_URL_FIELD_SUFFIX = "_url";
+    public static final String DYNAMIC_DATE_FIELD_SUFFIX = "_date";
+    public static final String DYNAMIC_LONG_FIELD_SUFFIX = "_long";
+    public static final String DYNAMIC_LIST_FIELD_SUFFIX = "_list";
+    
     @Field( SearchItem.FIELD_URL )
     private String _strUrl;
     @Field( SearchItem.FIELD_DATE )
@@ -78,121 +87,128 @@ public class SolrItem
     private List<String> _strCategorie;
     @Field( FIELD_HIERATCHY_DATE )
     private String _strHieDate;
+    @Field( FIELD_METADATA )
+    private String _strMetadata;
 
     //DynamicField
-    @Field( "*_listbox" )
-    private Map<String, List<String>> dfListBox;
-    @Field( "*_multiline" )
-    private Map<String, String> dfMultiLine;
-    @Field( "*_richtext" )
-    private Map<String, String> dfRichText;
-    @Field( "*_text" )
-    private Map<String, String> dfText;
-    @Field( "*_url" )
-    private Map<String, String> dfUrl;
-    @Field( "*_date" )
-    private Map<String, Date> dfDate;
-    @Field( "*_numerictext" )
-    private Map<String, Long> dfNumericText;
-    @Field( "*_internallink" )
-    private Map<String, String> dfInternalLink;
+    @Field( "*" + DYNAMIC_LIST_FIELD_SUFFIX )
+    private Map<String, List<String>> _dfListBox;
+    @Field( "*" + DYNAMIC_TEXT_FIELD_SUFFIX )
+    private Map<String, String> _dfText;
+    @Field( "*" + DYNAMIC_STRING_FIELD_SUFFIX )
+    private Map<String, String> _dfString;
+    @Field( "*" + DYNAMIC_DATE_FIELD_SUFFIX )
+    private Map<String, Date> _dfDate;
+    @Field( "*" + DYNAMIC_LONG_FIELD_SUFFIX )
+    private Map<String, Long> _dfNumericText;
 
-    /**
+	/**
      * Creates a new SolrItem
      */
     public SolrItem(  )
     {
     }
 
-    /*******************/
-    /** DYNAMIC FIELD **/
-    /*******************/
-    public Map<String, List<String>> getDfListBox(  )
+    /**
+     * Returns list of all dynamic fields
+     * @return the list of all dynamic fields
+     */
+    public Map<String,Object> getDynamicFields()
     {
-        return dfListBox;
+    	Map<String,Object> mapDynamicFields = new HashMap<String, Object>();
+    	
+    	if( _dfString != null )
+    	{
+    		mapDynamicFields.putAll( _dfString );
+    	}
+		if ( _dfDate != null )
+		{
+			mapDynamicFields.putAll( _dfDate );
+		}
+		if ( _dfListBox != null )
+		{
+			mapDynamicFields.putAll( _dfListBox );
+		}
+		if ( _dfNumericText != null )
+		{
+			mapDynamicFields.putAll( _dfNumericText );
+		}
+		if ( _dfText != null )
+		{
+			mapDynamicFields.putAll( _dfText );
+    	}
+    	
+    	return mapDynamicFields;
+    }
+    
+    /**
+     * Add a dynamic field
+     * @param strName the name of the field
+     * @param dValue the value of the field
+     */
+    public void addDynamicField( String strName, Date dValue )
+    {
+    	if( _dfDate == null )
+    	{
+    		_dfDate = new HashMap<String, Date>();
+    	}
+        _dfDate.put( strName + DYNAMIC_DATE_FIELD_SUFFIX, dValue );
+    }
+    
+    /**
+     * Add a dynamic field
+     * @param strName the name of the field
+     * @param dValue the value of the field
+     */
+    public void addDynamicField( String strName, Long lValue )
+    {
+    	if( _dfNumericText == null )
+    	{
+    		_dfNumericText = new HashMap<String, Long>();
+    	}
+    	_dfNumericText.put( strName + DYNAMIC_LONG_FIELD_SUFFIX, lValue );
+    }
+    
+    /**
+     * Add a dynamic field
+     * @param strName the name of the field
+     * @param dValue the value of the field
+     */
+    public void addDynamicField( String strName, String strValue )
+    {
+    	if( _dfText == null )
+    	{
+    		_dfText = new HashMap<String, String>();
+    	}
+    	_dfText.put( strName + DYNAMIC_TEXT_FIELD_SUFFIX, strValue );
+    }
+    
+    /**
+     * Add a dynamic field
+     * @param strName the name of the field
+     * @param dValue the value of the field
+     */
+    public void addDynamicField( String strName, List<String> strValue )
+    {
+    	if( _dfListBox == null )
+    	{
+    		_dfListBox = new HashMap<String, List<String>>();
+    	}
+    	_dfListBox.put( strName + DYNAMIC_LIST_FIELD_SUFFIX, strValue );
     }
 
-    public void setDfListBox( Map<String, List<String>> dfListBox )
+    /**
+     * Add a dynamic field
+     * @param strName the name of the field
+     * @param dValue the value of the field
+     */
+    public void addDynamicFieldNotAnalysed( String strName, String strValue )
     {
-        this.dfListBox = dfListBox;
-    }
-
-    public Map<String, String> getDfMultiLine(  )
-    {
-        return dfMultiLine;
-    }
-
-    public void setDfMultiLine( Map<String, String> dfMultiLine )
-    {
-        this.dfMultiLine = dfMultiLine;
-    }
-
-    public Map<String, String> getDfRichText(  )
-    {
-        return dfRichText;
-    }
-
-    public void setDfRichText( Map<String, String> dfRichText )
-    {
-        this.dfRichText = dfRichText;
-    }
-
-    public Map<String, String> getDfText(  )
-    {
-        return dfText;
-    }
-
-    public void setDfText( Map<String, String> dfText )
-    {
-        this.dfText = dfText;
-    }
-
-    public Map<String, String> getDfUrl(  )
-    {
-        return dfUrl;
-    }
-
-    public void setDfUrl( Map<String, String> dfUrl )
-    {
-        this.dfUrl = dfUrl;
-    }
-
-    public Map<String, Date> getDfDate(  )
-    {
-        return dfDate;
-    }
-
-    public void setDfDate( Map<String, Date> dfDate )
-    {
-        this.dfDate = dfDate;
-    }
-
-    public Map<String, Long> getDfNumericText(  )
-    {
-        return dfNumericText;
-    }
-
-    public void setDfNumericText( Map<String, Long> dfNumericText )
-    {
-        this.dfNumericText = dfNumericText;
-    }
-
-    public Map<String, String> getDfInternalLink(  )
-    {
-        return dfInternalLink;
-    }
-
-    public void setDfInternalLink( Map<String, String> dfInternalLink )
-    {
-        this.dfInternalLink = dfInternalLink;
-    }
-
-    public void addDynamiqueField( String name, String value, String Type )
-    {
-        /*if (this.dfString == null) {
-                this.dfString = new HashMap<String, String>();
-        }
-        this.dfString.put(name, value);*/
+    	if( _dfString == null )
+    	{
+    		_dfString = new HashMap<String, String>();
+    	}
+    	_dfString.put( strName + DYNAMIC_STRING_FIELD_SUFFIX, strValue );
     }
 
     /**
@@ -367,16 +383,6 @@ public class SolrItem
         _strXmlContent = strXmlContent;
     }
 
-    /*    public String getCategorie( )
-        {
-                return _strCategorie;
-        }
-    
-        public void setCategorie( String strCategorie )
-        {
-                _strCategorie = strCategorie;
-        }
-     */
     public List<String> getCategorie(  )
     {
         return _strCategorie;
@@ -396,4 +402,22 @@ public class SolrItem
     {
         _strHieDate = strHieDate;
     }
+
+    /**
+     * Gets the metadata
+     * @return the metadata
+     */
+	public String getMetadata()
+	{
+		return _strMetadata;
+	}
+
+	/**
+	 * Sets the metadata
+	 * @param strMetadata the metadata
+	 */
+	public void setMetadata( String strMetadata )
+	{
+		_strMetadata = strMetadata;
+	}
 }

@@ -6,4 +6,7 @@
     <bean id="fieldDAO" class="fr.paris.lutece.plugins.search.solr.business.field.FieldDAO" />
     <bean id="facetIntersectionDAO" class="fr.paris.lutece.plugins.search.solr.business.facetIntersection.FacetIntersectionDAO" />
 	
+    <!--                  		Indexer                  			  -->
+	<bean id="solr.solrPageIndexer" class="fr.paris.lutece.plugins.search.solr.indexer.SolrPageIndexer" />
+	
 </beans>
