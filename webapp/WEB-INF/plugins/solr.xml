@@ -1,71 +1,74 @@
-<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?><plug-in>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<plug-in>
 
-	<!-- Plugin Informations -->
-	<name>solr</name>
-	<class>fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation</class>
-	<version>2.1.1</version>
-	<documentation/>
-	<installation/>
-	<changes/>
-	<user-guide/>
-	<description>search.solr.plugin.description</description>
-	<provider>search.solr.plugin.provider</provider>
-	<provider-url>http://lutece.paris.fr</provider-url>
-	<icon-url>images/admin/skin/plugins/search/solr_FC.jpg</icon-url>
-	<copyright>Copyright 2001-2008 Mairie de Paris</copyright>
-	<core-version-dependency>
-		<min-core-version>2.4.0</min-core-version>
-		<max-core-version/>	
+    <!-- Plugin Informations -->
+    <name>solr</name>
+    <class>fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation</class>
+    <version>2.1.1</version>
+    <documentation />
+    <installation />
+    <changes />
+    <user-guide />
+    <description>search.solr.plugin.description</description>
+    <provider>search.solr.plugin.provider</provider>
+    <provider-url>http://lutece.paris.fr</provider-url>
+    <icon-url>images/admin/skin/plugins/search/solr_FC.jpg</icon-url>
+    <copyright>Copyright 2001-2011 Mairie de Paris</copyright>
+    <core-version-dependency>
+        <min-core-version>2.4.0</min-core-version>
+        <max-core-version />
     </core-version-dependency>
-	<db-pool-required>1</db-pool-required>
+    <db-pool-required>1</db-pool-required>
 
-	<applications>
-		<application>
-			<application-id>search-solr</application-id>
-			<application-class>fr.paris.lutece.plugins.search.solr.web.SolrSearchApp</application-class>
-		</application>
-	</applications>
+    <applications>
+        <application>
+            <application-id>search-solr</application-id>
+            <application-class>fr.paris.lutece.plugins.search.solr.web.SolrSearchApp</application-class>
+        </application>
+    </applications>
 
-	<admin-features>
-		<admin-feature>
-			<feature-id>SOLR_INDEX_MANAGEMENT</feature-id>
-			<feature-title>search.solr.adminFeature.title</feature-title>
-			<feature-description>search.solr.adminFeature.description</feature-description>
-			<feature-level>1</feature-level>
-			<feature-url>jsp/admin/search/solr/ManageSearchIndexation.jsp</feature-url>
-			<feature-icon-url>images/admin/skin/plugins/search/solr_FC.jpg</feature-icon-url>
-			<feature-group>SYSTEM</feature-group>
-			<feature-documentation-url/>
-		</admin-feature>
-		<admin-feature>
-			<feature-id>SOLR_CONFIGURATION_MANAGEMENT</feature-id>
-			<feature-title>search.solr.adminFeature.configuration.title</feature-title>
-			<feature-description>search.solr.adminFeature.configuration.description</feature-description>
-			<feature-level>1</feature-level>
-			<feature-url>jsp/admin/search/solr/ManageSearchConfiguration.jsp</feature-url>
-			<feature-icon-url>images/admin/skin/plugins/search/solr_FC.jpg</feature-icon-url>
-			<feature-group>SYSTEM</feature-group>
-			<feature-documentation-url/>
-		</admin-feature>
-		<admin-feature>
-			<feature-id>SOLR_FIELDS_MANAGEMENT</feature-id>
-			<feature-title>search.solr.adminFeature.fields.title</feature-title>
-			<feature-description>search.solr.adminFeature.fields.description</feature-description>
-			<feature-level>1</feature-level>
-			<feature-url>jsp/admin/search/solr/ManageSolrFields.jsp</feature-url>
-			<feature-icon-url>images/admin/skin/plugins/search/solr_FC.jpg</feature-icon-url>
-			<feature-group>SYSTEM</feature-group>
-			<feature-documentation-url/>
-		</admin-feature>
-	</admin-features>
-	
-	<!-- Specific javascripts -->
+    <admin-features>
+        <admin-feature>
+            <feature-id>SOLR_INDEX_MANAGEMENT</feature-id>
+            <feature-title>search.solr.adminFeature.title</feature-title>
+            <feature-description>search.solr.adminFeature.description</feature-description>
+            <feature-level>1</feature-level>
+            <feature-url>jsp/admin/search/solr/ManageSearchIndexation.jsp</feature-url>
+            <feature-icon-url>images/admin/skin/plugins/search/solr_FC.jpg</feature-icon-url>
+            <feature-group>SYSTEM</feature-group>
+            <feature-documentation-url />
+        </admin-feature>
+        <admin-feature>
+            <feature-id>SOLR_CONFIGURATION_MANAGEMENT</feature-id>
+            <feature-title>search.solr.adminFeature.configuration.title</feature-title>
+            <feature-description>search.solr.adminFeature.configuration.description</feature-description>
+            <feature-level>1</feature-level>
+            <feature-url>jsp/admin/search/solr/ManageSearchConfiguration.jsp</feature-url>
+            <feature-icon-url>images/admin/skin/plugins/search/solr_FC.jpg</feature-icon-url>
+            <feature-group>SYSTEM</feature-group>
+            <feature-documentation-url />
+        </admin-feature>
+        <admin-feature>
+            <feature-id>SOLR_FIELDS_MANAGEMENT</feature-id>
+            <feature-title>search.solr.adminFeature.fields.title</feature-title>
+            <feature-description>search.solr.adminFeature.fields.description</feature-description>
+            <feature-level>1</feature-level>
+            <feature-url>jsp/admin/search/solr/ManageSolrFields.jsp</feature-url>
+            <feature-icon-url>images/admin/skin/plugins/search/solr_FC.jpg</feature-icon-url>
+            <feature-group>SYSTEM</feature-group>
+            <feature-documentation-url />
+        </admin-feature>
+    </admin-features>
+
+    <!-- Specific javascripts -->
     <javascript-files>
+        <javascript-files-scope>xpage</javascript-files-scope>
         <javascript-file>solr/jquery.autocomplete.js</javascript-file>
     </javascript-files>
-	
-	<!-- Specific plugin CSS stylesheets -->
+
+    <!-- Specific plugin CSS stylesheets -->
     <css-stylesheets>
+        <css-stylesheets-scope>xpage</css-stylesheets-scope>
         <css-stylesheet>solr/jquery.autocomplete.css</css-stylesheet>
     </css-stylesheets>
 
