@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.search.solr.business.facetIntersection;
 
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
+import fr.paris.lutece.plugins.search.solr.service.SolrPlugin;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
@@ -49,7 +50,7 @@ public final class FacetIntersectionHome
     // Static variable pointed at the DAO instance
     private static IFacetIntersectionDAO _dao = (IFacetIntersectionDAO) SpringContextService.getPluginBean( "solr",
             "facetIntersectionDAO" );
-    private static Plugin plugin = PluginService.getPlugin( "solr" );
+    private static Plugin plugin = PluginService.getPlugin( SolrPlugin.PLUGIN_NAME );
 
     /**
      * Private constructor - this class need not be instantiated
@@ -61,7 +62,6 @@ public final class FacetIntersectionHome
     /**
      * Create an instance of the facetIntersection class
      * @param facetIntersection The instance of the FacetIntersection which contains the informations to store
-     * @param plugin the Plugin
      * @return The  instance of facetIntersection which has been created with its primary key.
      */
     public static FacetIntersection create( FacetIntersection facetIntersection )
@@ -90,7 +90,7 @@ public final class FacetIntersectionHome
     /**
      * Remove the facetIntersection whose identifier is specified in parameter
      * @param nFacetIntersectionId The facetIntersection Id
-     * @param plugin the Plugin
+     * @param nFacetIntersectionId2 The other facetIntersection Id
      */
     public static void remove( int nFacetIntersectionId, int nFacetIntersectionId2 )
     {
@@ -102,7 +102,6 @@ public final class FacetIntersectionHome
 
     /**
      * Load the data of all the facetIntersection objects and returns them in form of a list
-     * @param plugin the Plugin
      * @return the list which contains the data of all the facetIntersection objects
      */
     public static List<FacetIntersection> getFacetIntersectionsList(  )

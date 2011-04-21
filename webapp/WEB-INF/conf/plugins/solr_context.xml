@@ -5,6 +5,7 @@
     <!--                  Data Access Objects (DAO)                   -->
     <bean id="fieldDAO" class="fr.paris.lutece.plugins.search.solr.business.field.FieldDAO" />
     <bean id="facetIntersectionDAO" class="fr.paris.lutece.plugins.search.solr.business.facetIntersection.FacetIntersectionDAO" />
+	<bean id="solrIndexerActionDAO" class="fr.paris.lutece.plugins.search.solr.business.indexeraction.SolrIndexerActionDAO" />
 	
     <!--                  		Indexer                  			  -->
 	<bean id="solr.solrPageIndexer" class="fr.paris.lutece.plugins.search.solr.indexer.SolrPageIndexer" />

@@ -20,3 +20,13 @@ CREATE TABLE solr_facet_intersection (
 	id_field1 int default NULL,
 	id_field2 int default NULL
 );
+
+DROP TABLE IF EXISTS solr_indexer_action;
+CREATE TABLE  solr_indexer_action (
+  id_action int default 0 NOT NULL,
+  id_document varchar(255) NOT NULL,
+  id_task int default 0 NOT NULL,
+  type_ressource varchar(255) NOT NULL,
+  id_portlet int default 0 NOT NULL,
+  PRIMARY KEY (id_action)
+);

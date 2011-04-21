@@ -37,20 +37,17 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.lucene.demo.html.HTMLParser;
 
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
+import fr.paris.lutece.plugins.search.utils.SolrPageIndexerUtils;
 import fr.paris.lutece.portal.business.page.Page;
 import fr.paris.lutece.portal.business.page.PageHome;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.page.IPageService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.url.UrlItem;
 
@@ -61,9 +58,9 @@ import fr.paris.lutece.util.url.UrlItem;
  */
 public class SolrPageIndexer implements SolrIndexer
 {
-    private static final String SITE = AppPropertiesService.getProperty( "solr.site.name" );
+	public static final String NAME = "SolrPageIndexer";
+    private static final String SITE = AppPropertiesService.getProperty( "lutece.name" );
     private static final String PARAMETER_PAGE_ID = "page_id";
-    private static final String NAME = "SolrPageIndexer";
     private static final String DESCRIPTION = "Solr page Indexer";
     private static final String VERSION = "1.0.0";
     private static final String TYPE = "PAGE";
@@ -72,58 +69,33 @@ public class SolrPageIndexer implements SolrIndexer
     private static final String SITE_URL = AppPropertiesService.getProperty( PROPERTY_PAGE_BASE_URL );
     private static final String PROPERTY_INDEXER_ENABLE = "solr.indexer.page.enable";
     private static final String BEAN_PAGE_SERVICE = "pageService";
-
+    
+    private static final List<String> LIST_RESSOURCES_NAME = new ArrayList<String>();
+	
     /**
      * Creates a new SolrPageIndexer
      */
     public SolrPageIndexer(  )
     {
+    	LIST_RESSOURCES_NAME.add( SolrPageIndexerUtils.RESSOURCE_PAGE );
     }
 
     /**
-     * Indexes data.
-     * @param mapDatas Map wich associates logs to indexed datas. The map is not null.
+     * {@inheritDoc}
      */
-    public Map<String, SolrItem> index(  )
+    public void indexDocuments(  ) throws IOException, InterruptedException, SiteMessageException
     {
-        StringBuilder sbLogs = new StringBuilder(  );
         List<Page> listPages = PageHome.getAllPages(  );
-        Map<String, SolrItem> mapDatas = new HashMap<String, SolrItem>();
         
         for ( Page page : listPages )
         {
-        	// Clears the buffer
-        	sbLogs.setLength( 0 );
-        	// Adds the log
-            sbLogs.append( "indexing " );
-            sbLogs.append( TYPE );
-            sbLogs.append( " Id : " );
-            sbLogs.append( page.getId(  ) );
-            sbLogs.append( " Id : " );
-            sbLogs.append( page.getName(  ) );
-            sbLogs.append( "<br/>" );
-
-            try
+            // Generates the item to index
+            SolrItem item = getItem( page, SITE_URL );
+            if( item != null )
             {
-            	// Generates the item to index
-                SolrItem item = getItem( page, SITE_URL );
-                mapDatas.put( sbLogs.toString(), item );
-            }
-            catch ( IOException e )
-            {
-                AppLogService.error( e.getMessage(  ), e );
-            }
-            catch ( InterruptedException e )
-            {
-                AppLogService.error( e.getMessage(  ), e );
-            }
-            catch ( SiteMessageException e )
-            {
-                AppLogService.error( e.getMessage(  ), e );
+            	SolrIndexerService.write( item );
             }
         }
-
-        return mapDatas;
     }
 
     /**
@@ -180,7 +152,7 @@ public class SolrPageIndexer implements SolrIndexer
         UrlItem urlItem = new UrlItem( strUrl );
         urlItem.addParameter( PARAMETER_PAGE_ID, page.getId(  ) );
         item.setUrl( urlItem.getUrl(  ) );
-        item.setUid( item.getSite(  ) + item.getType(  ) + page.getId(  ) );
+        item.setUid( getResourceUid( String.valueOf( page.getId(  ) ), SolrPageIndexerUtils.RESSOURCE_PAGE ) );
 
         return item;
     }
@@ -203,11 +175,17 @@ public class SolrPageIndexer implements SolrIndexer
         return VERSION;
     }
 
+    /**
+	 * {@inheritDoc}
+	 */
     public String getDescription(  )
     {
         return DESCRIPTION;
     }
 
+    /**
+	 * {@inheritDoc}
+	 */
     public boolean isEnable(  )
     {
         return "true".equalsIgnoreCase( AppPropertiesService.getProperty( PROPERTY_INDEXER_ENABLE ) );
@@ -216,9 +194,44 @@ public class SolrPageIndexer implements SolrIndexer
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings( "unchecked" )
 	public List<Field> getAdditionalFields()
     {
-    	return Collections.EMPTY_LIST;
+    	return null;
     }
+    
+	/**
+	 * {@inheritDoc}
+	 */
+    public List<SolrItem> getDocuments( String strIdDocument )
+    {
+    	List<SolrItem> lstItems = new ArrayList<SolrItem>();
+    	try
+		{
+    		int nIdDocument = Integer.parseInt( strIdDocument );
+        	Page page = PageHome.getPage( nIdDocument );
+        	lstItems.add( getItem( page, SITE_URL ) );
+		}
+		catch ( Exception e )
+		{
+			throw new RuntimeException( e );
+		}
+    	
+    	return lstItems;
+    }
+    
+    /**
+	 * {@inheritDoc}
+	 */
+    public List<String> getResourcesName()
+    {
+    	return LIST_RESSOURCES_NAME;
+    }
+
+    /**
+	 * {@inheritDoc}
+	 */
+	public String getResourceUid( String strResourceId, String strResourceType )
+	{
+		return strResourceId;
+	}
 }

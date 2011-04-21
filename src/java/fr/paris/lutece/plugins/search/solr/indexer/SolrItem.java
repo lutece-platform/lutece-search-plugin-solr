@@ -89,7 +89,9 @@ public class SolrItem
     private String _strHieDate;
     @Field( FIELD_METADATA )
     private String _strMetadata;
-
+    @Field( SearchItem.FIELD_DOCUMENT_PORTLET_ID )
+    private String _strDocPortletId;
+    
     //DynamicField
     @Field( "*" + DYNAMIC_LIST_FIELD_SUFFIX )
     private Map<String, List<String>> _dfListBox;
@@ -419,5 +421,23 @@ public class SolrItem
 	public void setMetadata( String strMetadata )
 	{
 		_strMetadata = strMetadata;
+	}
+
+	/**
+	 * Gets the portlet document id
+	 * @return the portlet document id
+	 */
+	public String getDocPortletId()
+	{
+		return _strDocPortletId;
+	}
+
+	/**
+	 * Sets the portlet document id
+	 * @param strDocPortletId the portlet document id
+	 */
+	public void setDocPortletId( String strDocPortletId )
+	{
+		_strDocPortletId = strDocPortletId;
 	}
 }

@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.search.solr.business.field;
 
 import fr.paris.lutece.plugins.search.solr.business.facetIntersection.FacetIntersection;
 import fr.paris.lutece.plugins.search.solr.business.facetIntersection.FacetIntersectionHome;
+import fr.paris.lutece.plugins.search.solr.util.SolrUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,8 +73,11 @@ public class SolrFieldManager
 
         for ( FacetHistorique f : this.currentFacet )
         {
-            f.query += ( "&fq=" + key );
-            facet.query += ( "&fq=" + f.name );
+        	// encode key
+        	String strEncodedKey = SolrUtil.encodeUrl( key );
+            f.query += ( "&fq=" + strEncodedKey );
+            String strEncodedName = SolrUtil.encodeUrl( f.name );
+            facet.query += ( "&fq=" + strEncodedName );
         }
 
         this.currentFacet.add( facet );

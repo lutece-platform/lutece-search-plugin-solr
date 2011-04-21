@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.search.solr.business.field;
 
+import fr.paris.lutece.plugins.search.solr.service.SolrPlugin;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
@@ -47,7 +48,7 @@ public final class FieldHome
 {
     // Static variable pointed at the DAO instance
     private static IFieldDAO _dao = (IFieldDAO) SpringContextService.getPluginBean( "solr", "fieldDAO" );
-    private static Plugin plugin = PluginService.getPlugin( "solr" );
+    private static Plugin plugin = PluginService.getPlugin( SolrPlugin.PLUGIN_NAME );
 
     /**
      * Private constructor - this class need not be instantiated
@@ -59,7 +60,6 @@ public final class FieldHome
     /**
      * Create an instance of the field class
      * @param field The instance of the Field which contains the informations to store
-     * @param plugin the Plugin
      * @return The  instance of field which has been created with its primary key.
      */
     public static Field create( Field field )
@@ -72,7 +72,6 @@ public final class FieldHome
     /**
      * Update of the field which is specified in parameter
      * @param field The instance of the Field which contains the data to store
-     * @param plugin the Plugin
      * @return The instance of the  field which has been updated
      */
     public static Field update( Field field )
@@ -85,7 +84,6 @@ public final class FieldHome
     /**
      * Remove the field whose identifier is specified in parameter
      * @param nFieldId The field Id
-     * @param plugin the Plugin
      */
     public static void remove( int nFieldId )
     {
@@ -98,7 +96,6 @@ public final class FieldHome
     /**
      * Returns an instance of a field whose identifier is specified in parameter
      * @param nKey The field primary key
-     * @param plugin the Plugin
      * @return an instance of Field
      */
     public static Field findByPrimaryKey( int nKey )
@@ -108,7 +105,6 @@ public final class FieldHome
 
     /**
      * Load the data of all the field objects and returns them in form of a list
-     * @param plugin the Plugin
      * @return the list which contains the data of all the field objects
      */
     public static List<Field> getFieldsList(  )

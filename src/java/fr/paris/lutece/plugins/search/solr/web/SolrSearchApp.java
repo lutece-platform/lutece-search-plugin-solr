@@ -33,8 +33,6 @@
  */
 package fr.paris.lutece.plugins.search.solr.web;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -48,15 +46,13 @@ import fr.paris.lutece.plugins.search.solr.business.SolrFacetedResult;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchResult;
 import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
+import fr.paris.lutece.plugins.search.solr.util.SolrUtil;
 import fr.paris.lutece.portal.service.i18n.I18nService;
-import fr.paris.lutece.portal.service.message.SiteMessage;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
-import fr.paris.lutece.portal.service.message.SiteMessageService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.search.QueryEvent;
 import fr.paris.lutece.portal.service.search.QueryListenersService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
-import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.xpages.XPage;
 import fr.paris.lutece.portal.web.xpages.XPageApplication;
@@ -82,7 +78,6 @@ public class SolrSearchApp implements XPageApplication
     private static final String PROPERTY_PATH_LABEL = "portal.search.search_results.pathLabel";
     private static final String PROPERTY_PAGE_TITLE = "portal.search.search_results.pageTitle";
     private static final String MESSAGE_INVALID_SEARCH_TERMS = "portal.search.message.invalidSearchTerms";
-    private static final String MESSAGE_ENCODING_ERROR = "portal.search.message.encodingError";
     private static final String DEFAULT_RESULTS_PER_PAGE = "10";
     private static final String DEFAULT_PAGE_INDEX = "1";
     private static final String PARAMETER_PAGE_INDEX = "page_index";
@@ -110,8 +105,6 @@ public class SolrSearchApp implements XPageApplication
     private static final String MARK_SORT_LIST = "sort_list";
     private static final String MARK_FACET_TREE = "facet_tree";
     private static final String PROPERTY_ENCODE_URI = "search.encode.uri";
-    private static final String PROPERTY_ENCODE_URI_ENCODING = "search.encode.uri.encoding";
-    private static final String DEFAULT_URI_ENCODING = "ISO-8859-1";
     private static final boolean DEFAULT_ENCODE_URI = false;
 
     /**
@@ -188,7 +181,7 @@ public class SolrSearchApp implements XPageApplication
 
         if ( bEncodeUri )
         {
-            strQueryForPaginator = encodeUrl( request, strQuery );
+            strQueryForPaginator = SolrUtil.encodeUrl( request, strQuery );
         }
 
         url.addParameter( PARAMETER_QUERY, strQueryForPaginator );
@@ -230,32 +223,6 @@ public class SolrSearchApp implements XPageApplication
         page.setContent( template.getHtml(  ) );
 
         return page;
-    }
-
-    /**
-     * Encode an url string
-     * @param strSource The string to encode
-     * @param request the http request
-     * @return The encoded string
-     * @throws SiteMessageException exception
-     */
-    public static String encodeUrl( HttpServletRequest request, String strSource )
-        throws SiteMessageException
-    {
-        String strEncoded = "";
-        String strURIEncoding = AppPropertiesService.getProperty( PROPERTY_ENCODE_URI_ENCODING, DEFAULT_URI_ENCODING );
-
-        try
-        {
-            strEncoded = URLEncoder.encode( strSource, strURIEncoding );
-        }
-        catch ( UnsupportedEncodingException e )
-        {
-            AppLogService.error( e.getMessage(  ), e );
-            SiteMessageService.setMessage( request, MESSAGE_ENCODING_ERROR, SiteMessage.TYPE_ERROR );
-        }
-
-        return strEncoded;
     }
 
     /**

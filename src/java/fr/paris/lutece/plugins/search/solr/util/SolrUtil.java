@@ -37,15 +37,24 @@ import fr.paris.lutece.plugins.search.solr.business.SolrHighlights;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchItem;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchResult;
 import fr.paris.lutece.plugins.search.solr.indexer.SolrItem;
+import fr.paris.lutece.portal.service.message.SiteMessage;
+import fr.paris.lutece.portal.service.message.SiteMessageException;
+import fr.paris.lutece.portal.service.message.SiteMessageService;
 import fr.paris.lutece.portal.service.search.SearchResult;
+import fr.paris.lutece.portal.service.util.AppLogService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -55,6 +64,10 @@ import java.util.Map;
  */
 public final class SolrUtil
 {
+	private static final String MESSAGE_ENCODING_ERROR = "portal.search.message.encodingError";
+    private static final String PROPERTY_ENCODE_URI_ENCODING = "search.encode.uri.encoding";
+    private static final String DEFAULT_URI_ENCODING = "ISO-8859-1";
+    
     /**
      * Empty private constructor
      */
@@ -120,5 +133,51 @@ public final class SolrUtil
         }
 
         return resultList;
+    }
+    
+    /**
+     * encode url
+     * @param strSource source
+     * @return encoded url, null otherwise
+     */
+    public static String encodeUrl( String strSource )
+    {
+    	try
+    	{
+    		return encodeUrl( null, strSource);
+    	}
+    	catch ( SiteMessageException sme )
+    	{
+    		return null;
+    	}
+    }
+    
+    /**
+     * Encode an url string
+     * @param strSource The string to encode
+     * @param request the http request (can be null)
+     * @return The encoded string
+     * @throws SiteMessageException exception and request != null
+     */
+    public static String encodeUrl( HttpServletRequest request, String strSource )
+        throws SiteMessageException
+    {
+        String strEncoded = SolrConstants.CONSTANT_EMPTY_STRING;
+        String strURIEncoding = AppPropertiesService.getProperty( PROPERTY_ENCODE_URI_ENCODING, DEFAULT_URI_ENCODING );
+
+        try
+        {
+            strEncoded = URLEncoder.encode( strSource, strURIEncoding );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            AppLogService.error( e.getMessage(  ), e );
+            if ( request != null )
+            {
+            	SiteMessageService.setMessage( request, MESSAGE_ENCODING_ERROR, SiteMessage.TYPE_ERROR );
+            }
+        }
+
+        return strEncoded;
     }
 }

@@ -35,19 +35,31 @@ package fr.paris.lutece.plugins.search.solr.indexer;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.store.Directory;
 import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 
 import fr.paris.lutece.plugins.search.solr.business.SolrServerService;
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
+import fr.paris.lutece.plugins.search.solr.business.indexeraction.SolrIndexerAction;
+import fr.paris.lutece.plugins.search.solr.business.indexeraction.SolrIndexerActionHome;
+import fr.paris.lutece.plugins.search.solr.service.SolrPlugin;
 import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
+import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
+import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.portal.service.plugin.PluginService;
+import fr.paris.lutece.portal.service.search.IndexationService;
 import fr.paris.lutece.portal.service.search.SearchItem;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
 
 /**
@@ -59,7 +71,10 @@ public final class SolrIndexerService
 {
 	private static final SolrServer SOLR_SERVER = SolrServerService.getInstance(  ).getSolrServer(  );
     private static final List<SolrIndexer> INDEXERS = initIndexersList(  );
-
+    private static final String PARAM_TYPE_PAGE = "Page";
+    private static final String SITE = AppPropertiesService.getProperty( "lutece.name" );
+    private static StringBuffer _sbLogs;
+    
     /**
      * Empty private constructor
      */
@@ -75,47 +90,219 @@ public final class SolrIndexerService
     {
         return INDEXERS;
     }
-
+    
     /**
-     * Calls all known indexers
-     * @return the logs
+     * Index one document, called by plugin indexers
+     * @param doc the document to index
+     * @throws CorruptIndexException corruptIndexException
+     * @throws IOException i/o exception
      */
-    public static String processIndexing(  )
+    public static void write( SolrItem solrItem ) throws CorruptIndexException, IOException
     {
-        StringBuilder sbLogs = new StringBuilder(  );
+    	try
+		{
+    		SolrInputDocument solrInputDocument = solrItem2SolrInputDocument( solrItem );
+    		SOLR_SERVER.add( solrInputDocument );
+    		SOLR_SERVER.commit();
 
-        for ( SolrIndexer solrIndexer : INDEXERS )
-        {
-        	Map<String, SolrItem> mapDatas = solrIndexer.index( );
-        	sbLogs.append( solrIndexer.getName(  ) );
-            sbLogs.append( SolrConstants.CONSTANT_SPACE );
-            sbLogs.append( solrIndexer.getVersion(  ) );
-            sbLogs.append( SolrConstants.CONSTANT_BR_TAG );
-            for( String strLog : mapDatas.keySet() )
-            {
-            	try
-				{
-            		//Converts the SolrItem object to SolrInputDocument
-            		SolrInputDocument solrInputDocument = solrItem2SolrInputDocument( mapDatas.get( strLog ) );
-					SOLR_SERVER.add( solrInputDocument );
-					SOLR_SERVER.commit();
-	            	sbLogs.append( strLog );
-				}
-				catch ( IOException e )
-				{
-					AppLogService.error( e.getMessage(  ), e );
-				}
-				catch ( SolrServerException e )
-				{
-					AppLogService.error( e.getMessage(  ), e );
-				}
-            }
-            sbLogs.append( SolrConstants.CONSTANT_BR_TAG );
-        }
-        
-        return sbLogs.toString(  );
+    		_sbLogs.append( "Indexing " );
+    		_sbLogs.append( solrItem.getType() );
+    		_sbLogs.append( " #" );
+    		_sbLogs.append( solrItem.getUid() );
+    		_sbLogs.append( " - " );
+    		_sbLogs.append( solrItem.getTitle() );
+    		_sbLogs.append( "\r\n" );
+		}
+        catch ( Exception e )
+		{
+			printIndexMessage( e );
+		}
     }
+    
+    /**
+     * Process the indexing
+     * @param bCreate tell if it's total indexing or total (total = true)
+     * @return the result log of the indexing
+     */
+    public static synchronized String processIndexing( boolean bCreate )
+    {
+        // String buffer for building the response page;
+    	_sbLogs = new StringBuffer(  );
+    	Plugin plugin = PluginService.getPlugin( SolrPlugin.PLUGIN_NAME );
+    	
+        boolean bCreateIndex = bCreate;
 
+        try
+        {
+            Directory dir = IndexationService.getDirectoryIndex(  );
+
+            if ( !IndexReader.indexExists( dir ) )
+            { //init index
+                bCreateIndex = true;
+            }
+
+            Date start = new Date(  );
+
+            if ( bCreateIndex )
+            {
+            	_sbLogs.append( "\r\nIndexing all contents ...\r\n" );
+
+            	// Remove all indexed values of this site
+            	SOLR_SERVER.deleteByQuery( SearchItem.FIELD_UID + ":" + SITE + SolrConstants.CONSTANT_UNDERSCORE + SolrConstants.CONSTANT_WILDCARD );
+            	
+                for ( SolrIndexer solrIndexer : INDEXERS )
+                {
+                	try
+                    {
+                		if ( solrIndexer.isEnable(  ) )
+                		{
+                			_sbLogs.append( "\r\n<strong>Indexer : " );
+                			_sbLogs.append( solrIndexer.getName(  ) );
+                			_sbLogs.append( " - " );
+                			_sbLogs.append( solrIndexer.getDescription(  ) );
+                			_sbLogs.append( "</strong>\r\n" );
+
+                			//the indexer will call write(doc)
+                			solrIndexer.indexDocuments();
+                		}
+                    }
+                	catch ( Exception e )
+                    {
+                        _sbLogs.append( "<strong>ERROR : " );
+                        _sbLogs.append( e.getMessage(  ) );
+
+                        if ( e.getCause(  ) != null )
+                        {
+                            _sbLogs.append( " : " );
+                            _sbLogs.append( e.getCause(  ).getMessage(  ) );
+                        }
+
+                        _sbLogs.append( "</strong>\r\n" );
+                    }
+                }
+                
+                // Remove all actions of the database
+                SolrIndexerActionHome.removeAll( plugin );
+            }
+            else
+            {
+                _sbLogs.append( "\r\nIncremental Indexing ...\r\n" );
+                //incremental indexing
+                Collection<SolrIndexerAction> actions = SolrIndexerActionHome.getList( plugin );
+
+                for ( SolrIndexerAction action : actions )
+                {
+                    // catch any exception coming from an indexer to prevent global indexation to fail
+                    try
+                    {
+                        SolrIndexer indexer = findSolrIndexer( action.getTypeResource() );
+                        
+                        if( indexer == null )
+                        {
+                        	_sbLogs.append( " - ERROR : " );
+                            _sbLogs.append( " No indexer found for the resource name : " + action.getTypeResource() );
+                            _sbLogs.append( "</strong>\r\n" );
+                            continue;
+                        }
+                        
+                        if ( action.getIdTask(  ) == IndexerAction.TASK_DELETE )
+                        {
+                            if ( action.getIdPortlet(  ) != IndexationService.ALL_DOCUMENT )
+                            {
+                                //delete only the index linked to this portlet
+                                SOLR_SERVER.deleteByQuery( SearchItem.FIELD_DOCUMENT_PORTLET_ID + ":" + action.getIdDocument(  ) + "&" + Integer.toString( action.getIdPortlet(  ) ) );
+                            }
+                            else
+                            {
+                                //delete all index linked to uid. We get the uid of the resource to prefix it like we do during the indexation 
+                            	SOLR_SERVER.deleteByQuery( SearchItem.FIELD_UID + ":" + SITE + SolrConstants.CONSTANT_UNDERSCORE + indexer.getResourceUid( action.getIdDocument(  ), action.getTypeResource() ) );
+                            }
+
+                            _sbLogs.append( "Deleting " );
+                            _sbLogs.append( " #" );
+                            _sbLogs.append( action.getIdDocument(  ) );
+                            _sbLogs.append( "\r\n" );
+                        }
+                        else
+                        {
+                            List<SolrItem> lstItems = indexer.getDocuments( action.getIdDocument(  ) );
+
+                            if ( lstItems != null  &&  !lstItems.isEmpty() )
+                            {
+                                for ( SolrItem item : lstItems )
+                                {
+                                    if ( ( action.getIdPortlet(  ) == IndexationService.ALL_DOCUMENT ) ||
+                                            ( item.getDocPortletId() != null && item.getDocPortletId().equals( item.getUid() + "&" + action.getIdPortlet(  ) ) ) )
+                                    {
+                                        if ( action.getIdTask(  ) == IndexerAction.TASK_CREATE )
+                                        {
+                                            _sbLogs.append( "Adding " );
+                                        }
+                                        else if ( action.getIdTask(  ) == IndexerAction.TASK_MODIFY )
+                                        {
+                                        	_sbLogs.append( "Updating " );
+                                        } 
+                                        SOLR_SERVER.add( solrItem2SolrInputDocument( item ) );
+                                        SOLR_SERVER.commit();
+
+                                        _sbLogs.append( item.getType() );
+                                        _sbLogs.append( " #" );
+                                        _sbLogs.append( item.getUid() );
+                                        _sbLogs.append( " - " );
+                                        _sbLogs.append( item.getTitle() );
+                                        _sbLogs.append( "\r\n" );
+                                    }
+                                }
+                            }
+                        }
+
+                        SolrIndexerActionHome.remove( action.getIdAction(  ), plugin );
+                    }
+                    catch ( Exception e )
+                    {
+                        _sbLogs.append( "\r\n<strong>Action from indexer : " );
+                        _sbLogs.append( action.getIndexerName(  ) );
+                        _sbLogs.append( " Action ID : " + action.getIdAction(  ) + " - Document ID : " +
+                            action.getIdDocument(  ) );
+                        _sbLogs.append( " - ERROR : " );
+                        _sbLogs.append( e.getMessage(  ) + ( e.getCause(  ) != null ? " : " +  e.getCause(  ).getMessage(  ) : SolrConstants.CONSTANT_EMPTY_STRING ) );
+                        _sbLogs.append( "</strong>\r\n" );
+                    }
+                }
+                //reindexing all pages.
+                SOLR_SERVER.deleteByQuery( SearchItem.FIELD_TYPE + ":" + PARAM_TYPE_PAGE );
+                for( SolrIndexer indexer : INDEXERS )
+                {
+                	if( SolrPageIndexer.NAME.equals( indexer.getName(  ) ))
+                	{
+                		indexer.indexDocuments();
+                		break;
+                	}
+                }
+            }
+            
+            SOLR_SERVER.commit();
+            
+            Date end = new Date(  );
+            _sbLogs.append( "Duration of the treatment : " );
+            _sbLogs.append( end.getTime(  ) - start.getTime(  ) );
+            _sbLogs.append( " milliseconds\r\n" );
+            
+        }
+        catch ( Exception e )
+        {
+            _sbLogs.append( " caught a " );
+            _sbLogs.append( e.getClass(  ) );
+            _sbLogs.append( "\n with message: " );
+            _sbLogs.append( e.getMessage(  ) );
+            _sbLogs.append( "\r\n" );
+            AppLogService.error( "Indexing error : " + e.getMessage(  ), e );
+        }
+
+        
+        return _sbLogs.toString(  );
+    }
+    
     /**
      * Returns the list of all dynamic fields.
      * @return the list of all additional fields
@@ -125,10 +312,85 @@ public final class SolrIndexerService
     	List<Field> lstFields = new ArrayList<Field>();
     	for ( SolrIndexer solrIndexer : INDEXERS )
         {
-    		lstFields.addAll( solrIndexer.getAdditionalFields() );
+    		List<Field> lstAdditionalFields = solrIndexer.getAdditionalFields();
+    		if( lstAdditionalFields != null )
+    		{
+    			lstFields.addAll( lstAdditionalFields );
+    		}
         }
     	
     	return lstFields;
+    }
+    
+    /**
+     * Adds the exception into the buffer and the logs  
+     * @param exception Exception to report
+     */
+    private static void printIndexMessage( Exception exception )
+    {
+		_sbLogs.append( " - ERROR : " );
+		_sbLogs.append( exception.getMessage(  ) );
+
+        if ( exception.getCause(  ) != null )
+        {
+        	_sbLogs.append( " : " );
+        	_sbLogs.append( exception.getCause(  ).getMessage(  ) );
+        }
+
+        _sbLogs.append( "</strong>\r\n" );
+		AppLogService.error( exception.getMessage(  ), exception );
+    }
+    
+    /**
+     * Index resources of the indexer and add formated logs into the buffer
+     */
+    /*
+    private static void index( SolrIndexer solrIndexer, StringBuilder sbLogs )
+    {
+    	Map<String, SolrItem> mapDatas = solrIndexer.index( );
+    	sbLogs.append( solrIndexer.getName(  ) );
+        sbLogs.append( SolrConstants.CONSTANT_SPACE );
+        sbLogs.append( solrIndexer.getVersion(  ) );
+        sbLogs.append( SolrConstants.CONSTANT_BR_TAG );
+        for( String strLog : mapDatas.keySet() )
+        {
+        	try
+			{
+        		//Converts the SolrItem object to SolrInputDocument
+        		SolrInputDocument solrInputDocument = solrItem2SolrInputDocument( mapDatas.get( strLog ) );
+				SOLR_SERVER.add( solrInputDocument );
+				SOLR_SERVER.commit();
+            	sbLogs.append( strLog );
+			}
+			catch ( IOException e )
+			{
+				printIndexMessage( sbLogs, e );
+			}
+			catch ( SolrServerException e )
+			{
+				printIndexMessage( sbLogs, e );
+			}
+        }
+        sbLogs.append( SolrConstants.CONSTANT_BR_TAG );
+    }
+    */
+    
+    /**
+     * Find the indexer of the resource parameter
+     * @param strResourceName the name of the resource to index
+     * @return the indexer of the resource
+     */
+    private static SolrIndexer findSolrIndexer( String strResourceName )
+    {
+    	for( SolrIndexer indexer : INDEXERS )
+    	{
+    		List<String> lstResources = indexer.getResourcesName();
+    		if( lstResources != null  && lstResources.contains( strResourceName ) )
+    		{
+    			return indexer;
+    		}
+    	}
+    	return null;
     }
     
     /**
@@ -140,7 +402,8 @@ public final class SolrIndexerService
     {
     	SolrInputDocument solrInputDocument = new SolrInputDocument();
     	
-    	solrInputDocument.addField( SearchItem.FIELD_UID, solrItem.getUid() );
+    	// Prefix the uid by the name of the site. Without that, it is necessary imposible to index two resources of two different sites with the same identifier
+    	solrInputDocument.addField( SearchItem.FIELD_UID, SITE + SolrConstants.CONSTANT_UNDERSCORE + solrItem.getUid() );
     	solrInputDocument.addField( SearchItem.FIELD_DATE, solrItem.getDate() );
     	solrInputDocument.addField( SearchItem.FIELD_TYPE, solrItem.getType(  ) );
     	solrInputDocument.addField( SearchItem.FIELD_SUMMARY, solrItem.getSummary(  ) );
@@ -152,6 +415,7 @@ public final class SolrIndexerService
     	solrInputDocument.addField( SolrItem.FIELD_HIERATCHY_DATE, solrItem.getHieDate() );
     	solrInputDocument.addField( SolrItem.FIELD_CATEGORIE, solrItem.getCategorie() );
     	solrInputDocument.addField( SolrItem.FIELD_CONTENT, solrItem.getContent() );
+    	solrInputDocument.addField( SearchItem.FIELD_DOCUMENT_PORTLET_ID, solrItem.getDocPortletId() );
 
     	// Add the dynamic fields
     	// They must be declared into the schema.xml of the solr server
