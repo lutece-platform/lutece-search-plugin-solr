@@ -210,7 +210,8 @@ public class SolrSearchApp implements XPageApplication
 
         Map<String, Object> model = new HashMap<String, Object>(  );
         model.put( MARK_RESULTS_LIST, paginator.getPageItems(  ) );
-        model.put( MARK_QUERY, strQuery );
+        // put the query only if it's not *.*
+        model.put( MARK_QUERY, ALL_SEARCH_QUERY.equals( strQuery ) ? SolrConstants.CONSTANT_EMPTY_STRING : strQuery );
         model.put( MARK_FACET_QUERY, facetQueryUrl );
         model.put( MARK_PAGINATOR, paginator );
         model.put( MARK_NB_ITEMS_PER_PAGE, strNbItemPerPage );
