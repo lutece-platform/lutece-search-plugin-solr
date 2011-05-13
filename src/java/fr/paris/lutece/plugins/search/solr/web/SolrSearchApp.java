@@ -83,7 +83,7 @@ public class SolrSearchApp implements XPageApplication
     private static final String PROPERTY_ONLY_FACTES = "solr.onlyFacets";
     private static final String PROPERTY_SOLR_RESPONSE_MAX = "solr.reponse.max";
     private static final int SOLR_RESPONSE_MAX = Integer.parseInt( AppPropertiesService.getProperty( 
-                PROPERTY_SOLR_RESPONSE_MAX, String.valueOf( SolrConstants.CONSTANT_UNLIMITED_RESULT ) ) );
+                PROPERTY_SOLR_RESPONSE_MAX, "50" ) );
     private static final String MESSAGE_INVALID_SEARCH_TERMS = "portal.search.message.invalidSearchTerms";
     private static final String DEFAULT_RESULTS_PER_PAGE = "10";
     private static final String DEFAULT_PAGE_INDEX = "1";

@@ -15,7 +15,7 @@
     <icon-url>images/admin/skin/plugins/search/solr_FC.jpg</icon-url>
     <copyright>Copyright 2001-2011 Mairie de Paris</copyright>
     <core-version-dependency>
-        <min-core-version>3.0.0</min-core-version>
+        <min-core-version>2.9.9</min-core-version>
         <max-core-version />
     </core-version-dependency>
     <db-pool-required>1</db-pool-required>

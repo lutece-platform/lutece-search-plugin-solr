@@ -149,7 +149,7 @@ public class SolrSearchEngine implements SearchEngine
      * @param facetQueries The selected facets
      * @param sortName The facet name to sort by
      * @param sortOrder "asc" or "desc"
-     * @param nLimit Maximal number of results. -1 = unlimited
+     * @param nLimit Maximal number of results.
      * @return the result with facets
      */
     public SolrFacetedResult getFacetedSearchResults( String strQuery, String[] facetQueries, String sortName,
@@ -171,10 +171,7 @@ public class SolrSearchEngine implements SearchEngine
             query.setFacet( true );
             query.setFacetLimit( 8 );
             query.setFacetMinCount( 1 );
-            if( nLimit != SolrConstants.CONSTANT_UNLIMITED_RESULT )
-            {
-            	query.setRows( nLimit );
-            }
+            query.setRows( nLimit );
 
             for ( Field field : SolrFieldManager.getFacetList(  ).values(  ) )
             {
