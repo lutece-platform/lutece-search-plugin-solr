@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.search.solr.web;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -40,12 +41,14 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.response.SpellCheckResponse;
 
 import fr.paris.lutece.plugins.search.solr.business.SolrFacetedResult;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchResult;
 import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
+import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
 import fr.paris.lutece.plugins.search.solr.util.SolrUtil;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
@@ -77,6 +80,10 @@ public class SolrSearchApp implements XPageApplication
     private static final String PROPERTY_RESULTS_PER_PAGE = "search.nb.docs.per.page";
     private static final String PROPERTY_PATH_LABEL = "portal.search.search_results.pathLabel";
     private static final String PROPERTY_PAGE_TITLE = "portal.search.search_results.pageTitle";
+    private static final String PROPERTY_ONLY_FACTES = "solr.onlyFacets";
+    private static final String PROPERTY_SOLR_RESPONSE_MAX = "solr.reponse.max";
+    private static final int SOLR_RESPONSE_MAX = Integer.parseInt( AppPropertiesService.getProperty( 
+                PROPERTY_SOLR_RESPONSE_MAX, String.valueOf( SolrConstants.CONSTANT_UNLIMITED_RESULT ) ) );
     private static final String MESSAGE_INVALID_SEARCH_TERMS = "portal.search.message.invalidSearchTerms";
     private static final String DEFAULT_RESULTS_PER_PAGE = "10";
     private static final String DEFAULT_PAGE_INDEX = "1";
@@ -104,6 +111,7 @@ public class SolrSearchApp implements XPageApplication
     private static final String MARK_SORT_ORDER = "sort_order";
     private static final String MARK_SORT_LIST = "sort_list";
     private static final String MARK_FACET_TREE = "facet_tree";
+    private static final String MARK_FACETS_LIST = "facets_list";
     private static final String PROPERTY_ENCODE_URI = "search.encode.uri";
     private static final boolean DEFAULT_ENCODE_URI = false;
 
@@ -130,6 +138,7 @@ public class SolrSearchApp implements XPageApplication
         String facetQueryUrl = "";
         SolrFieldManager sfm = new SolrFieldManager(  );
 
+        List<String> lstSingleFacetQueries = new ArrayList<String>();
         if ( facetQuery != null )
         {
             for ( String fq : facetQuery )
@@ -138,6 +147,7 @@ public class SolrSearchApp implements XPageApplication
                 {
                     facetQueryUrl += ( "&fq=" + fq );
                     sfm.addFacet( fq );
+                    lstSingleFacetQueries.add( fq );
                 }
             }
         }
@@ -149,14 +159,22 @@ public class SolrSearchApp implements XPageApplication
         String strError = "";
         Locale locale = request.getLocale(  );
 
+        int nLimit = SOLR_RESPONSE_MAX;
+        
         // Check XSS characters
         if ( ( strQuery != null ) && ( StringUtil.containsXssCharacters( strQuery ) ) )
         {
             strError = I18nService.getLocalizedString( MESSAGE_INVALID_SEARCH_TERMS, locale );
         }
-        if( strQuery == null || strQuery.length() == 0)
+        if( StringUtils.isBlank( strQuery ) )
         {
-            strQuery = ALL_SEARCH_QUERY;
+        	strQuery = ALL_SEARCH_QUERY;
+        	String strOnlyFacets = AppPropertiesService.getProperty( PROPERTY_ONLY_FACTES );
+        	if( ( facetQuery == null || facetQuery.length <= 0 ) && StringUtils.isNotBlank( strOnlyFacets ) && SolrConstants.CONSTANT_TRUE.equals( strOnlyFacets ) )
+        	{
+        		//no request and no facet selected : we show the facets but no result
+        		nLimit = 0;
+        	}
         }
 
         String strNbItemPerPage = request.getParameter( PARAMETER_NB_ITEMS_PER_PAGE );
@@ -169,7 +187,7 @@ public class SolrSearchApp implements XPageApplication
         strCurrentPageIndex = ( strCurrentPageIndex != null ) ? strCurrentPageIndex : DEFAULT_PAGE_INDEX;
 
         SolrSearchEngine engine = SolrSearchEngine.getInstance(  );
-        SolrFacetedResult facetedResult = engine.getFacetedSearchResults( strQuery, facetQuery, sort, order );
+        SolrFacetedResult facetedResult = engine.getFacetedSearchResults( strQuery, facetQuery, sort, order, nLimit );
         List<SolrSearchResult> listResults = facetedResult.getSolrSearchResults(  );
 
         // The page should not be added to the cache
@@ -201,6 +219,7 @@ public class SolrSearchApp implements XPageApplication
         model.put( MARK_SOLR_FIELDS, SolrFieldManager.getFacetList(  ) );
         model.put( MARK_FACETS_DATE, facetedResult.getFacetDateList(  ) );
         model.put( MARK_HISTORIQUE, sfm.getCurrentFacet(  ) );
+        model.put( MARK_FACETS_LIST, lstSingleFacetQueries );
         if( strQuery != null && strQuery.compareToIgnoreCase( ALL_SEARCH_QUERY )!=0 )
         {
         	SpellCheckResponse checkResponse = engine.getSpellChecker( strQuery );

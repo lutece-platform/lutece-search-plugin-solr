@@ -33,10 +33,29 @@
  */
 package fr.paris.lutece.plugins.search.solr.business;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
+import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.SpellCheckResponse;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.util.NamedList;
+
 import fr.paris.lutece.plugins.search.solr.business.facetIntersection.FacetIntersection;
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
 import fr.paris.lutece.plugins.search.solr.indexer.SolrItem;
+import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
 import fr.paris.lutece.plugins.search.solr.util.SolrUtil;
 import fr.paris.lutece.portal.business.page.Page;
 import fr.paris.lutece.portal.service.search.SearchEngine;
@@ -47,24 +66,6 @@ import fr.paris.lutece.portal.service.security.SecurityService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.SpellCheckResponse;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.util.NamedList;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.servlet.http.HttpServletRequest;
-
 
 /**
  *
@@ -73,11 +74,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class SolrSearchEngine implements SearchEngine
 {
-    private static final String PROPERTY_SOLR_RESPONSE_MAX = "solr.reponse.max";
     private static final String PROPERTY_SOLR_HIGHLIGHT_PRE = "solr.highlight.pre";
     private static final String PROPERTY_SOLR_HIGHLIGHT_POST = "solr.highlight.post";
-    private static final int SOLR_RESPONSE_MAX = Integer.parseInt( AppPropertiesService.getProperty( 
-                PROPERTY_SOLR_RESPONSE_MAX ) );
     private static final String SOLR_HIGHLIGHT_PRE = AppPropertiesService.getProperty( PROPERTY_SOLR_HIGHLIGHT_PRE );
     private static final String SOLR_HIGHLIGHT_POST = AppPropertiesService.getProperty( PROPERTY_SOLR_HIGHLIGHT_POST );
     private static SolrSearchEngine _instance;
@@ -148,11 +146,14 @@ public class SolrSearchEngine implements SearchEngine
     /**
      * Return the result with facets. Does NOT support authentification yet.
      * @param strQuery the query
-     * @param request the request
+     * @param facetQueries The selected facets
+     * @param sortName The facet name to sort by
+     * @param sortOrder "asc" or "desc"
+     * @param nLimit Maximal number of results. -1 = unlimited
      * @return the result with facets
      */
     public SolrFacetedResult getFacetedSearchResults( String strQuery, String[] facetQueries, String sortName,
-        String sortOrder )
+        String sortOrder, int nLimit )
     {
         SolrFacetedResult facetedResult = new SolrFacetedResult(  );
 
@@ -170,7 +171,10 @@ public class SolrSearchEngine implements SearchEngine
             query.setFacet( true );
             query.setFacetLimit( 8 );
             query.setFacetMinCount( 1 );
-            query.setRows( SOLR_RESPONSE_MAX ); //TODO back office parametre
+            if( nLimit != SolrConstants.CONSTANT_UNLIMITED_RESULT )
+            {
+            	query.setRows( nLimit );
+            }
 
             for ( Field field : SolrFieldManager.getFacetList(  ).values(  ) )
             {
