@@ -8,3 +8,5 @@ CREATE TABLE  solr_indexer_action (
   id_portlet int default 0 NOT NULL,
   PRIMARY KEY (id_action)
 );
+
+ALTER TABLE solr_fields MODIFY label varchar(255) default NULL;

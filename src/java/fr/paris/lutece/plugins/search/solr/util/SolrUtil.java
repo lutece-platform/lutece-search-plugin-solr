@@ -123,7 +123,15 @@ public final class SolrUtil
             searchResult.setTitle( item.getTitle(  ) );
             searchResult.setType( item.getType(  ) );
             searchResult.setUrl( item.getUrl(  ) );
-
+            searchResult.setCategorie( item.getCategorie(  ) );
+            searchResult.setXmlContent( item.getXmlContent(  ) );
+            searchResult.setMetadata( item.getMetadata(  ) );
+            searchResult.setDocPortletId( item.getDocPortletId(  ) );
+            searchResult.setHieDate( item.getHieDate() );
+            
+            // The name of the dynamic fields is like NAME_XXX where XXX is a SolrItem dynamic field type
+            searchResult.setDynamicFields( item.getDynamicFields() );
+            
             if ( highlights != null )
             {
                 searchResult.setHighlight( highlights.getHighlights( searchResult.getId(  ) ) );
