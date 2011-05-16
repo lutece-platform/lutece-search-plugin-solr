@@ -9,6 +9,8 @@ public class SolrConstants
 	public static final String CONSTANT_WILDCARD = "*";
 	public static final String CONSTANT_UNDERSCORE = "_";
 	public static final String CONSTANT_AND = "&";
+	public static final String CONSTANT_COLON = ":";
+	public static final String CONSTANT_QUOTE = "\"";
 	
 	public static final String CONSTANT_TRUE = "true";
 }

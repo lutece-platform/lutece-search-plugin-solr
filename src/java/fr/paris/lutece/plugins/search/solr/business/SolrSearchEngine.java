@@ -79,7 +79,8 @@ public class SolrSearchEngine implements SearchEngine
     private static final String SOLR_HIGHLIGHT_PRE = AppPropertiesService.getProperty( PROPERTY_SOLR_HIGHLIGHT_PRE );
     private static final String SOLR_HIGHLIGHT_POST = AppPropertiesService.getProperty( PROPERTY_SOLR_HIGHLIGHT_POST );
     private static SolrSearchEngine _instance;
-
+    private static final String COLON_QUOTE = ":\"";
+    
     /**
     * Return search results
     * @param strQuery The search query
@@ -233,7 +234,9 @@ public class SolrSearchEngine implements SearchEngine
             {
                 for ( String facetQuery : facetQueries )
                 {
-                    query.addFilterQuery( facetQuery );
+                	String strFacetQuery = facetQuery.replaceFirst( SolrConstants.CONSTANT_COLON, COLON_QUOTE );
+                	strFacetQuery += SolrConstants.CONSTANT_QUOTE;
+                    query.addFilterQuery( strFacetQuery );
                 }
             }
 
