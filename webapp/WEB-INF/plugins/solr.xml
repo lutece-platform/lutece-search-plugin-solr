@@ -1,14 +1,13 @@
-<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-<plug-in>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?><plug-in>
 
     <!-- Plugin Informations -->
     <name>solr</name>
     <class>fr.paris.lutece.plugins.search.solr.service.SolrPlugin</class>
     <version>2.1.1</version>
-    <documentation />
-    <installation />
-    <changes />
-    <user-guide />
+    <documentation/>
+    <installation/>
+    <changes/>
+    <user-guide/>
     <description>search.solr.plugin.description</description>
     <provider>search.solr.plugin.provider</provider>
     <provider-url>http://lutece.paris.fr</provider-url>
@@ -16,7 +15,7 @@
     <copyright>Copyright 2001-2011 Mairie de Paris</copyright>
     <core-version-dependency>
         <min-core-version>2.9.9</min-core-version>
-        <max-core-version />
+        <max-core-version/>
     </core-version-dependency>
     <db-pool-required>1</db-pool-required>
 
@@ -36,7 +35,7 @@
             <feature-url>jsp/admin/search/solr/ManageSearchIndexation.jsp</feature-url>
             <feature-icon-url>images/admin/skin/plugins/search/solr_FC.jpg</feature-icon-url>
             <feature-group>SYSTEM</feature-group>
-            <feature-documentation-url />
+            <feature-documentation-url/>
         </admin-feature>
         <admin-feature>
             <feature-id>SOLR_CONFIGURATION_MANAGEMENT</feature-id>
@@ -46,7 +45,7 @@
             <feature-url>jsp/admin/search/solr/ManageSearchConfiguration.jsp</feature-url>
             <feature-icon-url>images/admin/skin/plugins/search/solr_FC.jpg</feature-icon-url>
             <feature-group>SYSTEM</feature-group>
-            <feature-documentation-url />
+            <feature-documentation-url/>
         </admin-feature>
         <admin-feature>
             <feature-id>SOLR_FIELDS_MANAGEMENT</feature-id>
@@ -56,7 +55,7 @@
             <feature-url>jsp/admin/search/solr/ManageSolrFields.jsp</feature-url>
             <feature-icon-url>images/admin/skin/plugins/search/solr_FC.jpg</feature-icon-url>
             <feature-group>SYSTEM</feature-group>
-            <feature-documentation-url />
+            <feature-documentation-url/>
         </admin-feature>
     </admin-features>
 
