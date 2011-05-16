@@ -163,10 +163,11 @@ public class SolrSearchApp implements XPageApplication
         int nLimit = SOLR_RESPONSE_MAX;
         
         // Check XSS characters
-        if ( ( strQuery != null ) && ( StringUtil.containsXssCharacters( strQuery ) ) )
-        {
-            strError = I18nService.getLocalizedString( MESSAGE_INVALID_SEARCH_TERMS, locale );
-        }
+        // Anno SOLR-18
+//        if ( ( strQuery != null ) && ( StringUtil.containsXssCharacters( strQuery ) ) )
+//        {
+//            strError = I18nService.getLocalizedString( MESSAGE_INVALID_SEARCH_TERMS, locale );
+//        }
         if( StringUtils.isBlank( strQuery ) )
         {
         	strQuery = ALL_SEARCH_QUERY;
