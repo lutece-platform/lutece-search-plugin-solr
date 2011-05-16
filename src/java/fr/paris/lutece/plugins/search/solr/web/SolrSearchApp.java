@@ -206,6 +206,10 @@ public class SolrSearchApp implements XPageApplication
 
         url.addParameter( PARAMETER_QUERY, strQueryForPaginator );
         url.addParameter( PARAMETER_NB_ITEMS_PER_PAGE, nNbItemsPerPage );
+        for( String strFacetName : lstSingleFacetQueries )
+        {
+        	url.addParameter( PARAMETER_FACET_QUERY, SolrUtil.encodeUrl( strFacetName ) );
+        }
 
         Paginator<SolrSearchResult> paginator = new Paginator<SolrSearchResult>( listResults, nNbItemsPerPage, url.getUrl(  ), PARAMETER_PAGE_INDEX,
                 strCurrentPageIndex );
