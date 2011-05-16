@@ -114,6 +114,7 @@ public class SolrSearchApp implements XPageApplication
     private static final String MARK_FACETS_LIST = "facets_list";
     private static final String PROPERTY_ENCODE_URI = "search.encode.uri";
     private static final boolean DEFAULT_ENCODE_URI = false;
+    private static Map<String, Object> _lastSearchModel;
 
     /**
      * Returns search results
@@ -238,6 +239,8 @@ public class SolrSearchApp implements XPageApplication
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_RESULTS, locale, model );
 
+        _lastSearchModel = model;
+        
         page.setPathLabel( I18nService.getLocalizedString( PROPERTY_PATH_LABEL, locale ) );
         page.setTitle( I18nService.getLocalizedString( PROPERTY_PAGE_TITLE, locale ) );
         page.setContent( template.getHtml(  ) );
@@ -258,5 +261,14 @@ public class SolrSearchApp implements XPageApplication
         event.setResultsCount( nResultsCount );
         event.setRequest( request );
         QueryListenersService.getInstance(  ).notifyListeners( event );
+    }
+    
+    /**
+     * Return the model used during the last search
+     * @return  the model used during the last search
+     */
+    public static Map<String, Object> getLastSearchModel()
+    {
+    	return _lastSearchModel;
     }
 }
