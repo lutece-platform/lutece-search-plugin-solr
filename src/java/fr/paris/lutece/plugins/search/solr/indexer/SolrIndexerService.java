@@ -59,6 +59,7 @@ import fr.paris.lutece.portal.service.search.IndexationService;
 import fr.paris.lutece.portal.service.search.SearchItem;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
+import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
 
@@ -72,8 +73,9 @@ public final class SolrIndexerService
 	private static final SolrServer SOLR_SERVER = SolrServerService.getInstance(  ).getSolrServer(  );
     private static final List<SolrIndexer> INDEXERS = initIndexersList(  );
     private static final String PARAM_TYPE_PAGE = "Page";
-    private static final String SITE = AppPropertiesService.getProperty( "lutece.name" );
     private static StringBuffer _sbLogs;
+    private static final String PROPERTY_SITE = "lutece.name";
+    private static final String PROPERTY_PROD_URL = "lutece.prod.url";
     
     /**
      * Empty private constructor
@@ -131,7 +133,8 @@ public final class SolrIndexerService
     	Plugin plugin = PluginService.getPlugin( SolrPlugin.PLUGIN_NAME );
     	
         boolean bCreateIndex = bCreate;
-
+        String strWebappName = getWebAppName(  );
+        
         try
         {
             Directory dir = IndexationService.getDirectoryIndex(  );
@@ -148,7 +151,8 @@ public final class SolrIndexerService
             	_sbLogs.append( "\r\nIndexing all contents ...\r\n" );
 
             	// Remove all indexed values of this site
-            	SOLR_SERVER.deleteByQuery( SearchItem.FIELD_UID + ":" + SITE + SolrConstants.CONSTANT_UNDERSCORE + SolrConstants.CONSTANT_WILDCARD );
+            	
+            	SOLR_SERVER.deleteByQuery( SearchItem.FIELD_UID + ":" + strWebappName + SolrConstants.CONSTANT_UNDERSCORE + SolrConstants.CONSTANT_WILDCARD );
             	
                 for ( SolrIndexer solrIndexer : INDEXERS )
                 {
@@ -215,7 +219,7 @@ public final class SolrIndexerService
                             else
                             {
                                 //delete all index linked to uid. We get the uid of the resource to prefix it like we do during the indexation 
-                            	SOLR_SERVER.deleteByQuery( SearchItem.FIELD_UID + ":" + SITE + SolrConstants.CONSTANT_UNDERSCORE + indexer.getResourceUid( action.getIdDocument(  ), action.getTypeResource() ) );
+                            	SOLR_SERVER.deleteByQuery( SearchItem.FIELD_UID + ":" + strWebappName + SolrConstants.CONSTANT_UNDERSCORE + indexer.getResourceUid( action.getIdDocument(  ), action.getTypeResource() ) );
                             }
 
                             _sbLogs.append( "Deleting " );
@@ -401,9 +405,10 @@ public final class SolrIndexerService
     private static SolrInputDocument solrItem2SolrInputDocument( SolrItem solrItem )
     {
     	SolrInputDocument solrInputDocument = new SolrInputDocument();
+    	String strWebappName = getWebAppName(  );
     	
     	// Prefix the uid by the name of the site. Without that, it is necessary imposible to index two resources of two different sites with the same identifier
-    	solrInputDocument.addField( SearchItem.FIELD_UID, SITE + SolrConstants.CONSTANT_UNDERSCORE + solrItem.getUid() );
+    	solrInputDocument.addField( SearchItem.FIELD_UID, strWebappName + SolrConstants.CONSTANT_UNDERSCORE + solrItem.getUid() );
     	solrInputDocument.addField( SearchItem.FIELD_DATE, solrItem.getDate() );
     	solrInputDocument.addField( SearchItem.FIELD_TYPE, solrItem.getType(  ) );
     	solrInputDocument.addField( SearchItem.FIELD_SUMMARY, solrItem.getSummary(  ) );
@@ -435,5 +440,30 @@ public final class SolrIndexerService
     private static List<SolrIndexer> initIndexersList(  )
     {
         return SpringContextService.getBeansOfType( SolrIndexer.class );
+    }
+    
+    /**
+     * Return the url of the webapp
+     * @return strBase the webapp url
+     */
+    public static String getBaseUrl(  )
+    {
+    	String strBaseUrl = AppPropertiesService.getProperty( PROPERTY_PROD_URL );
+    	
+    	if ( !strBaseUrl.endsWith( "/" ) )
+        {
+    		strBaseUrl = strBaseUrl + "/";
+        }
+    	
+    	return strBaseUrl + AppPathService.getPortalUrl(  );
+    }
+    
+    /**
+     * Return the name of the webapp
+     * @return the name of the webapp
+     */
+    public static String getWebAppName(  )
+    {
+    	return AppPropertiesService.getProperty( PROPERTY_SITE );
     }
 }

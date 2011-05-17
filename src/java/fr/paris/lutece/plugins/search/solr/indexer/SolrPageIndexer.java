@@ -59,14 +59,11 @@ import fr.paris.lutece.util.url.UrlItem;
 public class SolrPageIndexer implements SolrIndexer
 {
 	public static final String NAME = "SolrPageIndexer";
-    private static final String SITE = AppPropertiesService.getProperty( "lutece.name" );
     private static final String PARAMETER_PAGE_ID = "page_id";
     private static final String DESCRIPTION = "Solr page Indexer";
     private static final String VERSION = "1.0.0";
     private static final String TYPE = "PAGE";
     private static final String CATEGORIE = "Html";
-    private static final String PROPERTY_PAGE_BASE_URL = "solr.pageIndexer.baseUrl";
-    private static final String SITE_URL = AppPropertiesService.getProperty( PROPERTY_PAGE_BASE_URL );
     private static final String PROPERTY_INDEXER_ENABLE = "solr.indexer.page.enable";
     private static final String BEAN_PAGE_SERVICE = "pageService";
     
@@ -90,7 +87,7 @@ public class SolrPageIndexer implements SolrIndexer
         for ( Page page : listPages )
         {
             // Generates the item to index
-            SolrItem item = getItem( page, SITE_URL );
+            SolrItem item = getItem( page, SolrIndexerService.getBaseUrl(  ) );
             if( item != null )
             {
             	SolrIndexerService.write( item );
@@ -142,7 +139,7 @@ public class SolrPageIndexer implements SolrIndexer
         }
 
         item.setType( TYPE );
-        item.setSite( SITE );
+        item.setSite( SolrIndexerService.getWebAppName(  ) );
 
         List<String> cat = new ArrayList<String>(  );
         cat.add( CATEGORIE );
@@ -209,7 +206,7 @@ public class SolrPageIndexer implements SolrIndexer
 		{
     		int nIdDocument = Integer.parseInt( strIdDocument );
         	Page page = PageHome.getPage( nIdDocument );
-        	lstItems.add( getItem( page, SITE_URL ) );
+        	lstItems.add( getItem( page, SolrIndexerService.getBaseUrl(  ) ) );
 		}
 		catch ( Exception e )
 		{
