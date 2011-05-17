@@ -42,6 +42,7 @@ import java.util.List;
 import org.apache.lucene.demo.html.HTMLParser;
 
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
+import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
 import fr.paris.lutece.plugins.search.utils.SolrPageIndexerUtils;
 import fr.paris.lutece.portal.business.page.Page;
 import fr.paris.lutece.portal.business.page.PageHome;
@@ -66,6 +67,7 @@ public class SolrPageIndexer implements SolrIndexer
     private static final String CATEGORIE = "Html";
     private static final String PROPERTY_INDEXER_ENABLE = "solr.indexer.page.enable";
     private static final String BEAN_PAGE_SERVICE = "pageService";
+    private static final String SHORT_NAME = "page";
     
     private static final List<String> LIST_RESSOURCES_NAME = new ArrayList<String>();
 	
@@ -229,6 +231,9 @@ public class SolrPageIndexer implements SolrIndexer
 	 */
 	public String getResourceUid( String strResourceId, String strResourceType )
 	{
-		return strResourceId;
+		StringBuffer sb = new StringBuffer( strResourceId );
+    	sb.append( SolrConstants.CONSTANT_UNDERSCORE ).append( SHORT_NAME );
+        
+    	return sb.toString(  );
 	}
 }
