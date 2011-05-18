@@ -80,6 +80,7 @@ public class SolrSearchEngine implements SearchEngine
     private static final String SOLR_HIGHLIGHT_POST = AppPropertiesService.getProperty( PROPERTY_SOLR_HIGHLIGHT_POST );
     private static SolrSearchEngine _instance;
     private static final String COLON_QUOTE = ":\"";
+    private static final String DATE_COLON = "date:";
     
     /**
     * Return search results
@@ -232,11 +233,19 @@ public class SolrSearchEngine implements SearchEngine
             //FacetQuery
             if ( facetQueries != null )
             {
-                for ( String facetQuery : facetQueries )
+                for ( String strFacetQuery : facetQueries )
                 {
-                	String strFacetQuery = facetQuery.replaceFirst( SolrConstants.CONSTANT_COLON, COLON_QUOTE );
-                	strFacetQuery += SolrConstants.CONSTANT_QUOTE;
-                    query.addFilterQuery( strFacetQuery );
+                	if( strFacetQuery.startsWith( DATE_COLON ) )
+                	{
+                		query.addFilterQuery( strFacetQuery );
+                	}
+                	else
+                	{
+                		String strFacetQueryWithColon;
+                		strFacetQueryWithColon = strFacetQuery.replaceFirst( SolrConstants.CONSTANT_COLON, COLON_QUOTE );
+                		strFacetQueryWithColon += SolrConstants.CONSTANT_QUOTE;
+                		query.addFilterQuery( strFacetQueryWithColon );
+                	}
                 }
             }
 
