@@ -112,6 +112,7 @@ public class SolrSearchApp implements XPageApplication
     private static final String MARK_SORT_LIST = "sort_list";
     private static final String MARK_FACET_TREE = "facet_tree";
     private static final String MARK_FACETS_LIST = "facets_list";
+    private static final String MARK_ENCODING = "encoding";
     private static final String PROPERTY_ENCODE_URI = "search.encode.uri";
     private static final boolean DEFAULT_ENCODE_URI = false;
     private static Map<String, Object> _lastSearchModel;
@@ -239,6 +240,7 @@ public class SolrSearchApp implements XPageApplication
         model.put( MARK_SORT_ORDER, order );
         model.put( MARK_SORT_LIST, SolrFieldManager.getSortList(  ) );
         model.put( MARK_FACET_TREE, facetedResult.getFacetIntersection(  ) );
+        model.put( MARK_ENCODING, SolrUtil.getEncoding(  ) );
         String strRequestUrl = request.getRequestURL(  ).toString(  );
         model.put( FULL_URL, strRequestUrl );
 

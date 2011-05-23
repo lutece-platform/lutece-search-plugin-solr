@@ -171,11 +171,10 @@ public final class SolrUtil
         throws SiteMessageException
     {
         String strEncoded = SolrConstants.CONSTANT_EMPTY_STRING;
-        String strURIEncoding = AppPropertiesService.getProperty( PROPERTY_ENCODE_URI_ENCODING, DEFAULT_URI_ENCODING );
 
         try
         {
-            strEncoded = URLEncoder.encode( strSource, strURIEncoding );
+            strEncoded = URLEncoder.encode( strSource, getEncoding(  ) );
         }
         catch ( UnsupportedEncodingException e )
         {
@@ -187,5 +186,16 @@ public final class SolrUtil
         }
 
         return strEncoded;
+    }
+    
+    /**
+     * Return the encoding define in the properties
+     * @return the encoding define in the properties
+     */
+    public static String getEncoding(  )
+    {
+    	String strURIEncoding = AppPropertiesService.getProperty( PROPERTY_ENCODE_URI_ENCODING, DEFAULT_URI_ENCODING );
+    	
+    	return strURIEncoding;
     }
 }
