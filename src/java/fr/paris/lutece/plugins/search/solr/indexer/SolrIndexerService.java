@@ -40,6 +40,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.store.Directory;
@@ -76,6 +77,7 @@ public final class SolrIndexerService
     private static StringBuffer _sbLogs;
     private static final String PROPERTY_SITE = "lutece.name";
     private static final String PROPERTY_PROD_URL = "lutece.prod.url";
+    private static final String PROPERTY_BASE_URL = "lutece.base.url";
     
     /**
      * Empty private constructor
@@ -448,7 +450,12 @@ public final class SolrIndexerService
      */
     public static String getBaseUrl(  )
     {
-    	String strBaseUrl = AppPropertiesService.getProperty( PROPERTY_PROD_URL );
+    	String strBaseUrl = AppPropertiesService.getProperty( PROPERTY_BASE_URL );
+    	
+    	if( StringUtils.isBlank( strBaseUrl ) )
+    	{
+    		strBaseUrl = AppPropertiesService.getProperty( PROPERTY_PROD_URL );
+    	}
     	
     	if ( !strBaseUrl.endsWith( "/" ) )
         {
