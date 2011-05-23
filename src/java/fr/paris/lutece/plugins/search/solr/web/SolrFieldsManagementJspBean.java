@@ -44,6 +44,7 @@ import fr.paris.lutece.plugins.search.solr.business.field.FieldHome;
 import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
 import fr.paris.lutece.plugins.search.solr.indexer.SolrIndexerService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
@@ -159,8 +160,7 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
         }
         catch ( UnsupportedEncodingException e )
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace(  );
+        	AppLogService.error( e.getMessage(  ), e );
         }
 
         field.setIsFacet( request.getParameter( "isfacet" ) != null );
@@ -184,8 +184,7 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
         }
         catch ( UnsupportedEncodingException e )
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace(  );
+        	AppLogService.error( e.getMessage(  ), e );
         }
 
         field.setIsFacet( request.getParameter( "isfacet" ) != null );

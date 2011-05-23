@@ -76,8 +76,14 @@ public class SolrSearchEngine implements SearchEngine
 {
     private static final String PROPERTY_SOLR_HIGHLIGHT_PRE = "solr.highlight.pre";
     private static final String PROPERTY_SOLR_HIGHLIGHT_POST = "solr.highlight.post";
+    private static final String PROPERTY_SOLR_HIGHLIGHT_SNIPPETS = "solr.highlight.snippets";
+    private static final String PROPERTY_SOLR_HIGHLIGHT_FRAGSIZE = "solr.highlight.fragsize";
+    private static final String PROPERTY_SOLR_FACET_DATE_START = "solr.facet.date.start";
     private static final String SOLR_HIGHLIGHT_PRE = AppPropertiesService.getProperty( PROPERTY_SOLR_HIGHLIGHT_PRE );
     private static final String SOLR_HIGHLIGHT_POST = AppPropertiesService.getProperty( PROPERTY_SOLR_HIGHLIGHT_POST );
+    private static final int SOLR_HIGHLIGHT_SNIPPETS = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_HIGHLIGHT_SNIPPETS, 5 );
+    private static final int SOLR_HIGHLIGHT_FRAGSIZE = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_HIGHLIGHT_FRAGSIZE, 100 );
+    private static final String SOLR_FACET_DATE_START = AppPropertiesService.getProperty( PROPERTY_SOLR_FACET_DATE_START );
     private static SolrSearchEngine _instance;
     private static final String COLON_QUOTE = ":\"";
     private static final String DATE_COLON = "date:";
@@ -168,8 +174,8 @@ public class SolrSearchEngine implements SearchEngine
             query.setHighlight( true );
             query.setHighlightSimplePre( SOLR_HIGHLIGHT_PRE );
             query.setHighlightSimplePost( SOLR_HIGHLIGHT_POST );
-            query.setHighlightSnippets( 5 ); //TODO back office parametre
-            query.setHighlightFragsize( 100 ); //TODO back office parametre
+            query.setHighlightSnippets( SOLR_HIGHLIGHT_SNIPPETS );
+            query.setHighlightFragsize( SOLR_HIGHLIGHT_FRAGSIZE );
             query.setFacet( true );
             query.setFacetLimit( 8 );
             query.setFacetMinCount( 1 );
@@ -183,7 +189,7 @@ public class SolrSearchEngine implements SearchEngine
                     if ( field.getName(  ).equalsIgnoreCase( "date" ) )
                     {
                         query.setParam( "facet.date", "date" );
-                        query.setParam( "facet.date.start", "NOW/YEAR-50YEARS" );
+                        query.setParam( "facet.date.start", SOLR_FACET_DATE_START );
                         query.setParam( "facet.date.gap", "+1MONTH" );
                         query.setParam( "facet.date.end", "NOW" );
                         query.setParam( "facet.date.mincount", "0" );
@@ -363,8 +369,7 @@ public class SolrSearchEngine implements SearchEngine
         }
         catch ( SolrServerException e )
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace(  );
+        	AppLogService.error( e.getMessage(  ), e );
         }
 
         return spellCheck;
@@ -387,8 +392,7 @@ public class SolrSearchEngine implements SearchEngine
         }
         catch ( SolrServerException e )
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace(  );
+        	AppLogService.error( e.getMessage(  ), e );
         }
 
         return response;
@@ -425,8 +429,7 @@ public class SolrSearchEngine implements SearchEngine
         }
         catch ( SolrServerException e )
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace(  );
+        	AppLogService.error( e.getMessage(  ), e );
         }
 
         return xmlContent;
