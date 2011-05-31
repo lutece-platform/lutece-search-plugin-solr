@@ -49,6 +49,7 @@ import fr.paris.lutece.portal.business.page.PageHome;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.page.IPageService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.url.UrlItem;
 
@@ -70,6 +71,7 @@ public class SolrPageIndexer implements SolrIndexer
     private static final String SHORT_NAME = "page";
     
     private static final List<String> LIST_RESSOURCES_NAME = new ArrayList<String>();
+	private static final String PAGE_INDEXATION_ERROR = "[SolrPageIndexer] An error occured during the indexation of the page number ";
 	
     /**
      * Creates a new SolrPageIndexer
@@ -82,19 +84,30 @@ public class SolrPageIndexer implements SolrIndexer
     /**
      * {@inheritDoc}
      */
-    public void indexDocuments(  ) throws IOException, InterruptedException, SiteMessageException
+    public List<String> indexDocuments(  )
     {
         List<Page> listPages = PageHome.getAllPages(  );
+        List<String> lstErrors = new ArrayList<String>(  );
         
         for ( Page page : listPages )
         {
-            // Generates the item to index
-            SolrItem item = getItem( page, SolrIndexerService.getBaseUrl(  ) );
-            if( item != null )
-            {
-            	SolrIndexerService.write( item );
-            }
+        	try
+        	{
+        		// Generates the item to index
+        		SolrItem item = getItem( page, SolrIndexerService.getBaseUrl(  ) );
+        		if( item != null )
+        		{
+        			SolrIndexerService.write( item );
+        		}
+        	}
+        	catch ( Exception e )
+        	{
+        		lstErrors.add( SolrIndexerService.buildErrorMessage( e ) );
+        		AppLogService.error( PAGE_INDEXATION_ERROR + page.getId(  ), e );
+        	}
         }
+        
+        return lstErrors;
     }
 
     /**

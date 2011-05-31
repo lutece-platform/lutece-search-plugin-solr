@@ -33,11 +33,9 @@
  */
 package fr.paris.lutece.plugins.search.solr.indexer;
 
-import java.io.IOException;
 import java.util.List;
 
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
-import fr.paris.lutece.portal.service.message.SiteMessageException;
 
 
 /**
@@ -49,11 +47,9 @@ public interface SolrIndexer
 {
 	/**
      * Index all solr documents from the plugin, replace  List<SolrItem> getDocuments(  ) method
-     * @throws IOException If an IO error occured
-     * @throws InterruptedException If a thread error occured
-     * @throws SiteMessageException occurs when a site message need to be displayed
+     * @return A list of error messages or null if there is no error
      */
-	void indexDocuments(  ) throws IOException, InterruptedException, SiteMessageException;
+	List<String> indexDocuments(  );
 
     /**
      * Returns the name of the indexer.

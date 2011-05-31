@@ -158,33 +158,27 @@ public final class SolrIndexerService
             	
                 for ( SolrIndexer solrIndexer : INDEXERS )
                 {
-                	try
-                    {
-                		if ( solrIndexer.isEnable(  ) )
+                	if ( solrIndexer.isEnable(  ) )
+                	{
+                		_sbLogs.append( "\r\n<strong>Indexer : " );
+                		_sbLogs.append( solrIndexer.getName(  ) );
+                		_sbLogs.append( " - " );
+                		_sbLogs.append( solrIndexer.getDescription(  ) );
+                		_sbLogs.append( "</strong>\r\n" );
+
+                		//the indexer will call write(doc)
+                		List<String> lstErrors = solrIndexer.indexDocuments(  );
+
+                		if( lstErrors != null )
                 		{
-                			_sbLogs.append( "\r\n<strong>Indexer : " );
-                			_sbLogs.append( solrIndexer.getName(  ) );
-                			_sbLogs.append( " - " );
-                			_sbLogs.append( solrIndexer.getDescription(  ) );
-                			_sbLogs.append( "</strong>\r\n" );
-
-                			//the indexer will call write(doc)
-                			solrIndexer.indexDocuments();
+                			for( String strError : lstErrors )
+                			{
+                				_sbLogs.append( "<strong>ERROR : " );
+                				_sbLogs.append( strError );
+                				_sbLogs.append( "</strong>\r\n" );
+                			}
                 		}
-                    }
-                	catch ( Exception e )
-                    {
-                        _sbLogs.append( "<strong>ERROR : " );
-                        _sbLogs.append( e.getMessage(  ) );
-
-                        if ( e.getCause(  ) != null )
-                        {
-                            _sbLogs.append( " : " );
-                            _sbLogs.append( e.getCause(  ).getMessage(  ) );
-                        }
-
-                        _sbLogs.append( "</strong>\r\n" );
-                    }
+                	}
                 }
                 
                 // Remove all actions of the database
@@ -307,6 +301,24 @@ public final class SolrIndexerService
 
         
         return _sbLogs.toString(  );
+    }
+    
+    /**
+     * Build the message error of an exception 
+     * @param exception The exception
+     * @return the message error of the exception 
+     */
+    public static String buildErrorMessage( Exception exception )
+    {
+    	StringBuffer sb = new StringBuffer(  );
+		sb.append( exception.getMessage() );
+		if ( exception.getCause(  ) != null )
+        {
+            sb.append( SolrConstants.CONSTANT_SPACE ).append( SolrConstants.CONSTANT_COLON ).append( SolrConstants.CONSTANT_SPACE );
+            sb.append( exception.getCause(  ).getMessage(  ) );
+        }
+		
+		return sb.toString(  );
     }
     
     /**
