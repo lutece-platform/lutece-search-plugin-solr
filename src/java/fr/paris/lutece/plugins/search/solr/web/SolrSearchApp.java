@@ -158,22 +158,21 @@ public class SolrSearchApp implements XPageApplication
                     Boolean.toString( DEFAULT_ENCODE_URI ) ) );
 
         String strSearchPageUrl = AppPropertiesService.getProperty( PROPERTY_SEARCH_PAGE_URL );
-        String strError = "";
+        String strError = SolrConstants.CONSTANT_EMPTY_STRING;
         Locale locale = request.getLocale(  );
 
         int nLimit = SOLR_RESPONSE_MAX;
         
         // Check XSS characters
-        // Anno SOLR-18
-//        if ( ( strQuery != null ) && ( StringUtil.containsXssCharacters( strQuery ) ) )
-//        {
-//            strError = I18nService.getLocalizedString( MESSAGE_INVALID_SEARCH_TERMS, locale );
-//        }
-        if( StringUtils.isBlank( strQuery ) )
+        if ( ( strQuery != null ) && ( StringUtil.containsXssCharacters( strQuery ) ) )
+        {
+            strError = I18nService.getLocalizedString( MESSAGE_INVALID_SEARCH_TERMS, locale );
+        }
+        if( StringUtils.isNotBlank( strError ) || StringUtils.isBlank( strQuery ) )
         {
         	strQuery = ALL_SEARCH_QUERY;
         	String strOnlyFacets = AppPropertiesService.getProperty( PROPERTY_ONLY_FACTES );
-        	if( ( facetQuery == null || facetQuery.length <= 0 ) && StringUtils.isNotBlank( strOnlyFacets ) && SolrConstants.CONSTANT_TRUE.equals( strOnlyFacets ) )
+        	if( StringUtils.isNotBlank( strError ) || ( ( facetQuery == null || facetQuery.length <= 0 ) && StringUtils.isNotBlank( strOnlyFacets ) && SolrConstants.CONSTANT_TRUE.equals( strOnlyFacets ) ) )
         	{
         		//no request and no facet selected : we show the facets but no result
         		nLimit = 0;
