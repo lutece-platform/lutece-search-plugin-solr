@@ -75,8 +75,8 @@ ${encoded_facets_queries}</#macro>
 									<#if count.count != 0>
 									<li>
 										<#assign toDate = "${count.name}"?datetime("yyyy-MM-dd'T'HH:mm:ss'Z'")>
-										<#assign daterange = "${field.name}:[${count.name} TO ${count.name}+1MONTH]"?url>
-										<#assign toString = "${toDate?string('MMMM yyyy')}">
+										<#assign daterange = "${field.name}:[${count.name} TO ${count.name}${facetDateGap}]"?url>
+										<#assign toString = "${toDate?string('yyyy')}">
 										<a href="${fullUrl}?page=search-solr&query=${query?url}&facetlabel=${toString}&facetname=${field.name}&fq=${daterange}<@EncodeFQ  facets_list/>">${toString}(${count.count})</a>
 									</li>
 									</#if>

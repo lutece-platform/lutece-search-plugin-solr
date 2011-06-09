@@ -72,6 +72,7 @@ import fr.paris.lutece.util.url.UrlItem;
 public class SolrSearchApp implements XPageApplication
 {
     private static final String FULL_URL = "fullUrl";
+    private static final String SOLR_FACET_DATE_GAP = "facetDateGap";
 	private static final String ALL_SEARCH_QUERY = "*:*";
 	////////////////////////////////////////////////////////////////////////////
     // Constants
@@ -242,6 +243,7 @@ public class SolrSearchApp implements XPageApplication
         model.put( MARK_ENCODING, SolrUtil.getEncoding(  ) );
         String strRequestUrl = request.getRequestURL(  ).toString(  );
         model.put( FULL_URL, strRequestUrl );
+        model.put( SOLR_FACET_DATE_GAP, SolrSearchEngine.SOLR_FACET_DATE_GAP );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_RESULTS, locale, model );
 
