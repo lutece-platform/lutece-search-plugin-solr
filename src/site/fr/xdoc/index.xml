@@ -6,8 +6,44 @@
 	<body>
 		<section name="Solr">
 			<p>
-			<a href="http://www.google.fr/search?q=solr+site%3Adev.lutece.paris.fr%2Fwikilutece" >En savoir plus.</a>
+            Configuration dans le web.xml
+            <pre>
+            
+    &lt;servlet&gt;
+        &lt;servlet-name&gt;SolrServlet&lt;/servlet-name&gt;
+        &lt;servlet-class&gt;fr.paris.lutece.plugins.search.solr.web.SolrSuggestServlet&lt;/servlet-class&gt;
+    &lt;/servlet&gt;
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;SolrServlet&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;/solrSuggest&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+            
+            </pre>
 			</p>
+            <p>
+    Configuration a ajouter au solrconfig.xml
+    
+    <pre>
+    &lt;requestHandler name="autoComplete" class="solr.SearchHandler"&gt;
+        &lt;lst name="defaults"&gt;
+            &lt;str name="defType"&gt;dismax&lt;/str&gt;
+            &lt;str name="qf"&gt;title&lt;/str&gt;
+            &lt;str name="pf"&gt;title&lt;/str&gt;
+            &lt;str name="qs"&gt;1&lt;/str&gt;
+            &lt;str name="ps"&gt;0&lt;/str&gt;
+            &lt;str name="tie"&gt;0.1&lt;/str&gt;
+            &lt;str name="fl"&gt;uid title&lt;/str&gt;
+        &lt;/lst&gt;
+    &lt;/requestHandler&gt;
+    </pre>
+
+            </p>
+            
+            
+            <p>
+http://dev.lutece.paris.fr/svn/lutece/contribs/atoswordline/trunk/config-SOLR/example/solr/conf/
+http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/technical/plugin-solrserver/webapp/WEB-INF/plugins/solrserver/conf/schema.xml
+            </p>
 		</section>
 	</body>
 </document>
