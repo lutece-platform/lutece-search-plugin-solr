@@ -33,12 +33,6 @@
  */
 package fr.paris.lutece.plugins.search.solr.web;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.plugins.search.solr.business.field.FieldHome;
 import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
@@ -47,6 +41,14 @@ import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
 import fr.paris.lutece.util.html.HtmlTemplate;
+
+import java.io.UnsupportedEncodingException;
+
+import java.net.URLDecoder;
+
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -81,10 +83,10 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
 
     public String getPage( HttpServletRequest request )
     {
-    	// Update fields to add dynamic fields of indexers
-    	SolrFieldManager.updateFields( SolrIndexerService.getAdditionalFields() );
-    	SolrFieldManager.reloadField(  );
-    	
+        // Update fields to add dynamic fields of indexers
+        SolrFieldManager.updateFields( SolrIndexerService.getAdditionalFields(  ) );
+        SolrFieldManager.reloadField(  );
+
         StringBuffer htmlBuffer = new StringBuffer(  );
         htmlBuffer.append( this.getFieldList( request ) );
 
@@ -103,11 +105,10 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
             //load Field
             Field updateField = FieldHome.findByPrimaryKey( Integer.parseInt( request.getParameter( "id" ) ) );
             model.put( "field", updateField );
-
         }
         else if ( request.getParameter( "create" ) != null )
         {
-        	//CREATE
+            //CREATE
             Field createField = new Field(  );
             model.put( "create", true );
             model.put( "field", createField );
@@ -160,7 +161,7 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
         }
         catch ( UnsupportedEncodingException e )
         {
-        	AppLogService.error( e.getMessage(  ), e );
+            AppLogService.error( e.getMessage(  ), e );
         }
 
         field.setIsFacet( request.getParameter( "isfacet" ) != null );
@@ -184,7 +185,7 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
         }
         catch ( UnsupportedEncodingException e )
         {
-        	AppLogService.error( e.getMessage(  ), e );
+            AppLogService.error( e.getMessage(  ), e );
         }
 
         field.setIsFacet( request.getParameter( "isfacet" ) != null );

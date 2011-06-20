@@ -33,12 +33,12 @@
  */
 package fr.paris.lutece.plugins.search.solr.business.indexeraction;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import fr.paris.lutece.portal.business.indexeraction.IndexerActionFilter;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -106,7 +106,7 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
      */
     public SolrIndexerAction load( int nId, Plugin plugin )
     {
-    	SolrIndexerAction indexerAction = null;
+        SolrIndexerAction indexerAction = null;
 
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_BY_PRIMARY_KEY, plugin );
         daoUtil.setInt( 1, nId );

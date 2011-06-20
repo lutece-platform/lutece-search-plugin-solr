@@ -82,20 +82,22 @@ public class SolrIndexerJspBean extends PluginAdminPageJspBean
      */
     public String doIndexing( HttpServletRequest request )
     {
-    	HashMap<String, String> model = new HashMap<String, String>(  );
-    	String strLogs;
-    	if ( request.getParameter( "incremental" ) != null )
-    	{
-    		strLogs = SolrIndexerService.processIndexing( false );
-    	}
-    	else
-    	{
-    		strLogs = SolrIndexerService.processIndexing( true );
-    	}
+        HashMap<String, String> model = new HashMap<String, String>(  );
+        String strLogs;
 
-    	model.put( MARK_LOGS, strLogs );
-    	HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_INDEXER_LOGS, null, model );
+        if ( request.getParameter( "incremental" ) != null )
+        {
+            strLogs = SolrIndexerService.processIndexing( false );
+        }
+        else
+        {
+            strLogs = SolrIndexerService.processIndexing( true );
+        }
 
-    	return getAdminPage( template.getHtml(  ) );
+        model.put( MARK_LOGS, strLogs );
+
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_INDEXER_LOGS, null, model );
+
+        return getAdminPage( template.getHtml(  ) );
     }
 }

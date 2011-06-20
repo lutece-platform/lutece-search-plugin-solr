@@ -33,10 +33,10 @@
  */
 package fr.paris.lutece.plugins.search.solr.business;
 
+import fr.paris.lutece.portal.service.search.SearchResult;
+
 import java.util.List;
 import java.util.Map;
-
-import fr.paris.lutece.portal.service.search.SearchResult;
 
 
 /**
@@ -54,7 +54,7 @@ public class SolrSearchResult extends SearchResult
     private String _strDocPortletId;
     private String _strHieDate;
     private String _strXmlContent;
-    
+
     /**
      * Return the highlight
      * @return the highlight
@@ -95,107 +95,107 @@ public class SolrSearchResult extends SearchResult
      * Return the categories
      * @return the list of categories
      */
-	public List<String> getCategorie()
-	{
-		return _lstCategories;
-	}
+    public List<String> getCategorie(  )
+    {
+        return _lstCategories;
+    }
 
-	/**
-	 * Set the categories
-	 * @param lstCategories the list of categories
-	 */
-	public void setCategorie( List<String> lstCategories )
-	{
-		_lstCategories = lstCategories;
-	}
+    /**
+     * Set the categories
+     * @param lstCategories the list of categories
+     */
+    public void setCategorie( List<String> lstCategories )
+    {
+        _lstCategories = lstCategories;
+    }
 
-	/**
-	 * Return the metadata
-	 * @return the metadata
-	 */
-	public String getMetadata()
-	{
-		return _strMetadata;
-	}
+    /**
+     * Return the metadata
+     * @return the metadata
+     */
+    public String getMetadata(  )
+    {
+        return _strMetadata;
+    }
 
-	/**
-	 * Set the metadata
-	 * @param strMetadata the metadata
-	 */
-	public void setMetadata( String strMetadata )
-	{
-		_strMetadata = strMetadata;
-	}
-	
-	/**
-	 * Return all the dynamics fields
-	 * @return A map which contains all the dynamics fields. The name of a dynamic field is like NAME_XXX where NAME is the name of the field and XXX a SolrItem dynamic type  
-	 */
-	public Map<String, Object> getDynamicFields()
-	{
-		return _dynamicFields;
-	}
-	
-	/**
-	 * Set the dynamics fields
-	 * @param dynamicFields the dynamics fields
-	 */
-	public void setDynamicFields( Map<String, Object> dynamicFields )
-	{
-		_dynamicFields = dynamicFields;
-	}
+    /**
+     * Set the metadata
+     * @param strMetadata the metadata
+     */
+    public void setMetadata( String strMetadata )
+    {
+        _strMetadata = strMetadata;
+    }
 
-	/**
-	 * Return the portlet identifier
-	 * @return the portlet identifier
-	 */
-	public String getDocPortletId()
-	{
-		return _strDocPortletId;
-	}
+    /**
+     * Return all the dynamics fields
+     * @return A map which contains all the dynamics fields. The name of a dynamic field is like NAME_XXX where NAME is the name of the field and XXX a SolrItem dynamic type
+     */
+    public Map<String, Object> getDynamicFields(  )
+    {
+        return _dynamicFields;
+    }
 
-	/**
-	 * Set the portlet identifier
-	 * @param strDocPortletId the portlet identifier
-	 */
-	public void setDocPortletId( String strDocPortletId )
-	{
-		_strDocPortletId = strDocPortletId;
-	}
+    /**
+     * Set the dynamics fields
+     * @param dynamicFields the dynamics fields
+     */
+    public void setDynamicFields( Map<String, Object> dynamicFields )
+    {
+        _dynamicFields = dynamicFields;
+    }
 
-	/**
-	 * Return the hierarchical date
-	 * @return the hierarchical date
-	 */
-	public String getHieDate()
-	{
-		return _strHieDate;
-	}
+    /**
+     * Return the portlet identifier
+     * @return the portlet identifier
+     */
+    public String getDocPortletId(  )
+    {
+        return _strDocPortletId;
+    }
 
-	/**
-	 * Set the hierarchical date
-	 * @param strHieDate the hierarchical date
-	 */
-	public void setHieDate( String strHieDate )
-	{
-		_strHieDate = strHieDate;
-	}
+    /**
+     * Set the portlet identifier
+     * @param strDocPortletId the portlet identifier
+     */
+    public void setDocPortletId( String strDocPortletId )
+    {
+        _strDocPortletId = strDocPortletId;
+    }
 
-	/**
-	 * Return the XML content
-	 * @return the XML content
-	 */
-	public String getXmlContent()
-	{
-		return _strXmlContent;
-	}
+    /**
+     * Return the hierarchical date
+     * @return the hierarchical date
+     */
+    public String getHieDate(  )
+    {
+        return _strHieDate;
+    }
 
-	/**
-	 * Set the XML content
-	 * @param strXmlContent the XML content
-	 */
-	public void setXmlContent( String strXmlContent )
-	{
-		_strXmlContent = strXmlContent;
-	}
+    /**
+     * Set the hierarchical date
+     * @param strHieDate the hierarchical date
+     */
+    public void setHieDate( String strHieDate )
+    {
+        _strHieDate = strHieDate;
+    }
+
+    /**
+     * Return the XML content
+     * @return the XML content
+     */
+    public String getXmlContent(  )
+    {
+        return _strXmlContent;
+    }
+
+    /**
+     * Set the XML content
+     * @param strXmlContent the XML content
+     */
+    public void setXmlContent( String strXmlContent )
+    {
+        _strXmlContent = strXmlContent;
+    }
 }

@@ -33,24 +33,6 @@
  */
 package fr.paris.lutece.plugins.search.solr.business;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.SpellCheckResponse;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.util.NamedList;
-
 import fr.paris.lutece.plugins.search.solr.business.facetIntersection.FacetIntersection;
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
@@ -65,6 +47,24 @@ import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
+
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.SpellCheckResponse;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.util.NamedList;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -81,14 +81,16 @@ public class SolrSearchEngine implements SearchEngine
     private static final String PROPERTY_SOLR_FACET_DATE_START = "solr.facet.date.start";
     private static final String SOLR_HIGHLIGHT_PRE = AppPropertiesService.getProperty( PROPERTY_SOLR_HIGHLIGHT_PRE );
     private static final String SOLR_HIGHLIGHT_POST = AppPropertiesService.getProperty( PROPERTY_SOLR_HIGHLIGHT_POST );
-    private static final int SOLR_HIGHLIGHT_SNIPPETS = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_HIGHLIGHT_SNIPPETS, 5 );
-    private static final int SOLR_HIGHLIGHT_FRAGSIZE = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_HIGHLIGHT_FRAGSIZE, 100 );
+    private static final int SOLR_HIGHLIGHT_SNIPPETS = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_HIGHLIGHT_SNIPPETS,
+            5 );
+    private static final int SOLR_HIGHLIGHT_FRAGSIZE = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_HIGHLIGHT_FRAGSIZE,
+            100 );
     private static final String SOLR_FACET_DATE_START = AppPropertiesService.getProperty( PROPERTY_SOLR_FACET_DATE_START );
     public static final String SOLR_FACET_DATE_GAP = AppPropertiesService.getProperty( "solr.facet.date.gap", "+1YEAR" );
     private static SolrSearchEngine _instance;
     private static final String COLON_QUOTE = ":\"";
     private static final String DATE_COLON = "date:";
-    
+
     /**
     * Return search results
     * @param strQuery The search query
@@ -104,10 +106,12 @@ public class SolrSearchEngine implements SearchEngine
         if ( ( solrServer != null ) && !strQuery.equals( "" ) )
         {
             SolrQuery query = new SolrQuery(  );
-            if( strQuery != null && strQuery.length()>0 )
+
+            if ( ( strQuery != null ) && ( strQuery.length(  ) > 0 ) )
             {
                 query.setQuery( strQuery );
             }
+
             String[] userRoles;
             String[] roles;
 
@@ -242,17 +246,17 @@ public class SolrSearchEngine implements SearchEngine
             {
                 for ( String strFacetQuery : facetQueries )
                 {
-                	if( strFacetQuery.startsWith( DATE_COLON ) )
-                	{
-                		query.addFilterQuery( strFacetQuery );
-                	}
-                	else
-                	{
-                		String strFacetQueryWithColon;
-                		strFacetQueryWithColon = strFacetQuery.replaceFirst( SolrConstants.CONSTANT_COLON, COLON_QUOTE );
-                		strFacetQueryWithColon += SolrConstants.CONSTANT_QUOTE;
-                		query.addFilterQuery( strFacetQueryWithColon );
-                	}
+                    if ( strFacetQuery.startsWith( DATE_COLON ) )
+                    {
+                        query.addFilterQuery( strFacetQuery );
+                    }
+                    else
+                    {
+                        String strFacetQueryWithColon;
+                        strFacetQueryWithColon = strFacetQuery.replaceFirst( SolrConstants.CONSTANT_COLON, COLON_QUOTE );
+                        strFacetQueryWithColon += SolrConstants.CONSTANT_QUOTE;
+                        query.addFilterQuery( strFacetQueryWithColon );
+                    }
                 }
             }
 
@@ -274,7 +278,7 @@ public class SolrSearchEngine implements SearchEngine
                 results = SolrUtil.transformSolrItemsToSolrSearchResults( itemList, highlights );
 
                 //Date facet
-                if ( response.getFacetDates(  ) != null && !response.getFacetDates(  ).isEmpty(  ) )
+                if ( ( response.getFacetDates(  ) != null ) && !response.getFacetDates(  ).isEmpty(  ) )
                 {
                     facetedResult.setFacetDateList( response.getFacetDates(  ) );
                 }
@@ -291,31 +295,32 @@ public class SolrSearchEngine implements SearchEngine
                             "trees" );
                     Map<String, ArrayList<FacetField>> treesResult = new HashMap<String, ArrayList<FacetField>>(  );
 
-                    if( trees != null )
+                    if ( trees != null )
                     {
-	                    for ( Entry<String, NamedList<NamedList<Integer>>> selectedFacet : trees )
-	                    { //Selected Facet (ex : type,categorie )
-	                      //System.out.println(selectedFacet.getKey());
-	
-	                        ArrayList<FacetField> facetFields = new ArrayList<FacetField>( selectedFacet.getValue(  ).size(  ) );
-	
-	                        for ( Entry<String, NamedList<Integer>> facetField : selectedFacet.getValue(  ) )
-	                        {
-	                            FacetField ff = new FacetField( facetField.getKey(  ) );
-	
-	                            //System.out.println("\t" + facetField.getKey());
-	                            for ( Entry<String, Integer> value : facetField.getValue(  ) )
-	                            { // Second Level
-	                                ff.add( value.getKey(  ), value.getValue(  ) );
-	
-	                                //System.out.println("\t\t" + value.getKey() + " : " + value.getValue());
-	                            }
-	
-	                            facetFields.add( ff );
-	                        }
-	
-	                        treesResult.put( selectedFacet.getKey(  ), facetFields );
-	                    }
+                        for ( Entry<String, NamedList<NamedList<Integer>>> selectedFacet : trees )
+                        { //Selected Facet (ex : type,categorie )
+                          //System.out.println(selectedFacet.getKey());
+
+                            ArrayList<FacetField> facetFields = new ArrayList<FacetField>( selectedFacet.getValue(  )
+                                                                                                        .size(  ) );
+
+                            for ( Entry<String, NamedList<Integer>> facetField : selectedFacet.getValue(  ) )
+                            {
+                                FacetField ff = new FacetField( facetField.getKey(  ) );
+
+                                //System.out.println("\t" + facetField.getKey());
+                                for ( Entry<String, Integer> value : facetField.getValue(  ) )
+                                { // Second Level
+                                    ff.add( value.getKey(  ), value.getValue(  ) );
+
+                                    //System.out.println("\t\t" + value.getKey() + " : " + value.getValue());
+                                }
+
+                                facetFields.add( ff );
+                            }
+
+                            treesResult.put( selectedFacet.getKey(  ), facetFields );
+                        }
                     }
 
                     facetedResult.setFacetIntersection( treesResult );
@@ -370,7 +375,7 @@ public class SolrSearchEngine implements SearchEngine
         }
         catch ( SolrServerException e )
         {
-        	AppLogService.error( e.getMessage(  ), e );
+            AppLogService.error( e.getMessage(  ), e );
         }
 
         return spellCheck;
@@ -393,7 +398,7 @@ public class SolrSearchEngine implements SearchEngine
         }
         catch ( SolrServerException e )
         {
-        	AppLogService.error( e.getMessage(  ), e );
+            AppLogService.error( e.getMessage(  ), e );
         }
 
         return response;
@@ -430,7 +435,7 @@ public class SolrSearchEngine implements SearchEngine
         }
         catch ( SolrServerException e )
         {
-        	AppLogService.error( e.getMessage(  ), e );
+            AppLogService.error( e.getMessage(  ), e );
         }
 
         return xmlContent;

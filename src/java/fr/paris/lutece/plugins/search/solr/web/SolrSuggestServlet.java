@@ -56,9 +56,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class SolrSuggestServlet extends HttpServlet
 {
-	private static final long serialVersionUID = -3273825949482572338L;
+    private static final long serialVersionUID = -3273825949482572338L;
 
-	public void init(  )
+    public void init(  )
     {
     }
 

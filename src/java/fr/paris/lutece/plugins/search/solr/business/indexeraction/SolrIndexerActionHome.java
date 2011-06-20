@@ -33,11 +33,11 @@
  */
 package fr.paris.lutece.plugins.search.solr.business.indexeraction;
 
-import java.util.List;
-
 import fr.paris.lutece.portal.business.indexeraction.IndexerActionFilter;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
+
+import java.util.List;
 
 
 /**
@@ -46,7 +46,8 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
 public final class SolrIndexerActionHome
 {
     // Static variable pointed at the DAO instance
-    private static ISolrIndexerActionDAO _dao = (ISolrIndexerActionDAO) SpringContextService.getBean( "solrIndexerActionDAO" );
+    private static ISolrIndexerActionDAO _dao = (ISolrIndexerActionDAO) SpringContextService.getBean( 
+            "solrIndexerActionDAO" );
 
     /**
      * Private constructor - this class need not be instantiated

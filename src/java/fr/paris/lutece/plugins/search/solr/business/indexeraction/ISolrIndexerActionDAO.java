@@ -33,11 +33,10 @@
  */
 package fr.paris.lutece.plugins.search.solr.business.indexeraction;
 
-import java.util.List;
-
-import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
 import fr.paris.lutece.portal.business.indexeraction.IndexerActionFilter;
 import fr.paris.lutece.portal.service.plugin.Plugin;
+
+import java.util.List;
 
 
 /**

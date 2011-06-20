@@ -48,11 +48,14 @@ import java.net.MalformedURLException;
  */
 public final class SolrServerService
 {
-	private static final String PROPERTY_SOLR_SERVER_URL = "solr.server.address";
+    private static final String PROPERTY_SOLR_SERVER_URL = "solr.server.address";
     private static final String PROPERTY_SOLR_SERVER_MAX_CONNECTION = "solr.server.max.connection";
+    private static final String PROPERTY_SOLR_TIMEOUT = "solr.server.timeout";
     private static final String SOLR_SERVER_URL = AppPropertiesService.getProperty( PROPERTY_SOLR_SERVER_URL );
     private static final int NO_MAX_CONNECTION_SET = -1;
-    private static final int SOLR_SERVER_MAX_CONNECTION = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_SERVER_MAX_CONNECTION, NO_MAX_CONNECTION_SET );
+    private static final int SOLR_SERVER_MAX_CONNECTION = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_SERVER_MAX_CONNECTION,
+            NO_MAX_CONNECTION_SET );
+    private static final int SOLR_TIMEOUT = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_TIMEOUT, 60000 );
     private static SolrServerService _instance;
     private SolrServer _solrServer;
 
@@ -101,13 +104,16 @@ public final class SolrServerService
     {
         try
         {
-        	CommonsHttpSolrServer solrServer = new CommonsHttpSolrServer( strServerUrl );
-        	if ( SOLR_SERVER_MAX_CONNECTION != NO_MAX_CONNECTION_SET )
-        	{
-        		solrServer.setMaxTotalConnections( SOLR_SERVER_MAX_CONNECTION );
-        	}
-        	
-        	return solrServer;
+            CommonsHttpSolrServer solrServer = new CommonsHttpSolrServer( strServerUrl );
+
+            if ( SOLR_SERVER_MAX_CONNECTION != NO_MAX_CONNECTION_SET )
+            {
+                solrServer.setMaxTotalConnections( SOLR_SERVER_MAX_CONNECTION );
+            }
+
+            solrServer.setConnectionTimeout( SOLR_TIMEOUT );
+
+            return solrServer;
         }
         catch ( MalformedURLException e )
         {

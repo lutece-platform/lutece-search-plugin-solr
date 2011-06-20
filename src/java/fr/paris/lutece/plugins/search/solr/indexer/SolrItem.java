@@ -33,14 +33,14 @@
  */
 package fr.paris.lutece.plugins.search.solr.indexer;
 
+import fr.paris.lutece.portal.service.search.SearchItem;
+
+import org.apache.solr.client.solrj.beans.Field;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.solr.client.solrj.beans.Field;
-
-import fr.paris.lutece.portal.service.search.SearchItem;
 
 
 /**
@@ -62,7 +62,6 @@ public class SolrItem
     public static final String DYNAMIC_DATE_FIELD_SUFFIX = "_date";
     public static final String DYNAMIC_LONG_FIELD_SUFFIX = "_long";
     public static final String DYNAMIC_LIST_FIELD_SUFFIX = "_list";
-    
     @Field( SearchItem.FIELD_URL )
     private String _strUrl;
     @Field( SearchItem.FIELD_DATE )
@@ -91,7 +90,7 @@ public class SolrItem
     private String _strMetadata;
     @Field( SearchItem.FIELD_DOCUMENT_PORTLET_ID )
     private String _strDocPortletId;
-    
+
     //DynamicField
     @Field( "*" + DYNAMIC_LIST_FIELD_SUFFIX )
     private Map<String, List<String>> _dfListBox;
@@ -104,9 +103,9 @@ public class SolrItem
     @Field( "*" + DYNAMIC_LONG_FIELD_SUFFIX )
     private Map<String, Long> _dfNumericText;
 
-	/**
-     * Creates a new SolrItem
-     */
+    /**
+    * Creates a new SolrItem
+    */
     public SolrItem(  )
     {
     }
@@ -115,34 +114,38 @@ public class SolrItem
      * Returns list of all dynamic fields
      * @return the list of all dynamic fields
      */
-    public Map<String,Object> getDynamicFields()
+    public Map<String, Object> getDynamicFields(  )
     {
-    	Map<String,Object> mapDynamicFields = new HashMap<String, Object>();
-    	
-    	if( _dfString != null )
-    	{
-    		mapDynamicFields.putAll( _dfString );
-    	}
-		if ( _dfDate != null )
-		{
-			mapDynamicFields.putAll( _dfDate );
-		}
-		if ( _dfListBox != null )
-		{
-			mapDynamicFields.putAll( _dfListBox );
-		}
-		if ( _dfNumericText != null )
-		{
-			mapDynamicFields.putAll( _dfNumericText );
-		}
-		if ( _dfText != null )
-		{
-			mapDynamicFields.putAll( _dfText );
-    	}
-    	
-    	return mapDynamicFields;
+        Map<String, Object> mapDynamicFields = new HashMap<String, Object>(  );
+
+        if ( _dfString != null )
+        {
+            mapDynamicFields.putAll( _dfString );
+        }
+
+        if ( _dfDate != null )
+        {
+            mapDynamicFields.putAll( _dfDate );
+        }
+
+        if ( _dfListBox != null )
+        {
+            mapDynamicFields.putAll( _dfListBox );
+        }
+
+        if ( _dfNumericText != null )
+        {
+            mapDynamicFields.putAll( _dfNumericText );
+        }
+
+        if ( _dfText != null )
+        {
+            mapDynamicFields.putAll( _dfText );
+        }
+
+        return mapDynamicFields;
     }
-    
+
     /**
      * Add a dynamic field
      * @param strName the name of the field
@@ -150,13 +153,14 @@ public class SolrItem
      */
     public void addDynamicField( String strName, Date dValue )
     {
-    	if( _dfDate == null )
-    	{
-    		_dfDate = new HashMap<String, Date>();
-    	}
+        if ( _dfDate == null )
+        {
+            _dfDate = new HashMap<String, Date>(  );
+        }
+
         _dfDate.put( strName + DYNAMIC_DATE_FIELD_SUFFIX, dValue );
     }
-    
+
     /**
      * Add a dynamic field
      * @param strName the name of the field
@@ -164,13 +168,14 @@ public class SolrItem
      */
     public void addDynamicField( String strName, Long lValue )
     {
-    	if( _dfNumericText == null )
-    	{
-    		_dfNumericText = new HashMap<String, Long>();
-    	}
-    	_dfNumericText.put( strName + DYNAMIC_LONG_FIELD_SUFFIX, lValue );
+        if ( _dfNumericText == null )
+        {
+            _dfNumericText = new HashMap<String, Long>(  );
+        }
+
+        _dfNumericText.put( strName + DYNAMIC_LONG_FIELD_SUFFIX, lValue );
     }
-    
+
     /**
      * Add a dynamic field
      * @param strName the name of the field
@@ -178,13 +183,14 @@ public class SolrItem
      */
     public void addDynamicField( String strName, String strValue )
     {
-    	if( _dfText == null )
-    	{
-    		_dfText = new HashMap<String, String>();
-    	}
-    	_dfText.put( strName + DYNAMIC_TEXT_FIELD_SUFFIX, strValue );
+        if ( _dfText == null )
+        {
+            _dfText = new HashMap<String, String>(  );
+        }
+
+        _dfText.put( strName + DYNAMIC_TEXT_FIELD_SUFFIX, strValue );
     }
-    
+
     /**
      * Add a dynamic field
      * @param strName the name of the field
@@ -192,11 +198,12 @@ public class SolrItem
      */
     public void addDynamicField( String strName, List<String> strValue )
     {
-    	if( _dfListBox == null )
-    	{
-    		_dfListBox = new HashMap<String, List<String>>();
-    	}
-    	_dfListBox.put( strName + DYNAMIC_LIST_FIELD_SUFFIX, strValue );
+        if ( _dfListBox == null )
+        {
+            _dfListBox = new HashMap<String, List<String>>(  );
+        }
+
+        _dfListBox.put( strName + DYNAMIC_LIST_FIELD_SUFFIX, strValue );
     }
 
     /**
@@ -206,11 +213,12 @@ public class SolrItem
      */
     public void addDynamicFieldNotAnalysed( String strName, String strValue )
     {
-    	if( _dfString == null )
-    	{
-    		_dfString = new HashMap<String, String>();
-    	}
-    	_dfString.put( strName + DYNAMIC_STRING_FIELD_SUFFIX, strValue );
+        if ( _dfString == null )
+        {
+            _dfString = new HashMap<String, String>(  );
+        }
+
+        _dfString.put( strName + DYNAMIC_STRING_FIELD_SUFFIX, strValue );
     }
 
     /**
@@ -409,35 +417,35 @@ public class SolrItem
      * Gets the metadata
      * @return the metadata
      */
-	public String getMetadata()
-	{
-		return _strMetadata;
-	}
+    public String getMetadata(  )
+    {
+        return _strMetadata;
+    }
 
-	/**
-	 * Sets the metadata
-	 * @param strMetadata the metadata
-	 */
-	public void setMetadata( String strMetadata )
-	{
-		_strMetadata = strMetadata;
-	}
+    /**
+     * Sets the metadata
+     * @param strMetadata the metadata
+     */
+    public void setMetadata( String strMetadata )
+    {
+        _strMetadata = strMetadata;
+    }
 
-	/**
-	 * Gets the portlet document id
-	 * @return the portlet document id
-	 */
-	public String getDocPortletId()
-	{
-		return _strDocPortletId;
-	}
+    /**
+     * Gets the portlet document id
+     * @return the portlet document id
+     */
+    public String getDocPortletId(  )
+    {
+        return _strDocPortletId;
+    }
 
-	/**
-	 * Sets the portlet document id
-	 * @param strDocPortletId the portlet document id
-	 */
-	public void setDocPortletId( String strDocPortletId )
-	{
-		_strDocPortletId = strDocPortletId;
-	}
+    /**
+     * Sets the portlet document id
+     * @param strDocPortletId the portlet document id
+     */
+    public void setDocPortletId( String strDocPortletId )
+    {
+        _strDocPortletId = strDocPortletId;
+    }
 }

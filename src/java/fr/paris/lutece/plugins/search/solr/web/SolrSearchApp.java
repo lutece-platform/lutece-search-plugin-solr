@@ -33,17 +33,6 @@
  */
 package fr.paris.lutece.plugins.search.solr.web;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.response.SpellCheckResponse;
-
 import fr.paris.lutece.plugins.search.solr.business.SolrFacetedResult;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchResult;
@@ -64,6 +53,18 @@ import fr.paris.lutece.util.html.Paginator;
 import fr.paris.lutece.util.string.StringUtil;
 import fr.paris.lutece.util.url.UrlItem;
 
+import org.apache.commons.lang.StringUtils;
+
+import org.apache.solr.client.solrj.response.SpellCheckResponse;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 
 /**
  * This page shows some features of Solr like Highlights or Facets.
@@ -73,8 +74,9 @@ public class SolrSearchApp implements XPageApplication
 {
     private static final String FULL_URL = "fullUrl";
     private static final String SOLR_FACET_DATE_GAP = "facetDateGap";
-	private static final String ALL_SEARCH_QUERY = "*:*";
-	////////////////////////////////////////////////////////////////////////////
+    private static final String ALL_SEARCH_QUERY = "*:*";
+
+    ////////////////////////////////////////////////////////////////////////////
     // Constants
     private static final String TEMPLATE_RESULTS = "skin/search/solr_search_results.html";
     private static final String PROPERTY_SEARCH_PAGE_URL = "solr.pageSearch.baseUrl";
@@ -117,6 +119,7 @@ public class SolrSearchApp implements XPageApplication
     private static final String PROPERTY_ENCODE_URI = "search.encode.uri";
     private static final boolean DEFAULT_ENCODE_URI = false;
     private static Map<String, Object> _lastSearchModel;
+    private static final boolean SOLR_SPELLCHECK = AppPropertiesService.getPropertyBoolean( "solr.spellchecker", false );
 
     /**
      * Returns search results
@@ -141,7 +144,8 @@ public class SolrSearchApp implements XPageApplication
         String facetQueryUrl = "";
         SolrFieldManager sfm = new SolrFieldManager(  );
 
-        List<String> lstSingleFacetQueries = new ArrayList<String>();
+        List<String> lstSingleFacetQueries = new ArrayList<String>(  );
+
         if ( facetQuery != null )
         {
             for ( String fq : facetQuery )
@@ -163,21 +167,26 @@ public class SolrSearchApp implements XPageApplication
         Locale locale = request.getLocale(  );
 
         int nLimit = SOLR_RESPONSE_MAX;
-        
+
         // Check XSS characters
         if ( ( strQuery != null ) && ( StringUtil.containsXssCharacters( strQuery ) ) )
         {
             strError = I18nService.getLocalizedString( MESSAGE_INVALID_SEARCH_TERMS, locale );
         }
-        if( StringUtils.isNotBlank( strError ) || StringUtils.isBlank( strQuery ) )
+
+        if ( StringUtils.isNotBlank( strError ) || StringUtils.isBlank( strQuery ) )
         {
-        	strQuery = ALL_SEARCH_QUERY;
-        	String strOnlyFacets = AppPropertiesService.getProperty( PROPERTY_ONLY_FACTES );
-        	if( StringUtils.isNotBlank( strError ) || ( ( facetQuery == null || facetQuery.length <= 0 ) && StringUtils.isNotBlank( strOnlyFacets ) && SolrConstants.CONSTANT_TRUE.equals( strOnlyFacets ) ) )
-        	{
-        		//no request and no facet selected : we show the facets but no result
-        		nLimit = 0;
-        	}
+            strQuery = ALL_SEARCH_QUERY;
+
+            String strOnlyFacets = AppPropertiesService.getProperty( PROPERTY_ONLY_FACTES );
+
+            if ( StringUtils.isNotBlank( strError ) ||
+                    ( ( ( facetQuery == null ) || ( facetQuery.length <= 0 ) ) &&
+                    StringUtils.isNotBlank( strOnlyFacets ) && SolrConstants.CONSTANT_TRUE.equals( strOnlyFacets ) ) )
+            {
+                //no request and no facet selected : we show the facets but no result
+                nLimit = 0;
+            }
         }
 
         String strNbItemPerPage = request.getParameter( PARAMETER_NB_ITEMS_PER_PAGE );
@@ -207,13 +216,14 @@ public class SolrSearchApp implements XPageApplication
 
         url.addParameter( PARAMETER_QUERY, strQueryForPaginator );
         url.addParameter( PARAMETER_NB_ITEMS_PER_PAGE, nNbItemsPerPage );
-        for( String strFacetName : lstSingleFacetQueries )
+
+        for ( String strFacetName : lstSingleFacetQueries )
         {
-        	url.addParameter( PARAMETER_FACET_QUERY, SolrUtil.encodeUrl( strFacetName ) );
+            url.addParameter( PARAMETER_FACET_QUERY, SolrUtil.encodeUrl( strFacetName ) );
         }
 
-        Paginator<SolrSearchResult> paginator = new Paginator<SolrSearchResult>( listResults, nNbItemsPerPage, url.getUrl(  ), PARAMETER_PAGE_INDEX,
-                strCurrentPageIndex );
+        Paginator<SolrSearchResult> paginator = new Paginator<SolrSearchResult>( listResults, nNbItemsPerPage,
+                url.getUrl(  ), PARAMETER_PAGE_INDEX, strCurrentPageIndex );
 
         Map<String, Object> model = new HashMap<String, Object>(  );
         model.put( MARK_RESULTS_LIST, paginator.getPageItems(  ) );
@@ -228,19 +238,23 @@ public class SolrSearchApp implements XPageApplication
         model.put( MARK_FACETS_DATE, facetedResult.getFacetDateList(  ) );
         model.put( MARK_HISTORIQUE, sfm.getCurrentFacet(  ) );
         model.put( MARK_FACETS_LIST, lstSingleFacetQueries );
-        if( strQuery != null && strQuery.compareToIgnoreCase( ALL_SEARCH_QUERY )!=0 )
+
+        if ( SOLR_SPELLCHECK && ( strQuery != null ) && ( strQuery.compareToIgnoreCase( ALL_SEARCH_QUERY ) != 0 ) )
         {
-        	SpellCheckResponse checkResponse = engine.getSpellChecker( strQuery );
-        	if( checkResponse != null )
-        	{
-        		model.put( MARK_SUGGESTION, checkResponse.getCollatedResult(  ) );
-        	}
+            SpellCheckResponse checkResponse = engine.getSpellChecker( strQuery );
+
+            if ( checkResponse != null )
+            {
+                model.put( MARK_SUGGESTION, checkResponse.getCollatedResult(  ) );
+            }
         }
+
         model.put( MARK_SORT_NAME, sort );
         model.put( MARK_SORT_ORDER, order );
         model.put( MARK_SORT_LIST, SolrFieldManager.getSortList(  ) );
         model.put( MARK_FACET_TREE, facetedResult.getFacetIntersection(  ) );
         model.put( MARK_ENCODING, SolrUtil.getEncoding(  ) );
+
         String strRequestUrl = request.getRequestURL(  ).toString(  );
         model.put( FULL_URL, strRequestUrl );
         model.put( SOLR_FACET_DATE_GAP, SolrSearchEngine.SOLR_FACET_DATE_GAP );
@@ -248,7 +262,7 @@ public class SolrSearchApp implements XPageApplication
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_RESULTS, locale, model );
 
         _lastSearchModel = model;
-        
+
         page.setPathLabel( I18nService.getLocalizedString( PROPERTY_PATH_LABEL, locale ) );
         page.setTitle( I18nService.getLocalizedString( PROPERTY_PAGE_TITLE, locale ) );
         page.setContent( template.getHtml(  ) );
@@ -270,13 +284,13 @@ public class SolrSearchApp implements XPageApplication
         event.setRequest( request );
         QueryListenersService.getInstance(  ).notifyListeners( event );
     }
-    
+
     /**
      * Return the model used during the last search
      * @return  the model used during the last search
      */
-    public static Map<String, Object> getLastSearchModel()
+    public static Map<String, Object> getLastSearchModel(  )
     {
-    	return _lastSearchModel;
+        return _lastSearchModel;
     }
 }

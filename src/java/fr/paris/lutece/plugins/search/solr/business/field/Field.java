@@ -64,7 +64,7 @@ public class Field
 
     public String getSolrName(  )
     {
-    	return this._strName;
+        return this._strName;
     }
 
     /**

@@ -33,14 +33,6 @@
  */
 package fr.paris.lutece.plugins.search.solr.indexer;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.lucene.demo.html.HTMLParser;
-
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
 import fr.paris.lutece.plugins.search.utils.SolrPageIndexerUtils;
@@ -53,6 +45,15 @@ import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.url.UrlItem;
 
+import org.apache.lucene.demo.html.HTMLParser;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * The indexer service for Solr.
@@ -60,7 +61,7 @@ import fr.paris.lutece.util.url.UrlItem;
  */
 public class SolrPageIndexer implements SolrIndexer
 {
-	public static final String NAME = "SolrPageIndexer";
+    public static final String NAME = "SolrPageIndexer";
     private static final String PARAMETER_PAGE_ID = "page_id";
     private static final String DESCRIPTION = "Solr page Indexer";
     private static final String VERSION = "1.0.0";
@@ -69,16 +70,15 @@ public class SolrPageIndexer implements SolrIndexer
     private static final String PROPERTY_INDEXER_ENABLE = "solr.indexer.page.enable";
     private static final String BEAN_PAGE_SERVICE = "pageService";
     private static final String SHORT_NAME = "page";
-    
-    private static final List<String> LIST_RESSOURCES_NAME = new ArrayList<String>();
-	private static final String PAGE_INDEXATION_ERROR = "[SolrPageIndexer] An error occured during the indexation of the page number ";
-	
+    private static final List<String> LIST_RESSOURCES_NAME = new ArrayList<String>(  );
+    private static final String PAGE_INDEXATION_ERROR = "[SolrPageIndexer] An error occured during the indexation of the page number ";
+
     /**
      * Creates a new SolrPageIndexer
      */
     public SolrPageIndexer(  )
     {
-    	LIST_RESSOURCES_NAME.add( SolrPageIndexerUtils.RESSOURCE_PAGE );
+        LIST_RESSOURCES_NAME.add( SolrPageIndexerUtils.RESSOURCE_PAGE );
     }
 
     /**
@@ -88,25 +88,26 @@ public class SolrPageIndexer implements SolrIndexer
     {
         List<Page> listPages = PageHome.getAllPages(  );
         List<String> lstErrors = new ArrayList<String>(  );
-        
+
         for ( Page page : listPages )
         {
-        	try
-        	{
-        		// Generates the item to index
-        		SolrItem item = getItem( page, SolrIndexerService.getBaseUrl(  ) );
-        		if( item != null )
-        		{
-        			SolrIndexerService.write( item );
-        		}
-        	}
-        	catch ( Exception e )
-        	{
-        		lstErrors.add( SolrIndexerService.buildErrorMessage( e ) );
-        		AppLogService.error( PAGE_INDEXATION_ERROR + page.getId(  ), e );
-        	}
+            try
+            {
+                // Generates the item to index
+                SolrItem item = getItem( page, SolrIndexerService.getBaseUrl(  ) );
+
+                if ( item != null )
+                {
+                    SolrIndexerService.write( item );
+                }
+            }
+            catch ( Exception e )
+            {
+                lstErrors.add( SolrIndexerService.buildErrorMessage( e ) );
+                AppLogService.error( PAGE_INDEXATION_ERROR + page.getId(  ), e );
+            }
         }
-        
+
         return lstErrors;
     }
 
@@ -127,7 +128,8 @@ public class SolrPageIndexer implements SolrIndexer
         SolrItem item = new SolrItem(  );
 
         // indexing page content
-        String strPageContent = ( (IPageService) SpringContextService.getBean( BEAN_PAGE_SERVICE ) ).getPageContent( page.getId(  ), 0, null );
+        String strPageContent = ( (IPageService) SpringContextService.getBean( BEAN_PAGE_SERVICE ) ).getPageContent( page.getId(  ),
+                0, null );
         StringReader readerPage = new StringReader( strPageContent );
         HTMLParser parser = new HTMLParser( readerPage );
 
@@ -188,65 +190,66 @@ public class SolrPageIndexer implements SolrIndexer
     }
 
     /**
-	 * {@inheritDoc}
-	 */
+         * {@inheritDoc}
+         */
     public String getDescription(  )
     {
         return DESCRIPTION;
     }
 
     /**
-	 * {@inheritDoc}
-	 */
+         * {@inheritDoc}
+         */
     public boolean isEnable(  )
     {
         return "true".equalsIgnoreCase( AppPropertiesService.getProperty( PROPERTY_INDEXER_ENABLE ) );
     }
-    
+
     /**
      * {@inheritDoc}
      */
-	public List<Field> getAdditionalFields()
+    public List<Field> getAdditionalFields(  )
     {
-    	return null;
-    }
-    
-	/**
-	 * {@inheritDoc}
-	 */
-    public List<SolrItem> getDocuments( String strIdDocument )
-    {
-    	List<SolrItem> lstItems = new ArrayList<SolrItem>();
-    	try
-		{
-    		int nIdDocument = Integer.parseInt( strIdDocument );
-        	Page page = PageHome.getPage( nIdDocument );
-        	lstItems.add( getItem( page, SolrIndexerService.getBaseUrl(  ) ) );
-		}
-		catch ( Exception e )
-		{
-			throw new RuntimeException( e );
-		}
-    	
-    	return lstItems;
-    }
-    
-    /**
-	 * {@inheritDoc}
-	 */
-    public List<String> getResourcesName()
-    {
-    	return LIST_RESSOURCES_NAME;
+        return null;
     }
 
     /**
-	 * {@inheritDoc}
-	 */
-	public String getResourceUid( String strResourceId, String strResourceType )
-	{
-		StringBuffer sb = new StringBuffer( strResourceId );
-    	sb.append( SolrConstants.CONSTANT_UNDERSCORE ).append( SHORT_NAME );
-        
-    	return sb.toString(  );
-	}
+     * {@inheritDoc}
+     */
+    public List<SolrItem> getDocuments( String strIdDocument )
+    {
+        List<SolrItem> lstItems = new ArrayList<SolrItem>(  );
+
+        try
+        {
+            int nIdDocument = Integer.parseInt( strIdDocument );
+            Page page = PageHome.getPage( nIdDocument );
+            lstItems.add( getItem( page, SolrIndexerService.getBaseUrl(  ) ) );
+        }
+        catch ( Exception e )
+        {
+            throw new RuntimeException( e );
+        }
+
+        return lstItems;
+    }
+
+    /**
+         * {@inheritDoc}
+         */
+    public List<String> getResourcesName(  )
+    {
+        return LIST_RESSOURCES_NAME;
+    }
+
+    /**
+         * {@inheritDoc}
+         */
+    public String getResourceUid( String strResourceId, String strResourceType )
+    {
+        StringBuffer sb = new StringBuffer( strResourceId );
+        sb.append( SolrConstants.CONSTANT_UNDERSCORE ).append( SHORT_NAME );
+
+        return sb.toString(  );
+    }
 }

@@ -60,6 +60,6 @@ public class SolrIndexerAction extends IndexerAction
      */
     public void setTypeResource( String strTypeResource )
     {
-    	_strTypeResource = strTypeResource;
+        _strTypeResource = strTypeResource;
     }
 }

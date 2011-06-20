@@ -48,7 +48,9 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
 import java.io.UnsupportedEncodingException;
+
 import java.net.URLEncoder;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,10 +66,10 @@ import javax.servlet.http.HttpServletRequest;
  */
 public final class SolrUtil
 {
-	private static final String MESSAGE_ENCODING_ERROR = "portal.search.message.encodingError";
+    private static final String MESSAGE_ENCODING_ERROR = "portal.search.message.encodingError";
     private static final String PROPERTY_ENCODE_URI_ENCODING = "search.encode.uri.encoding";
     private static final String DEFAULT_URI_ENCODING = "ISO-8859-1";
-    
+
     /**
      * Empty private constructor
      */
@@ -127,11 +129,11 @@ public final class SolrUtil
             searchResult.setXmlContent( item.getXmlContent(  ) );
             searchResult.setMetadata( item.getMetadata(  ) );
             searchResult.setDocPortletId( item.getDocPortletId(  ) );
-            searchResult.setHieDate( item.getHieDate() );
-            
+            searchResult.setHieDate( item.getHieDate(  ) );
+
             // The name of the dynamic fields is like NAME_XXX where XXX is a SolrItem dynamic field type
-            searchResult.setDynamicFields( item.getDynamicFields() );
-            
+            searchResult.setDynamicFields( item.getDynamicFields(  ) );
+
             if ( highlights != null )
             {
                 searchResult.setHighlight( highlights.getHighlights( searchResult.getId(  ) ) );
@@ -142,7 +144,7 @@ public final class SolrUtil
 
         return resultList;
     }
-    
+
     /**
      * encode url
      * @param strSource source
@@ -150,16 +152,16 @@ public final class SolrUtil
      */
     public static String encodeUrl( String strSource )
     {
-    	try
-    	{
-    		return encodeUrl( null, strSource);
-    	}
-    	catch ( SiteMessageException sme )
-    	{
-    		return null;
-    	}
+        try
+        {
+            return encodeUrl( null, strSource );
+        }
+        catch ( SiteMessageException sme )
+        {
+            return null;
+        }
     }
-    
+
     /**
      * Encode an url string
      * @param strSource The string to encode
@@ -179,23 +181,24 @@ public final class SolrUtil
         catch ( UnsupportedEncodingException e )
         {
             AppLogService.error( e.getMessage(  ), e );
+
             if ( request != null )
             {
-            	SiteMessageService.setMessage( request, MESSAGE_ENCODING_ERROR, SiteMessage.TYPE_ERROR );
+                SiteMessageService.setMessage( request, MESSAGE_ENCODING_ERROR, SiteMessage.TYPE_ERROR );
             }
         }
 
         return strEncoded;
     }
-    
+
     /**
      * Return the encoding define in the properties
      * @return the encoding define in the properties
      */
     public static String getEncoding(  )
     {
-    	String strURIEncoding = AppPropertiesService.getProperty( PROPERTY_ENCODE_URI_ENCODING, DEFAULT_URI_ENCODING );
-    	
-    	return strURIEncoding;
+        String strURIEncoding = AppPropertiesService.getProperty( PROPERTY_ENCODE_URI_ENCODING, DEFAULT_URI_ENCODING );
+
+        return strURIEncoding;
     }
 }
