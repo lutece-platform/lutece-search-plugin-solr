@@ -87,6 +87,7 @@ public class SolrSearchEngine implements SearchEngine
             100 );
     private static final String SOLR_FACET_DATE_START = AppPropertiesService.getProperty( PROPERTY_SOLR_FACET_DATE_START );
     public static final String SOLR_FACET_DATE_GAP = AppPropertiesService.getProperty( "solr.facet.date.gap", "+1YEAR" );
+    public static final int SOLR_FACET_LIMIT = AppPropertiesService.getPropertyInt( "solr.facet.limit", 100 );
     private static SolrSearchEngine _instance;
     private static final String COLON_QUOTE = ":\"";
     private static final String DATE_COLON = "date:";
@@ -182,7 +183,7 @@ public class SolrSearchEngine implements SearchEngine
             query.setHighlightSnippets( SOLR_HIGHLIGHT_SNIPPETS );
             query.setHighlightFragsize( SOLR_HIGHLIGHT_FRAGSIZE );
             query.setFacet( true );
-            query.setFacetLimit( 8 );
+            query.setFacetLimit( SOLR_FACET_LIMIT );
             query.setFacetMinCount( 1 );
             query.setRows( nLimit );
 
