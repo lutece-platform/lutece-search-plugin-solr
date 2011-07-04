@@ -94,6 +94,7 @@ public class SolrSearchApp implements XPageApplication
     private static final String PARAMETER_NB_ITEMS_PER_PAGE = "items_per_page";
     private static final String PARAMETER_QUERY = "query";
     private static final String PARAMETER_FACET_QUERY = "fq";
+    private static final String PARAMETER_PREVIOUS_SEARCH = "previous_search";
 
     //private static final String PARAMETER_FACET_LABEL = "facetlabel";
     //private static final String PARAMETER_FACET_NAME = "facetname";
@@ -118,7 +119,6 @@ public class SolrSearchApp implements XPageApplication
     private static final String MARK_ENCODING = "encoding";
     private static final String PROPERTY_ENCODE_URI = "search.encode.uri";
     private static final boolean DEFAULT_ENCODE_URI = false;
-    private static Map<String, Object> _lastSearchModel;
     private static final boolean SOLR_SPELLCHECK = AppPropertiesService.getPropertyBoolean( "solr.spellchecker", false );
 
     /**
@@ -261,7 +261,7 @@ public class SolrSearchApp implements XPageApplication
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_RESULTS, locale, model );
 
-        _lastSearchModel = model;
+        request.getSession().setAttribute( PARAMETER_PREVIOUS_SEARCH, model );
 
         page.setPathLabel( I18nService.getLocalizedString( PROPERTY_PATH_LABEL, locale ) );
         page.setTitle( I18nService.getLocalizedString( PROPERTY_PAGE_TITLE, locale ) );
@@ -287,10 +287,11 @@ public class SolrSearchApp implements XPageApplication
 
     /**
      * Return the model used during the last search
+     * @param request The HTTP request.
      * @return  the model used during the last search
      */
-    public static Map<String, Object> getLastSearchModel(  )
+    public static Map<String, Object> getLastSearchModel( HttpServletRequest request )
     {
-        return _lastSearchModel;
+       return ( Map<String, Object> ) request.getSession().getAttribute( PARAMETER_PREVIOUS_SEARCH );
     }
 }
