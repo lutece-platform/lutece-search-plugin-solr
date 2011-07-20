@@ -88,7 +88,7 @@ public class SolrSearchApp implements XPageApplication
     private static final int SOLR_RESPONSE_MAX = Integer.parseInt( AppPropertiesService.getProperty( 
                 PROPERTY_SOLR_RESPONSE_MAX, "50" ) );
     private static final String MESSAGE_INVALID_SEARCH_TERMS = "portal.search.message.invalidSearchTerms";
-    private static final String DEFAULT_RESULTS_PER_PAGE = "10";
+    private static final int DEFAULT_RESULTS_PER_PAGE = 10;
     private static final String DEFAULT_PAGE_INDEX = "1";
     private static final String PARAMETER_PAGE_INDEX = "page_index";
     private static final String PARAMETER_NB_ITEMS_PER_PAGE = "items_per_page";
@@ -189,12 +189,12 @@ public class SolrSearchApp implements XPageApplication
             }
         }
 
-        String strNbItemPerPage = request.getParameter( PARAMETER_NB_ITEMS_PER_PAGE );
-        String strDefaultNbItemPerPage = AppPropertiesService.getProperty( PROPERTY_RESULTS_PER_PAGE,
-                DEFAULT_RESULTS_PER_PAGE );
-        strNbItemPerPage = ( strNbItemPerPage != null ) ? strNbItemPerPage : strDefaultNbItemPerPage;
-
-        int nNbItemsPerPage = Integer.parseInt( strNbItemPerPage );
+        int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_RESULTS_PER_PAGE, DEFAULT_RESULTS_PER_PAGE );
+        Object currentItemsPerPage = request.getSession().getAttribute( MARK_NB_ITEMS_PER_PAGE );
+        int nCurrentItemsPerPage = currentItemsPerPage != null ? (Integer)currentItemsPerPage : 0;
+        int nItemsPerPage = Paginator.getItemsPerPage( request, Paginator.PARAMETER_ITEMS_PER_PAGE, nCurrentItemsPerPage,
+        		nDefaultItemsPerPage );
+        request.getSession().setAttribute( MARK_NB_ITEMS_PER_PAGE, nItemsPerPage );
         String strCurrentPageIndex = request.getParameter( PARAMETER_PAGE_INDEX );
         strCurrentPageIndex = ( strCurrentPageIndex != null ) ? strCurrentPageIndex : DEFAULT_PAGE_INDEX;
 
@@ -215,14 +215,14 @@ public class SolrSearchApp implements XPageApplication
         }
 
         url.addParameter( PARAMETER_QUERY, strQueryForPaginator );
-        url.addParameter( PARAMETER_NB_ITEMS_PER_PAGE, nNbItemsPerPage );
+        url.addParameter( PARAMETER_NB_ITEMS_PER_PAGE, nItemsPerPage );
 
         for ( String strFacetName : lstSingleFacetQueries )
         {
             url.addParameter( PARAMETER_FACET_QUERY, SolrUtil.encodeUrl( strFacetName ) );
         }
 
-        Paginator<SolrSearchResult> paginator = new Paginator<SolrSearchResult>( listResults, nNbItemsPerPage,
+        Paginator<SolrSearchResult> paginator = new Paginator<SolrSearchResult>( listResults, nItemsPerPage,
                 url.getUrl(  ), PARAMETER_PAGE_INDEX, strCurrentPageIndex );
 
         Map<String, Object> model = new HashMap<String, Object>(  );
@@ -231,7 +231,7 @@ public class SolrSearchApp implements XPageApplication
         model.put( MARK_QUERY, ALL_SEARCH_QUERY.equals( strQuery ) ? SolrConstants.CONSTANT_EMPTY_STRING : strQuery );
         model.put( MARK_FACET_QUERY, facetQueryUrl );
         model.put( MARK_PAGINATOR, paginator );
-        model.put( MARK_NB_ITEMS_PER_PAGE, strNbItemPerPage );
+        model.put( MARK_NB_ITEMS_PER_PAGE, nItemsPerPage );
         model.put( MARK_ERROR, strError );
         model.put( MARK_FACETS, facetedResult.getFacetFields(  ) );
         model.put( MARK_SOLR_FIELDS, SolrFieldManager.getFacetList(  ) );

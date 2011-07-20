@@ -172,7 +172,7 @@ ${encoded_facets_queries}</#macro>
 			<div>
 				<#-- Number of documents per page selector -->
 				#i18n{portal.search.search_results.labelNbDocsPerPage}<br />
-				<@NbItemsPerPageSelectorRadioList nb_items_per_page />
+				<@NbItemsPerPageSelectorRadioList nb_items_per_page?string />
 			</div>
  		</form>
 	</div>
