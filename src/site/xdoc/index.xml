@@ -14,6 +14,22 @@
 				<p>Apply <a href="http://issues.apache.org/jira/browse/SOLR-64">SOLR-64</a>
 				and <a href="http://issues.apache.org/jira/browse/SOLR-792">SOLR-792</a></p>
 			</subsection>
+			<subsection name="Re-index all periodically">
+			<p>To re-index all content from scratch, one can use the following JSP which can be call from a CRON (ex: every weekend)</p>
+<pre>
+&lt;html&gt;
+&lt;body&gt;
+&lt;div&gt;
+&lt;%= fr.paris.lutece.plugins.search.solr.indexer.SolrIndexerService.processDel(  ) %&gt;
+&lt;/div&gt;
+&lt;pre&gt;
+&lt;%= fr.paris.lutece.plugins.search.solr.indexer.SolrIndexerService.processIndexing( true ) %&gt;
+&lt;/pre&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+			</subsection>
+			
 		</section>
 		<section></section>
 	</body>
