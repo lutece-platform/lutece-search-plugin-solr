@@ -299,6 +299,7 @@ public final class SolrIndexerService
             }
 
             SOLR_SERVER.commit(  );
+            SOLR_SERVER.optimize(  );
 
             Date end = new Date(  );
             _sbLogs.append( "Duration of the treatment : " );
@@ -508,5 +509,30 @@ public final class SolrIndexerService
     public static String getWebAppName(  )
     {
         return AppPropertiesService.getProperty( PROPERTY_SITE );
+    }
+
+    /**
+     * Del sorl index related to this site.
+     * @return log of what appended
+     */
+    public static String processDel(  )
+    {
+        String strLog = "";
+        String strSite = AppPropertiesService.getProperty( PROPERTY_SITE );
+
+        try
+        {
+            SOLR_SERVER.deleteByQuery( SolrItem.FIELD_SITE + ":\"" + strSite + "\"" );
+            SOLR_SERVER.commit(  );
+            SOLR_SERVER.optimize(  );
+            strLog = "Delete site : " + strSite;
+            AppLogService.info( strLog );
+        }
+        catch ( Exception e )
+        {
+            strLog = e.getCause(  ).toString(  );
+        }
+
+        return strLog;
     }
 }

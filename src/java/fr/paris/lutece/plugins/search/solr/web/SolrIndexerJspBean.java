@@ -83,15 +83,19 @@ public class SolrIndexerJspBean extends PluginAdminPageJspBean
     public String doIndexing( HttpServletRequest request )
     {
         HashMap<String, String> model = new HashMap<String, String>(  );
-        String strLogs;
+        String strLogs = "";
 
         if ( request.getParameter( "incremental" ) != null )
         {
             strLogs = SolrIndexerService.processIndexing( false );
         }
-        else
+        else if ( request.getParameter( "total" ) != null )
         {
             strLogs = SolrIndexerService.processIndexing( true );
+        }
+        else if ( request.getParameter( "del" ) != null )
+        {
+            strLogs = SolrIndexerService.processDel(  );
         }
 
         model.put( MARK_LOGS, strLogs );
