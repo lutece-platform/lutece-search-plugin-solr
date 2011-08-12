@@ -46,8 +46,8 @@
     </dependencies>
 
     <properties>
-        <componentName>SOLR</componentName>
-        <jiraProjectName>LUTECE</jiraProjectName>
+        <componentName>solr</componentName>
+        <jiraProjectName>SOLR</jiraProjectName>
         <jiraComponentId>10240</jiraComponentId>
     </properties>
     <scm>
