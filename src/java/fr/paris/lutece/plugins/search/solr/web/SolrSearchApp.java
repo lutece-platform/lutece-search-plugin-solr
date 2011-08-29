@@ -45,6 +45,7 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.search.QueryEvent;
 import fr.paris.lutece.portal.service.search.QueryListenersService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.xpages.XPage;
 import fr.paris.lutece.portal.web.xpages.XPageApplication;
@@ -134,14 +135,36 @@ public class SolrSearchApp implements XPageApplication
         throws SiteMessageException
     {
         XPage page = new XPage(  );
-        String strQuery = request.getParameter( PARAMETER_QUERY );
+        Map<String, Object> model = getSearchResultModel( request );
+
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_RESULTS, request.getLocale(), model );
+
+        page.setPathLabel( I18nService.getLocalizedString( PROPERTY_PATH_LABEL, request.getLocale() ) );
+        page.setTitle( I18nService.getLocalizedString( PROPERTY_PAGE_TITLE, request.getLocale() ) );
+        page.setContent( template.getHtml(  ) );
+
+        return page;
+    }
+
+    /**
+     * Performs a search and fills the model (useful when a page needs to remind search parameters/results)
+     * @param request the request
+     * @return the model
+     * @throws SiteMessageException if an error occurs
+     */
+	public static Map<String, Object> getSearchResultModel( HttpServletRequest request )
+			throws SiteMessageException
+	{
+		String strQuery = request.getParameter( PARAMETER_QUERY );
         String[] facetQuery = request.getParameterValues( PARAMETER_FACET_QUERY );
         String sort = request.getParameter( PARAMETER_SORT_NAME );
         String order = request.getParameter( PARAMETER_SORT_ORDER );
+        String strCurrentPageIndex = request.getParameter( PARAMETER_PAGE_INDEX );
+        Locale locale = request.getLocale(  );
 
         //String facetlabel = request.getParameter( PARAMETER_FACET_LABEL );
         //String facetname = request.getParameter( PARAMETER_FACET_NAME );
-        String facetQueryUrl = "";
+        StringBuilder sbFacetQueryUrl = new StringBuilder();
         SolrFieldManager sfm = new SolrFieldManager(  );
 
         List<String> lstSingleFacetQueries = new ArrayList<String>(  );
@@ -150,9 +173,9 @@ public class SolrSearchApp implements XPageApplication
         {
             for ( String fq : facetQuery )
             {
-                if ( facetQueryUrl.indexOf( fq ) == -1 )
+                if ( sbFacetQueryUrl.indexOf( fq ) == -1 )
                 {
-                    facetQueryUrl += ( "&fq=" + fq );
+                	sbFacetQueryUrl.append( "&fq=" + fq );
                     sfm.addFacet( fq );
                     lstSingleFacetQueries.add( fq );
                 }
@@ -164,7 +187,6 @@ public class SolrSearchApp implements XPageApplication
 
         String strSearchPageUrl = AppPropertiesService.getProperty( PROPERTY_SEARCH_PAGE_URL );
         String strError = SolrConstants.CONSTANT_EMPTY_STRING;
-        Locale locale = request.getLocale(  );
 
         int nLimit = SOLR_RESPONSE_MAX;
 
@@ -189,13 +211,13 @@ public class SolrSearchApp implements XPageApplication
             }
         }
 
+        // paginator & session related elements
         int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_RESULTS_PER_PAGE, DEFAULT_RESULTS_PER_PAGE );
-        Object currentItemsPerPage = request.getSession().getAttribute( MARK_NB_ITEMS_PER_PAGE );
-        int nCurrentItemsPerPage = currentItemsPerPage != null ? (Integer)currentItemsPerPage : 0;
+        String strCurrentItemsPerPage = request.getParameter( PARAMETER_NB_ITEMS_PER_PAGE );
+        int nCurrentItemsPerPage = strCurrentItemsPerPage != null ? Integer.parseInt( strCurrentItemsPerPage ) : 0;
         int nItemsPerPage = Paginator.getItemsPerPage( request, Paginator.PARAMETER_ITEMS_PER_PAGE, nCurrentItemsPerPage,
         		nDefaultItemsPerPage );
-        request.getSession().setAttribute( MARK_NB_ITEMS_PER_PAGE, nItemsPerPage );
-        String strCurrentPageIndex = request.getParameter( PARAMETER_PAGE_INDEX );
+        
         strCurrentPageIndex = ( strCurrentPageIndex != null ) ? strCurrentPageIndex : DEFAULT_PAGE_INDEX;
 
         SolrSearchEngine engine = SolrSearchEngine.getInstance(  );
@@ -222,6 +244,7 @@ public class SolrSearchApp implements XPageApplication
             url.addParameter( PARAMETER_FACET_QUERY, SolrUtil.encodeUrl( strFacetName ) );
         }
 
+        // nb items per page
         Paginator<SolrSearchResult> paginator = new Paginator<SolrSearchResult>( listResults, nItemsPerPage,
                 url.getUrl(  ), PARAMETER_PAGE_INDEX, strCurrentPageIndex );
 
@@ -229,7 +252,7 @@ public class SolrSearchApp implements XPageApplication
         model.put( MARK_RESULTS_LIST, paginator.getPageItems(  ) );
         // put the query only if it's not *.*
         model.put( MARK_QUERY, ALL_SEARCH_QUERY.equals( strQuery ) ? SolrConstants.CONSTANT_EMPTY_STRING : strQuery );
-        model.put( MARK_FACET_QUERY, facetQueryUrl );
+        model.put( MARK_FACET_QUERY, sbFacetQueryUrl.toString(  ) );
         model.put( MARK_PAGINATOR, paginator );
         model.put( MARK_NB_ITEMS_PER_PAGE, nItemsPerPage );
         model.put( MARK_ERROR, strError );
@@ -258,17 +281,9 @@ public class SolrSearchApp implements XPageApplication
         String strRequestUrl = request.getRequestURL(  ).toString(  );
         model.put( FULL_URL, strRequestUrl );
         model.put( SOLR_FACET_DATE_GAP, SolrSearchEngine.SOLR_FACET_DATE_GAP );
-
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_RESULTS, locale, model );
-
-        request.getSession().setAttribute( PARAMETER_PREVIOUS_SEARCH, model );
-
-        page.setPathLabel( I18nService.getLocalizedString( PROPERTY_PATH_LABEL, locale ) );
-        page.setTitle( I18nService.getLocalizedString( PROPERTY_PAGE_TITLE, locale ) );
-        page.setContent( template.getHtml(  ) );
-
-        return page;
-    }
+		
+        return model;
+	}
 
     /**
      * Notify all query Listeners
@@ -276,7 +291,7 @@ public class SolrSearchApp implements XPageApplication
      * @param nResultsCount The results count
      * @param request The request
      */
-    private void notifyQueryListeners( String strQuery, int nResultsCount, HttpServletRequest request )
+    private static void notifyQueryListeners( String strQuery, int nResultsCount, HttpServletRequest request )
     {
         QueryEvent event = new QueryEvent(  );
         event.setQuery( strQuery );
@@ -289,9 +304,12 @@ public class SolrSearchApp implements XPageApplication
      * Return the model used during the last search
      * @param request The HTTP request.
      * @return  the model used during the last search
+     * @deprecated model is not stored in session anymore
      */
+    @Deprecated
     public static Map<String, Object> getLastSearchModel( HttpServletRequest request )
     {
+    	AppLogService.error(  "calling deprecated code : SolrSearchApp.getLastSearchModel( HttpServletRequest request )" );
        return ( Map<String, Object> ) request.getSession().getAttribute( PARAMETER_PREVIOUS_SEARCH );
     }
 }
