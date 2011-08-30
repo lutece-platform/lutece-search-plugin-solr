@@ -5,6 +5,10 @@
 	</properties>
 	<body>
 		<section name="Solr">
+			<subsection name="Introduction">
+			Ajoute la possibilité d'indexé le contenu de Lutece de solr.
+			</subsection>
+			<subsection name="Configuration">
 			<p>
             Configuration dans le web.xml
             <pre>
@@ -44,6 +48,7 @@
 http://dev.lutece.paris.fr/svn/lutece/contribs/atoswordline/trunk/config-SOLR/example/solr/conf/
 http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/technical/plugin-solrserver/webapp/WEB-INF/plugins/solrserver/conf/schema.xml
             </p>
+			</subsection>
 		</section>
 	</body>
 </document>
