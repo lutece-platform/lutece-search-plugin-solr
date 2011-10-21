@@ -33,6 +33,17 @@
  */
 package fr.paris.lutece.plugins.search.solr.web;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.response.SpellCheckResponse;
+
 import fr.paris.lutece.plugins.search.solr.business.SolrFacetedResult;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchResult;
@@ -50,21 +61,11 @@ import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.xpages.XPage;
 import fr.paris.lutece.portal.web.xpages.XPageApplication;
 import fr.paris.lutece.util.html.HtmlTemplate;
+import fr.paris.lutece.util.html.IPaginator;
 import fr.paris.lutece.util.html.Paginator;
+import fr.paris.lutece.util.html.QuickPaginator;
 import fr.paris.lutece.util.string.StringUtil;
 import fr.paris.lutece.util.url.UrlItem;
-
-import org.apache.commons.lang.StringUtils;
-
-import org.apache.solr.client.solrj.response.SpellCheckResponse;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -221,7 +222,7 @@ public class SolrSearchApp implements XPageApplication
         strCurrentPageIndex = ( strCurrentPageIndex != null ) ? strCurrentPageIndex : DEFAULT_PAGE_INDEX;
 
         SolrSearchEngine engine = SolrSearchEngine.getInstance(  );
-        SolrFacetedResult facetedResult = engine.getFacetedSearchResults( strQuery, facetQuery, sort, order, nLimit );
+        SolrFacetedResult facetedResult = engine.getFacetedSearchResults( strQuery, facetQuery, sort, order, nLimit, Integer.parseInt( strCurrentPageIndex ), nItemsPerPage  );
         List<SolrSearchResult> listResults = facetedResult.getSolrSearchResults(  );
 
         // The page should not be added to the cache
@@ -245,8 +246,8 @@ public class SolrSearchApp implements XPageApplication
         }
 
         // nb items per page
-        Paginator<SolrSearchResult> paginator = new Paginator<SolrSearchResult>( listResults, nItemsPerPage,
-                url.getUrl(  ), PARAMETER_PAGE_INDEX, strCurrentPageIndex );
+        IPaginator<SolrSearchResult> paginator = new QuickPaginator<SolrSearchResult>( listResults, nItemsPerPage,
+                url.getUrl(  ), PARAMETER_PAGE_INDEX, strCurrentPageIndex, facetedResult.getCount() );
 
         Map<String, Object> model = new HashMap<String, Object>(  );
         model.put( MARK_RESULTS_LIST, paginator.getPageItems(  ) );

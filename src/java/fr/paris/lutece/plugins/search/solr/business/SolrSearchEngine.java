@@ -59,6 +59,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -167,7 +168,7 @@ public class SolrSearchEngine implements SearchEngine
      * @return the result with facets
      */
     public SolrFacetedResult getFacetedSearchResults( String strQuery, String[] facetQueries, String sortName,
-        String sortOrder, int nLimit )
+        String sortOrder, int nLimit, int nCurrentPageIndex, int nItemsPerPage )
     {
         SolrFacetedResult facetedResult = new SolrFacetedResult(  );
 
@@ -185,7 +186,6 @@ public class SolrSearchEngine implements SearchEngine
             query.setFacet( true );
             query.setFacetLimit( SOLR_FACET_LIMIT );
             query.setFacetMinCount( 1 );
-            query.setRows( nLimit );
 
             for ( Field field : SolrFieldManager.getFacetList(  ).values(  ) )
             {
@@ -263,8 +263,18 @@ public class SolrSearchEngine implements SearchEngine
 
             try
             {
-                QueryResponse response = solrServer.query( query );
 
+            	// count query
+            	query.setRows( 0 );
+                QueryResponse response = solrServer.query( query );
+                
+                int nResults = (int) response.getResults().getNumFound( );
+                facetedResult.setCount( nResults > nLimit ? nLimit : nResults );
+                
+                query.setStart( ( nCurrentPageIndex - 1 ) * nItemsPerPage );
+            	query.setRows( nItemsPerPage > nLimit ? nLimit : nItemsPerPage );
+            	response = solrServer.query( query );
+            	
                 //HighLight
                 Map<String, Map<String, List<String>>> highlightsMap = response.getHighlighting(  );
                 SolrHighlights highlights = null;

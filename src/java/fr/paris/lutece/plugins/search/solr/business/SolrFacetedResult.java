@@ -59,6 +59,26 @@ public class SolrFacetedResult
 
     /**Commentaire. **/
     private Map<String, ArrayList<FacetField>> facetIntersection;
+    
+    private int _nCount;
+    
+    /**
+     * Items count
+     * @return items count
+     */
+    public int getCount( )
+    {
+    	return _nCount;
+    }
+    
+    /**
+     * Items count
+     * @param nCount items count
+     */
+    public void setCount( int nCount )
+    {
+    	_nCount = nCount;
+    }
 
     /**
      * Return the FacetField List.
