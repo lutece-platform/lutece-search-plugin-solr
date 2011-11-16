@@ -60,10 +60,10 @@ import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.xpages.XPage;
 import fr.paris.lutece.portal.web.xpages.XPageApplication;
+import fr.paris.lutece.util.html.DelegatePaginator;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.html.IPaginator;
 import fr.paris.lutece.util.html.Paginator;
-import fr.paris.lutece.util.html.QuickPaginator;
 import fr.paris.lutece.util.string.StringUtil;
 import fr.paris.lutece.util.url.UrlItem;
 
@@ -246,7 +246,7 @@ public class SolrSearchApp implements XPageApplication
         }
 
         // nb items per page
-        IPaginator<SolrSearchResult> paginator = new QuickPaginator<SolrSearchResult>( listResults, nItemsPerPage,
+        IPaginator<SolrSearchResult> paginator = new DelegatePaginator<SolrSearchResult>( listResults, nItemsPerPage,
                 url.getUrl(  ), PARAMETER_PAGE_INDEX, strCurrentPageIndex, facetedResult.getCount() );
 
         Map<String, Object> model = new HashMap<String, Object>(  );
