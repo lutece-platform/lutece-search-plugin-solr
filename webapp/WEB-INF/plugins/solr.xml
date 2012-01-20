@@ -70,5 +70,14 @@
         <css-stylesheets-scope>xpage</css-stylesheets-scope>
         <css-stylesheet>solr/jquery.autocomplete.css</css-stylesheet>
     </css-stylesheets>
+    
+    <daemons>
+        <daemon>
+            <daemon-id>solrindexer</daemon-id>
+            <daemon-name>search.solr.daemon.solrindexer.name</daemon-name>
+            <daemon-description>search.solr.daemon.solrindexer.description</daemon-description>
+            <daemon-class>fr.paris.lutece.plugins.search.solr.service.daemon.SolrIndexerDaemon</daemon-class>
+        </daemon>
+    </daemons>
 
 </plug-in>
