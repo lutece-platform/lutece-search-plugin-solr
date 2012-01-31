@@ -530,7 +530,9 @@ public final class SolrIndexerService
         }
         catch ( Exception e )
         {
-            strLog = e.getCause(  ).toString(  );
+            AppLogService.error( "Erreur lors de la suppression de l'index solr", e );
+            strLog = ( e.getCause( ) != null ? e.getCause( ).toString( ) : e.toString( ) );
+            // strLog = e.getCause( ).toString( ); FIXME NPE si pas de cause
         }
 
         return strLog;

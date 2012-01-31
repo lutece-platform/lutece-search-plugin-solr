@@ -59,7 +59,6 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +87,8 @@ public class SolrSearchEngine implements SearchEngine
             100 );
     private static final String SOLR_FACET_DATE_START = AppPropertiesService.getProperty( PROPERTY_SOLR_FACET_DATE_START );
     public static final String SOLR_FACET_DATE_GAP = AppPropertiesService.getProperty( "solr.facet.date.gap", "+1YEAR" );
+    public static final String SOLR_FACET_DATE_END = AppPropertiesService
+            .getProperty( "solr.facet.date.end", "NOW" );
     public static final int SOLR_FACET_LIMIT = AppPropertiesService.getPropertyInt( "solr.facet.limit", 100 );
     private static SolrSearchEngine _instance;
     private static final String COLON_QUOTE = ":\"";
@@ -192,12 +193,12 @@ public class SolrSearchEngine implements SearchEngine
                 //Add facet Field
                 if ( field.getEnableFacet(  ) )
                 {
-                    if ( field.getName(  ).equalsIgnoreCase( "date" ) )
+                    if ( field.getName( ).contains( "date" ) )
                     {
-                        query.setParam( "facet.date", "date" );
+                        query.setParam( "facet.date", field.getName( ) );
                         query.setParam( "facet.date.start", SOLR_FACET_DATE_START );
                         query.setParam( "facet.date.gap", SOLR_FACET_DATE_GAP );
-                        query.setParam( "facet.date.end", "NOW" );
+                        query.setParam( "facet.date.end", SOLR_FACET_DATE_END );
                         query.setParam( "facet.date.mincount", "0" );
                     }
                     else
@@ -247,7 +248,7 @@ public class SolrSearchEngine implements SearchEngine
             {
                 for ( String strFacetQuery : facetQueries )
                 {
-                    if ( strFacetQuery.startsWith( DATE_COLON ) )
+                    if ( strFacetQuery.contains( DATE_COLON ) )
                     {
                         query.addFilterQuery( strFacetQuery );
                     }
