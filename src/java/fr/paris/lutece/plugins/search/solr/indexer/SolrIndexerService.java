@@ -49,22 +49,19 @@ import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
-import org.apache.commons.lang.StringUtils;
-
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.store.Directory;
-
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.common.SolrInputDocument;
-
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.store.Directory;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.common.SolrInputDocument;
 
 
 /**
@@ -289,9 +286,9 @@ public final class SolrIndexerService
 
                 for ( SolrIndexer indexer : INDEXERS )
                 {
-                    if ( SolrPageIndexer.NAME.equals( indexer.getName(  ) ) )
+                    if ( indexer.isEnable( ) && SolrPageIndexer.NAME.equals( indexer.getName( ) ) )
                     {
-                        indexer.indexDocuments(  );
+                        indexer.indexDocuments( );
 
                         break;
                     }
