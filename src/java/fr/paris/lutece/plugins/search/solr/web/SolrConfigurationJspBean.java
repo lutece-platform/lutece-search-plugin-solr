@@ -48,6 +48,8 @@ import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
+
 
 /**
  *
@@ -65,6 +67,7 @@ public class SolrConfigurationJspBean extends PluginAdminPageJspBean
     private static final String MARK_FIELD = "field_list";
     private static final String MARK_INTERSECTION = "intersections";
     private static final String MESSAGE_VALID = "search.solr.adminFeature.configuration.valid";
+    private static final String PARAMETER_DEFAULT_SORT = "default_sort";
 
     /**
      * Displays the indexing parameters
@@ -139,6 +142,7 @@ public class SolrConfigurationJspBean extends PluginAdminPageJspBean
 
     public String doSort( HttpServletRequest request )
     {
+    	String strDefaultSort = request.getParameter( PARAMETER_DEFAULT_SORT );
         for ( Field field : SolrFieldManager.getFieldList(  ) )
         {
             if ( request.getParameter( Integer.toString( field.getIdField(  ) ) ) != null )
@@ -148,6 +152,17 @@ public class SolrConfigurationJspBean extends PluginAdminPageJspBean
             else
             {
                 field.setEnableSort( false );
+            }
+            if ( StringUtils.isNotBlank( strDefaultSort ) && StringUtils.isNumeric( strDefaultSort ) )             		
+            {
+            	if ( Integer.parseInt(strDefaultSort) == field.getIdField(  ) ) 
+            	{
+            		field.setDefaultSort( true );
+            	}
+            	else
+            	{
+            		field.setDefaultSort( false );
+            	}            	
             }
 
             FieldHome.update( field );
