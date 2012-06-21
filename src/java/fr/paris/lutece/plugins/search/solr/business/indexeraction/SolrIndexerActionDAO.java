@@ -55,7 +55,7 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
     private static final String SQL_QUERY_INSERT = "INSERT INTO solr_indexer_action( id_action,id_document,id_task ,type_ressource,id_portlet)" +
         " VALUES(?,?,?,?,?)";
     private static final String SQL_QUERY_DELETE = "DELETE FROM solr_indexer_action WHERE id_action = ? ";
-    private static final String SQL_QUERY_TRUNCATE = "TRUNCATE solr_indexer_action  ";
+    private static final String SQL_QUERY_TRUNCATE = "DELETE FROM solr_indexer_action  ";
     private static final String SQL_QUERY_UPDATE = "UPDATE solr_indexer_action SET id_action=?,id_document=?,id_task=?,type_ressource=?,id_portlet=? WHERE id_action = ? ";
     private static final String SQL_QUERY_SELECT = "SELECT id_action,id_document,id_task,type_ressource,id_portlet" +
         " FROM solr_indexer_action  ";
