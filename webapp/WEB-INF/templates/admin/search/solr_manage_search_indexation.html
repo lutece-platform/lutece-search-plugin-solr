@@ -1,32 +1,42 @@
-<div class="content-box">
+<div class="row-fluid">
     <h2>#i18n{portal.search.manage_indexer.labelIndexersList}</h2>
-    <table>
+    <table class="table table-striped table-condensed">
         <tr>
             <th width="30%">#i18n{portal.search.manage_indexer.columnIndexerName}</th>
             <th width="10%">#i18n{portal.search.manage_indexer.columnIndexerVersion}</th>
             <th width="10%">#i18n{portal.search.manage_indexer.columnIndexerEnable}</th>
-			<th width="10%">#i18n{portal.search.manage_indexer.columnIndexerEnable}</th>
+            <th width="10%">#i18n{portal.search.manage_indexer.columnIndexerEnable}</th>
         </tr>
         <#list indexers_list as indexer>
             <tr>
                 <td>${indexer.name}</td>
                 <td>${indexer.version}</td>
-				<td>${indexer.description}</td>
+                <td>${indexer.description}</td>
                 <td>
-	                <#if indexer.enable >  
-	                    <img src="images/admin/skin/enable.png" width="24" height="24" valign="center" />  
-	                <#else>    
-	                    <img src="images/admin/skin/disable.png" width="24" height="24" valign="center" />  
-	                </#if> 
+                    <#if indexer.enable >  
+                        <span class="label label-success"><i class="icon-ok-sign icon-white"></i> #i18n{portal.util.labelEnabled}</span>
+                    <#else>    
+                        <span class="label label-important"><i class="icon-remove-sign icon-white"></i> #i18n{portal.util.labelDisabled}</span>
+                    </#if> 
                 </td>
             </tr>
         </#list>
     </table>
 <br/>
 <form method="get" name="doIndexing" action="jsp/admin/search/solr/DoIndexing.jsp" >
-    <input class="button" type="submit" name="del" value="#i18n{search.solr.adminFeature.buttonDoDel}" />
-    <input class="button" type="submit" name="total" value="#i18n{portal.search.manage_indexer.buttonDoIndex}" />
-    <input class="button" type="submit" name="incremental" value="#i18n{portal.search.manage_indexer.buttonDoIncrementalIndex}" />
-    <input class="button" type="button" value="#i18n{portal.util.labelCancel}" onClick="javascript:history.go(-1);" />
+    <div class="form-actions">
+        <button class="btn btn-danger btn-small" type="submit" name="del">
+            <i class="icon-white icon-trash"></i>&nbsp;#i18n{search.solr.adminFeature.buttonDoDel}
+        </button>
+        <button class="btn btn-primary btn-small" type="submit" name="total" >
+            #i18n{portal.search.manage_indexer.buttonDoIndex}
+        </button>
+        <button class="btn btn-primary btn-small" type="submit" name="incremental" >
+            #i18n{portal.search.manage_indexer.buttonDoIncrementalIndex}
+        </button>
+        <button class="btn btn-danger btn-small" type="button" onClick="javascript:history.go(-1);" >
+            #i18n{portal.util.labelCancel}
+        </button>
+    </div>
 </form>
 </div>

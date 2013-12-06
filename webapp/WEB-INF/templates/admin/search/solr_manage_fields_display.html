@@ -1,36 +1,39 @@
-<div class="content-box">
+<div class="row-fluid">
     <h2>#i18n{search.solr.adminFeature.fields.display.title}</h2>
-	<p>#i18n{search.solr.adminFeature.fields.display.description}</p>
+    <p>#i18n{search.solr.adminFeature.fields.display.description}</p>
 <br/>
-	<table>
-		<th>#i18n{search.solr.adminFeature.fields.form.name}</th>
-		<th>#i18n{search.solr.adminFeature.fields.form.label}</th>
-		<th>#i18n{search.solr.adminFeature.fields.form.facet}</th>
-		<th>#i18n{search.solr.adminFeature.fields.form.sort}</th>
-		<th>#i18n{search.solr.adminFeature.fields.form.description}</th>
-		<th>#i18n{search.solr.adminFeature.fields.form.actions}</th>
-		<#list field_list as field>
-			<tr>
-				<td>${field.name}</td>
-				<td>${field.label}</td>
-				<td>${field.isFacet?string}</td>
-				<td>${field.isSort?string}</td>
-				<td>${field.description}</td>
-				<td>
-					<form method="get" name="doFields" action="jsp/admin/search/solr/ManageSolrFields.jsp" >
-						<input type="hidden" value="${field.idField}" name="id"/>
-						<input class="button" type="submit" value="Delete" name="delete"/>
-					</form> 
-					<form method="get" name="doFields" action="jsp/admin/search/solr/SolrCreateUpdateFields.jsp" >
-						<input type="hidden" value="${field.idField}" name="id"/>
-						<input class="button" type="submit" value="Update" name="update"/>
-					</form>
-				</td>
-			</tr>
-		</#list>
-	</table>
-	<br/>
-	<form method="get" name="doFields" action="jsp/admin/search/solr/SolrCreateUpdateFields.jsp" >
-    	<input class="button" type="submit" value="Add" name="create"/>
-	</form>
+    <table class="table table-striped table-condensed">
+        <th>#i18n{search.solr.adminFeature.fields.form.name}</th>
+        <th>#i18n{search.solr.adminFeature.fields.form.label}</th>
+        <th>#i18n{search.solr.adminFeature.fields.form.facet}</th>
+        <th>#i18n{search.solr.adminFeature.fields.form.sort}</th>
+        <th>#i18n{search.solr.adminFeature.fields.form.description}</th>
+        <th>#i18n{search.solr.adminFeature.fields.form.actions}</th>
+        <#list field_list as field>
+            <tr>
+                <td>${field.name}</td>
+                <td>${field.label}</td>
+                <td>${field.isFacet?string}</td>
+                <td>${field.isSort?string}</td>
+                <td>${field.description}</td>
+                <td>
+                    <form method="get" name="doFields" action="jsp/admin/search/solr/ManageSolrFields.jsp" >
+                        <input type="hidden" value="${field.idField}" name="id"/>
+                        <a class="btn btn-primary btn-small" href="jsp/admin/search/solr/SolrCreateUpdateFields.jsp?id=${field.idField}&update=Update">
+                          <i class="icon-white icon-edit"></i>
+                        </a>
+                        <button class="btn btn-danger btn-small" type="submit" name="delete">
+                          <i class="icon-white icon-trash"></i>
+                        </button>
+                    </form> 
+                </td>
+            </tr>
+        </#list>
+    </table>
+    <br/>
+    <form method="get" name="doFields" action="jsp/admin/search/solr/SolrCreateUpdateFields.jsp" >
+        <button class="btn btn-primary" type="submit" name="create">
+           <i class="icon-white icon-plus"></i>&nbsp;#i18n{portal.site.admin_page.buttonAdd}
+        </button>
+    </form>
 </div>

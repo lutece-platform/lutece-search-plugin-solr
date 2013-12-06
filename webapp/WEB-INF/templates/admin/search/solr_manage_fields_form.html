@@ -1,69 +1,67 @@
 <#setting url_escaping_charset='ISO-8859-1'>
-<div class="content-box">
-	<#if create>
-    	<h2>#i18n{search.solr.adminFeature.fields.form.create.title}</h2>
-	<#else>
-    	<h2>#i18n{search.solr.adminFeature.fields.form.update.title}</h2>
-	</#if>
+<div class="row-fluid">
+    <#if create>
+        <h2>#i18n{search.solr.adminFeature.fields.form.create.title}</h2>
+    <#else>
+        <h2>#i18n{search.solr.adminFeature.fields.form.update.title}</h2>
+    </#if>
 <br/>
-<form method="get" name="doFields" action="jsp/admin/search/solr/ManageSolrFields.jsp" enctype="text/plain" accept-charset="ISO-8859-1">
-	<table>
-		<input type="hidden" name="id" value="${field.idField}" />
-		<tr>
-			<td>
-				#i18n{search.solr.adminFeature.fields.form.name} :
-			</td>
-			<td>
-				<input type="text" name="name" value="${field.name}"/>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				#i18n{search.solr.adminFeature.fields.form.label} :
-			</td>
-			<td>
-				<input type="text" name="label" value="${field.label}"/>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				#i18n{search.solr.adminFeature.fields.form.facet} :
-			</td>
-			<td>
-				<#if field.isFacet>
-					<input type="checkbox" name="isfacet" checked />
-				<#else>
-					<input type="checkbox" name="isfacet" />
-				</#if>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				#i18n{search.solr.adminFeature.fields.form.sort} :
-			</td>
-			<td>
-				<#if field.isSort>
-					<input type="checkbox" name="issort" checked />
-				<#else>
-					<input type="checkbox" name="issort" />
-				</#if>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				#i18n{search.solr.adminFeature.fields.form.description} :
-			</td>
-			<td>
-				<input type="text" name="description" value="${field.description}"/>
-			</td>
-		</tr>
-	</table>
-	<br/>
-	<#if create>
-    	<input class="button" type="submit" value="Create" name="create"/>
-	<#else>
-    	<input class="button" type="submit" value="Update" name="update" />
-	</#if>
-    <input class="button" type="button" value="#i18n{portal.util.labelCancel}" onClick="javascript:history.go(-1);" />
+<form class="form-horizontal" method="get" name="doFields" action="jsp/admin/search/solr/ManageSolrFields.jsp" enctype="text/plain" accept-charset="ISO-8859-1">
+    <div class="well">
+        <input type="hidden" name="id" value="${field.idField}" />
+        <div class="control-group">
+           <label class="control-label">#i18n{search.solr.adminFeature.fields.form.name} :</label>
+            <div class="controls">
+                <input type="text" name="name" value="${field.name}"/>
+            </div>
+        </div>
+        <div class="control-group">
+              <label class="control-label">#i18n{search.solr.adminFeature.fields.form.label} :</label>
+            <div class="controls">
+                <input type="text" name="label" value="${field.label}"/>
+                </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">#i18n{search.solr.adminFeature.fields.form.facet} :</label>
+            <div class="controls">
+                <#if field.isFacet>
+                    <input type="checkbox" name="isfacet" checked />
+                <#else>
+                    <input type="checkbox" name="isfacet" />
+                </#if>
+                </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">#i18n{search.solr.adminFeature.fields.form.sort} :</label>
+            <div class="controls">
+                <#if field.isSort>
+                    <input type="checkbox" name="issort" checked />
+                <#else>
+                    <input type="checkbox" name="issort" />
+                </#if>
+                </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">#i18n{search.solr.adminFeature.fields.form.description} :</label>
+            <div class="controls">
+                <input type="text" name="description" value="${field.description}"/>
+                </div>
+        </div>
+    </div>
+    <br/>
+    <div class="form-actions">
+        <#if create>
+            <button class="btn btn-primary" type="submit" name="create">
+               #i18n{portal.site.admin_page.buttonCreate}
+            </button>
+        <#else>
+            <button class="btn btn-primary" type="submit" name="update" >
+               #i18n{portal.site.admin_page.buttonModify}
+            </button>
+        </#if>
+        <button class="btn btn-danger" type="button" onClick="javascript:history.go(-1);" >
+            #i18n{portal.util.labelCancel}
+        </button>
+    </div>
 </form>
 </div>

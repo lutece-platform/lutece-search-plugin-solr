@@ -1,28 +1,31 @@
 <div class="content-box">
     <h2>#i18n{search.solr.adminFeature.configuration.facet.title}</h2>
-	<p>#i18n{search.solr.adminFeature.configuration.facet.description}</p>
+    <p>#i18n{search.solr.adminFeature.configuration.facet.description}</p>
 <br/>
 <form method="get" name="doFacet" action="jsp/admin/search/solr/DoFacet.jsp" >
-	<table>
-		<#list field_list as field>
-			<#if field.isFacet >
-				<tr>
-					<td>${field.label}</td>
-					<td>
-						<#if field.enableFacet >
-							<input name="${field.idField}" class="checkbox" type="checkbox" value="${field.idField}" checked/>
-						<#else>
-							<input name="${field.idField}" class="checkbox" type="checkbox" value="${field.idField}" />
-						</#if>					
-					</td>
-						
-					<td>${field.description}</td>
-				</tr>
-			</#if>
-		</#list>
-	</table>
-	<br/>
-    <input class="button" type="submit" value="#i18n{portal.util.labelValidate}" />
-    <input class="button" type="button" value="#i18n{portal.util.labelCancel}" onClick="javascript:history.go(-1);" />
+    <table class="table table-striped table-condensed">
+        <#list field_list as field>
+            <#if field.isFacet >
+                <tr>
+                    <td>${field.label}</td>
+                    <td>${field.description}</td>
+                    <td>
+                        <#if field.enableFacet >
+                            <input name="${field.idField}" class="checkbox" type="checkbox" value="${field.idField}" checked/>
+                        <#else>
+                            <input name="${field.idField}" class="checkbox" type="checkbox" value="${field.idField}" />
+                        </#if>                  
+                    </td>
+                </tr>
+            </#if>
+        </#list>
+    </table>
+    <br/>
+    <button class="btn btn-primary" type="submit" >
+        #i18n{portal.util.labelValidate}
+    </button>
+    <button class="btn btn-danger" type="button" onClick="javascript:history.go(-1);" >
+        #i18n{portal.util.labelCancel}
+    </button>
 </form>
 </div>
