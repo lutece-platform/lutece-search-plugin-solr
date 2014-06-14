@@ -48,17 +48,15 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.store.Directory;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.common.SolrInputDocument;
@@ -97,7 +95,7 @@ public final class SolrIndexerService
 
     /**
      * Index one document, called by plugin indexers
-     * @param doc the document to index
+     * @param solrItem The item
      * @throws CorruptIndexException corruptIndexException
      * @throws IOException i/o exception
      */
@@ -142,7 +140,7 @@ public final class SolrIndexerService
         {
             Directory dir = IndexationService.getDirectoryIndex(  );
 
-            if ( !IndexReader.indexExists( dir ) )
+            if ( !DirectoryReader.indexExists( dir ) )
             { //init index
                 bCreateIndex = true;
             }
@@ -202,7 +200,7 @@ public final class SolrIndexerService
                         if ( indexer == null )
                         {
                             _sbLogs.append( " - ERROR : " );
-                            _sbLogs.append( " No indexer found for the resource name : " + action.getTypeResource(  ) );
+                            _sbLogs.append(" No indexer found for the resource name : ").append( action.getTypeResource(  ));
                             _sbLogs.append( "</strong>\r\n" );
 
                             continue;
@@ -271,12 +269,10 @@ public final class SolrIndexerService
                     {
                         _sbLogs.append( "\r\n<strong>Action from indexer : " );
                         _sbLogs.append( action.getIndexerName(  ) );
-                        _sbLogs.append( " Action ID : " + action.getIdAction(  ) + " - Document ID : " +
-                            action.getIdDocument(  ) );
+                        _sbLogs.append(" Action ID : ").append(action.getIdAction(  )).append(" - Document ID : ").append( action.getIdDocument(  ));
                         _sbLogs.append( " - ERROR : " );
-                        _sbLogs.append( e.getMessage(  ) +
-                            ( ( e.getCause(  ) != null ) ? ( " : " + e.getCause(  ).getMessage(  ) )
-                                                         : SolrConstants.CONSTANT_EMPTY_STRING ) );
+                        _sbLogs.append(e.getMessage(  )).append( ( e.getCause(  ) != null ) ? ( " : " + e.getCause(  ).getMessage(  ) )
+                                : SolrConstants.CONSTANT_EMPTY_STRING);
                         _sbLogs.append( "</strong>\r\n" );
                     }
                 }
@@ -323,7 +319,7 @@ public final class SolrIndexerService
      */
     public static String buildErrorMessage( Exception exception )
     {
-        StringBuffer sb = new StringBuffer(  );
+        StringBuilder sb = new StringBuilder(  );
         sb.append( exception.getMessage(  ) );
 
         if ( exception.getCause(  ) != null )
@@ -376,40 +372,6 @@ public final class SolrIndexerService
         AppLogService.error( exception.getMessage(  ), exception );
     }
 
-    /**
-     * Index resources of the indexer and add formated logs into the buffer
-     */
-
-    /*
-    private static void index( SolrIndexer solrIndexer, StringBuilder sbLogs )
-    {
-            Map<String, SolrItem> mapDatas = solrIndexer.index( );
-            sbLogs.append( solrIndexer.getName(  ) );
-        sbLogs.append( SolrConstants.CONSTANT_SPACE );
-        sbLogs.append( solrIndexer.getVersion(  ) );
-        sbLogs.append( SolrConstants.CONSTANT_BR_TAG );
-        for( String strLog : mapDatas.keySet() )
-        {
-                try
-                        {
-                        //Converts the SolrItem object to SolrInputDocument
-                        SolrInputDocument solrInputDocument = solrItem2SolrInputDocument( mapDatas.get( strLog ) );
-                                SOLR_SERVER.add( solrInputDocument );
-                                SOLR_SERVER.commit();
-                    sbLogs.append( strLog );
-                        }
-                        catch ( IOException e )
-                        {
-                                printIndexMessage( sbLogs, e );
-                        }
-                        catch ( SolrServerException e )
-                        {
-                                printIndexMessage( sbLogs, e );
-                        }
-        }
-        sbLogs.append( SolrConstants.CONSTANT_BR_TAG );
-    }
-    */
 
     /**
      * Find the indexer of the resource parameter
@@ -529,7 +491,6 @@ public final class SolrIndexerService
         {
             AppLogService.error( "Erreur lors de la suppression de l'index solr", e );
             strLog = ( e.getCause( ) != null ? e.getCause( ).toString( ) : e.toString( ) );
-            // strLog = e.getCause( ).toString( ); FIXME NPE si pas de cause
         }
 
         return strLog;

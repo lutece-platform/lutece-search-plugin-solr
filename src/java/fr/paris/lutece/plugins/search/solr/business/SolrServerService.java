@@ -33,13 +33,10 @@
  */
 package fr.paris.lutece.plugins.search.solr.business;
 
-import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
-
 import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 
-import java.net.MalformedURLException;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 
 
 /**
@@ -102,24 +99,12 @@ public final class SolrServerService
     */
     private SolrServer createSolrServer( String strServerUrl )
     {
-        try
+        HttpSolrServer solrServer = new HttpSolrServer( strServerUrl );
+        if ( SOLR_SERVER_MAX_CONNECTION != NO_MAX_CONNECTION_SET )
         {
-            CommonsHttpSolrServer solrServer = new CommonsHttpSolrServer( strServerUrl );
-
-            if ( SOLR_SERVER_MAX_CONNECTION != NO_MAX_CONNECTION_SET )
-            {
-                solrServer.setMaxTotalConnections( SOLR_SERVER_MAX_CONNECTION );
-            }
-
-            solrServer.setConnectionTimeout( SOLR_TIMEOUT );
-
-            return solrServer;
+            solrServer.setMaxTotalConnections( SOLR_SERVER_MAX_CONNECTION );
         }
-        catch ( MalformedURLException e )
-        {
-            AppLogService.error( e.getMessage(  ), e );
-
-            return null;
-        }
+        solrServer.setConnectionTimeout( SOLR_TIMEOUT );
+        return solrServer;
     }
 }
