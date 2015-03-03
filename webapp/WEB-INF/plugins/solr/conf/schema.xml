@@ -39,8 +39,7 @@
                     catenateWords="1" catenateNumbers="1" catenateAll="0"
                     splitOnCaseChange="1"/>
                 <filter class="solr.LowerCaseFilterFactory"/>
-                <filter class="solr.EnglishPorterFilterFactory"
-                    protected="protwords.txt"/>
+                <filter class="solr.PorterStemFilterFactory"/>
                 <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
             </analyzer>
         </fieldType>
