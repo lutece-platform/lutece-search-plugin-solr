@@ -224,11 +224,11 @@ public class SolrSearchEngine implements SearchEngine
             {
                 if ( sortOrder.equals( "asc" ) )
                 {
-                    query.setSortField( sortName, ORDER.asc );
+                    query.setSort( sortName, ORDER.asc );
                 }
                 else
                 {
-                    query.setSortField( sortName, ORDER.desc );
+                    query.setSort( sortName, ORDER.desc );
                 }
             }
             else
@@ -237,7 +237,7 @@ public class SolrSearchEngine implements SearchEngine
                 {
                     if ( field.getDefaultSort(  ) )
                     {
-                        query.setSortField( field.getName(  ), ORDER.desc );
+                        query.setSort( field.getName(  ), ORDER.desc );
                     }
                 }
             }
