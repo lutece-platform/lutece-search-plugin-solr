@@ -8,8 +8,9 @@
 </#list>
 ${encoded_facets_queries}</#macro>
 
+<div class="row">
 <#-- facets -->
-<div class="span-5 prepend-1 append-0 append-bottom" >
+<div class="col-sm-3 well" >
 
     <#-- Historique -->
     <div id="histoique" class="portlet -lutece-border-radius append-bottom">
@@ -153,39 +154,43 @@ ${encoded_facets_queries}</#macro>
 </div>
 
 <#-- results -->
-<div id="resultList" class="span-17 prepend-0 append-0 append-bottom">
+<div id="resultList" class="col-sm-6">
     <#-- new Search -->
-    <div id="newSearch" class="portlet -lutece-border-radius append-bottom">
-        <form name="search" method="post" action="${fullUrl}">
-            <div class="hide">
-                <input type="hidden" name="page" value="search-solr" />
-                <input type="hidden" name="sort_name" value="${sort_name!}" />
-                <input type="hidden" name="sort_order" value="${sort_order!}" />
-                <#if facets_list??>
-                <#list facets_list as facet>
-                <input type="hidden" name="fq" value="${facet}" />
-                </#list>
-                </#if>
+    <div id="newSearch" class="append-bottom ">
+	<div class="well">
+		<form name="search" method="post" action="${fullUrl}">
+		    <div class="hide">
+		        <input type="hidden" name="page" value="search-solr" />
+		        <input type="hidden" name="sort_name" value="${sort_name!}" />
+		        <input type="hidden" name="sort_order" value="${sort_order!}" />
+		        <#if facets_list??>
+		        <#list facets_list as facet>
+		        <input type="hidden" name="fq" value="${facet}" />
+		        </#list>
+		        </#if>
 
-            </div>
-            <div style="text-align:center;">
-                <input type="text" name="query" size="35" value="${query?if_exists}" id="solr" /> 
-                <input type="submit" value="#i18n{portal.search.search_results.buttonSearch}" />
-            </div>
+		    </div>
+		    <div style="text-align:center;">
+		        <input type="text" name="query" size="35" value="${query?if_exists}" id="solr" /> 
+			<span>
+		        	<input type="submit" value="#i18n{portal.search.search_results.buttonSearch}" />
+			</span>
+		    </div>
+	    </div>
             <div>
                 <#-- Number of documents per page selector -->
-                #i18n{portal.search.search_results.labelNbDocsPerPage}<br />
-                <@NbItemsPerPageSelectorRadioList nb_items_per_page?string />
+                #i18n{portal.search.search_results.labelNbDocsPerPage}: 
+                <@NbItemsPerPageSelectorCombo nb_items_per_page?string />
             </div>
         </form>
     </div>
     <div id="resultList2" class="portlet -lutece-border-radius">
-        <div id="resultHeader" class="portlet-header">#i18n{portal.search.search_results.title}</div>
+        <legend>#i18n{portal.search.search_results.title}</legend>
         <#if error?has_content>
         <div class="error">${error}</div>
         </#if>
         <div>#i18n{portal.search.search_results.labelResultsCount} : <strong>${paginator.itemsCount}</strong></div>
-        <div>#i18n{portal.search.search_results.labelResultsRange} : <strong>${paginator.rangeMin} - ${paginator.rangeMax}</strong></div>
+        
 
         <#-- spellChecker -->
         <#if suggestion?has_content>
@@ -202,7 +207,7 @@ ${encoded_facets_queries}</#macro>
             </p>
         </div>
 
-        <div id="resultItems" class="portlet-background">
+        <div id="resultItems" class="">
             <div>
                 <#list results_list as result>
                 <div id="item" >
@@ -210,7 +215,6 @@ ${encoded_facets_queries}</#macro>
                     <div style="font-weight:bold; font-size:1.2em"><a href="${result.url}&terms=${query?url}&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}<@EncodeFQ  facets_list/>">${result.title}</a></div>
 
                     <#if result.summary??>${result.summary}</#if>
-                    <br />
                     <#if result.highlight??>
                     <#-- get a extract from the "content" field where there is one (or more) of the searched words -->
                     <#if result.highlight.map["content"]??>
@@ -223,13 +227,14 @@ ${encoded_facets_queries}</#macro>
                     <br />
                     <div style="text-align:right; font-size:0.8em;" ><#if result.date?has_content>${result.date?date}</#if></div>
                 </div>
-                <div style="clear:both">&nbsp;</div>
+		<hr/>
                 </#list>
             </div>
         </div>
     </div>
+    <div>#i18n{portal.search.search_results.labelResultsRange} : <strong>${paginator.rangeMin} - ${paginator.rangeMax}</strong></div>
 </div>
-
+</div>
 <#-- Freemarker macros -->
 
 <#-- Number of items per page selector - Combo Box implementation -->
