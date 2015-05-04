@@ -36,12 +36,12 @@ package fr.paris.lutece.plugins.search.solr.web;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
 
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
+import org.apache.solr.client.solrj.response.SpellCheckResponse.Suggestion;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -80,35 +80,35 @@ public class SolrSuggestServlet extends HttpServlet
         result.append( "({\"response\":{\"docs\":[" );
 
         QueryResponse response = engine.getJsonpSuggest( terms, callback );
-        SolrDocument solr = null;
-        String fieldName = null;
+        Suggestion solr = null;
+        //String fieldName = null;
+        int i= 1;
 
         //Iterate on all document
-        for ( Iterator<SolrDocument> ite = response.getResults(  ).iterator(  ); ite.hasNext(  ); )
+        for ( Iterator<Suggestion> ite = response.getSpellCheckResponse().getSuggestions().iterator(); ite.hasNext(  ); )
         {
             solr = ite.next(  );
-            result.append( "{" );
+           
+            List<String> suggestions=solr.getAlternatives();
+            
 
             //iterate on each field
-            for ( Iterator<String> ite2 = solr.getFieldNames(  ).iterator(  ); ite2.hasNext(  ); )
+            for ( String suggest : suggestions )
             {
-                fieldName = ite2.next(  );
-                result.append( "\"" ).append( fieldName ).append( "\":\"" ).append( solr.getFieldValue( fieldName ) )
+            	result.append( "{" );
+                result.append( "\"" ).append( "title" ).append( "\":\"" ).append( suggest )
                       .append( "\"" );
 
-                if ( ite2.hasNext(  ) )
-                {
-                    result.append( "," );
-                }
-            }
 
-            if ( ite.hasNext(  ) )
-            {
-                result.append( "}," );
-            }
-            else
-            {
-                result.append( "}" );
+	            if ( suggestions.size() > i )
+	            {
+	                result.append( "}," );
+	            }
+	            else
+	            {
+	                result.append( "}" );
+	            }
+	            i++;
             }
         }
 

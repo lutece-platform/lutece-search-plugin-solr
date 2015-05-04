@@ -402,7 +402,7 @@ public class SolrSearchEngine implements SearchEngine
         query.setParam( "wt", "json" );
         query.setParam( "json.wrf", callback );
         query.setRows( 10 );
-        query.setQueryType( "autoComplete" ); //TODO
+        query.setRequestHandler("/autoComplete" ); //TODO
 
         try
         {
