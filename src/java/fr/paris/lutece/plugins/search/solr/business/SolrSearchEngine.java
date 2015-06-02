@@ -50,7 +50,7 @@ import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -58,6 +58,7 @@ import org.apache.solr.client.solrj.response.SpellCheckResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,11 +75,15 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class SolrSearchEngine implements SearchEngine
 {
-    private static final String PROPERTY_SOLR_HIGHLIGHT_PRE = "solr.highlight.pre";
+	private static final String PROPERTY_SOLR_AUTOCOMPLETE_HANDLER = "solr.autocomplete.handler";
+	private static final String PROPERTY_SOLR_SPELLCHECK_HANDLER = "solr.spellcheck.handler";
+	private static final String PROPERTY_SOLR_HIGHLIGHT_PRE = "solr.highlight.pre";
     private static final String PROPERTY_SOLR_HIGHLIGHT_POST = "solr.highlight.post";
     private static final String PROPERTY_SOLR_HIGHLIGHT_SNIPPETS = "solr.highlight.snippets";
     private static final String PROPERTY_SOLR_HIGHLIGHT_FRAGSIZE = "solr.highlight.fragsize";
     private static final String PROPERTY_SOLR_FACET_DATE_START = "solr.facet.date.start";
+    private static final String SOLR_AUTOCOMPLETE_HANDLER = AppPropertiesService.getProperty(PROPERTY_SOLR_AUTOCOMPLETE_HANDLER);
+    private static final String SOLR_SPELLCHECK_HANDLER = AppPropertiesService.getProperty(PROPERTY_SOLR_SPELLCHECK_HANDLER);
     private static final String SOLR_HIGHLIGHT_PRE = AppPropertiesService.getProperty( PROPERTY_SOLR_HIGHLIGHT_PRE );
     private static final String SOLR_HIGHLIGHT_POST = AppPropertiesService.getProperty( PROPERTY_SOLR_HIGHLIGHT_POST );
     private static final int SOLR_HIGHLIGHT_SNIPPETS = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_HIGHLIGHT_SNIPPETS,
@@ -93,7 +98,8 @@ public class SolrSearchEngine implements SearchEngine
     private static SolrSearchEngine _instance;
     private static final String COLON_QUOTE = ":\"";
     private static final String DATE_COLON = "date:";
-
+    private static final String DEF_TYPE = "dismax";
+    
     /**
     * Return search results
     * @param strQuery The search query
@@ -104,7 +110,7 @@ public class SolrSearchEngine implements SearchEngine
     {
         List<SearchResult> results = new ArrayList<SearchResult>(  );
 
-        SolrServer solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
+        SolrClient solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
 
         if ( ( solrServer != null ) && !strQuery.equals( "" ) )
         {
@@ -153,7 +159,9 @@ public class SolrSearchEngine implements SearchEngine
             catch ( SolrServerException e )
             {
                 AppLogService.error( e.getMessage(  ), e );
-            }
+            } catch (IOException e) {
+            	AppLogService.error( e.getMessage(  ), e );
+			}
         }
 
         return results;
@@ -169,11 +177,11 @@ public class SolrSearchEngine implements SearchEngine
      * @return the result with facets
      */
     public SolrFacetedResult getFacetedSearchResults( String strQuery, String[] facetQueries, String sortName,
-        String sortOrder, int nLimit, int nCurrentPageIndex, int nItemsPerPage )
+        String sortOrder, int nLimit, int nCurrentPageIndex, int nItemsPerPage, Boolean bSpellCheck )
     {
         SolrFacetedResult facetedResult = new SolrFacetedResult(  );
 
-        SolrServer solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
+        SolrClient solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
         List<SolrSearchResult> results = new ArrayList<SolrSearchResult>(  );
 
         if ( solrServer != null )
@@ -218,7 +226,8 @@ public class SolrSearchEngine implements SearchEngine
 
             //(String []) al.toArray (new String [0]);
             query.setParam( "facet.tree", (String[]) treeParam.toArray( new String[0] ) );
-
+            query.setParam( "spellcheck", bSpellCheck);
+            
             //sort order
             if ( ( sortName != null ) && !"".equals( sortName ) )
             {
@@ -274,6 +283,11 @@ public class SolrSearchEngine implements SearchEngine
                 
                 query.setStart( ( nCurrentPageIndex - 1 ) * nItemsPerPage );
             	query.setRows( nItemsPerPage > nLimit ? nLimit : nItemsPerPage );
+
+            	query.setParam("defType", DEF_TYPE);
+            	String strWeightValue = generateQueryWeightValue();
+            	query.setParam("qf", strWeightValue);
+            	
             	response = solrServer.query( query );
             	
                 //HighLight
@@ -289,6 +303,9 @@ public class SolrSearchEngine implements SearchEngine
                 List<SolrItem> itemList = response.getBeans( SolrItem.class );
                 results = SolrUtil.transformSolrItemsToSolrSearchResults( itemList, highlights );
 
+                //set the spellcheckresult
+                facetedResult.setSolrSpellCheckResponse(response.getSpellCheckResponse());
+                
                 //Date facet
                 if ( ( response.getFacetDates(  ) != null ) && !response.getFacetDates(  ).isEmpty(  ) )
                 {
@@ -341,7 +358,9 @@ public class SolrSearchEngine implements SearchEngine
             catch ( SolrServerException e )
             {
                 AppLogService.error( e.getMessage(  ), e );
-            }
+            } catch (IOException e) {
+            	AppLogService.error( e.getMessage(  ), e );
+			}
         }
         else
         {
@@ -353,7 +372,17 @@ public class SolrSearchEngine implements SearchEngine
         return facetedResult;
     }
 
-    /**
+    private String generateQueryWeightValue() {
+    	List<Field> fieldList =  SolrFieldManager.getFieldList();
+    	String strQueryWeight = "";
+    	for (Field field : fieldList)
+    	{
+    		strQueryWeight += field.getSolrName() + "^" + field.getWeight() + " " ;
+    	}
+    	return strQueryWeight;
+	}
+
+	/**
      * Return the suggestion terms
      * @param term the terms of search
      * @return The spell checker response
@@ -361,7 +390,7 @@ public class SolrSearchEngine implements SearchEngine
     public SpellCheckResponse getSpellChecker( String term )
     {
         SpellCheckResponse spellCheck = null;
-        SolrServer solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
+        SolrClient solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
 
         SolrQuery query = new SolrQuery( term );
         //Do not return results (optimization)
@@ -369,7 +398,7 @@ public class SolrSearchEngine implements SearchEngine
         //Activate spellChecker
         query.setParam( "spellcheck", "true" );
         //The request handler used
-        query.setQueryType( "spellCheckText" ); //TODO
+        query.setRequestHandler(SOLR_SPELLCHECK_HANDLER );
                                                 //The number of suggest returned
 
         query.setParam( "spellcheck.count", "1" ); // TODO
@@ -388,7 +417,9 @@ public class SolrSearchEngine implements SearchEngine
         catch ( SolrServerException e )
         {
             AppLogService.error( e.getMessage(  ), e );
-        }
+        } catch (IOException e) {
+        	AppLogService.error( e.getMessage(  ), e );
+		}
 
         return spellCheck;
     }
@@ -396,13 +427,13 @@ public class SolrSearchEngine implements SearchEngine
     public QueryResponse getJsonpSuggest( String terms, String callback )
     {
         QueryResponse response = null;
-        SolrServer solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
+        SolrClient solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
 
         SolrQuery query = new SolrQuery( terms );
         query.setParam( "wt", "json" );
         query.setParam( "json.wrf", callback );
         query.setRows( 10 );
-        query.setRequestHandler("/autoComplete" ); //TODO
+        query.setRequestHandler( "/" + SOLR_AUTOCOMPLETE_HANDLER ); 
 
         try
         {
@@ -411,7 +442,9 @@ public class SolrSearchEngine implements SearchEngine
         catch ( SolrServerException e )
         {
             AppLogService.error( e.getMessage(  ), e );
-        }
+        } catch (IOException e) {
+        	AppLogService.error( e.getMessage(  ), e );
+		}
 
         return response;
     }
@@ -419,7 +452,7 @@ public class SolrSearchEngine implements SearchEngine
     public String getDocumentHighLighting( String strDocumentId, String terms )
     {
         String xmlContent = null;
-        SolrServer solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
+        SolrClient solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
         SolrQuery query = new SolrQuery( terms );
         query.setHighlight( true );
         query.setHighlightSimplePre( SOLR_HIGHLIGHT_PRE );
@@ -448,7 +481,9 @@ public class SolrSearchEngine implements SearchEngine
         catch ( SolrServerException e )
         {
             AppLogService.error( e.getMessage(  ), e );
-        }
+        } catch (IOException e) {
+        	AppLogService.error( e.getMessage(  ), e );
+		}
 
         return xmlContent;
     }
