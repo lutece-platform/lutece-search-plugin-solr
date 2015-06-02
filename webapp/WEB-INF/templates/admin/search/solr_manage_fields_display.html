@@ -7,6 +7,7 @@
         <th>#i18n{search.solr.adminFeature.fields.form.label}</th>
         <th>#i18n{search.solr.adminFeature.fields.form.facet}</th>
         <th>#i18n{search.solr.adminFeature.fields.form.sort}</th>
+        <th>#i18n{search.solr.adminFeature.fields.form.weight}</th>
         <th>#i18n{search.solr.adminFeature.fields.form.description}</th>
         <th>#i18n{search.solr.adminFeature.fields.form.actions}</th>
         <#list field_list as field>
@@ -15,6 +16,16 @@
                 <td>${field.label}</td>
                 <td>${field.isFacet?string}</td>
                 <td>${field.isSort?string}</td>
+                <td>
+                  <#if field.weight == 0.1>
+                  #i18n{search.solr.adminFeature.fields.form.weight.low}
+                  <#elseif field.weight == 1>
+				  #i18n{search.solr.adminFeature.fields.form.weight.normal}
+                  <#else>
+				  #i18n{search.solr.adminFeature.fields.form.weight.high}
+                  </#if>
+                </td>
+
                 <td>${field.description}</td>
                 <td>
                     <form method="get" name="doFields" action="jsp/admin/search/solr/ManageSolrFields.jsp" >

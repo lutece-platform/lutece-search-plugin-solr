@@ -49,6 +49,7 @@ public class Field
     private boolean _IsSort;
     private boolean _EnableSort;
     private boolean _DefaultSort;
+    private double _Weight;
 
     public Field(  )
     {
@@ -227,5 +228,23 @@ public class Field
     public void setDefaultSort( boolean DefaultSort )
     {
         _DefaultSort = DefaultSort;
+    }
+
+    /**
+     * Sets the weight
+     * @param Weight The Weight
+     */
+	public void setWeight( double dWeight ) {
+		_Weight = dWeight;
+		
+	}
+	
+	/**
+     * Returns the weight
+     * @return The weight
+     */
+    public double getWeight(  )
+    {
+        return _Weight;
     }
 }

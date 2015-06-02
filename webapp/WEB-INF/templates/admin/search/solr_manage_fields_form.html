@@ -42,6 +42,16 @@
                 </div>
         </div>
         <div class="control-group">
+          <label class="control-label">#i18n{search.solr.adminFeature.fields.form.weight} :</label>
+            <div class="controls">
+            	<select name="weight" id="weight">
+					<option value="0.1" <#if field.weight == 0.1>selected</#if> >#i18n{search.solr.adminFeature.fields.form.weight.low}</option>
+                  <option value="1" <#if field.weight == 1>selected</#if> >#i18n{search.solr.adminFeature.fields.form.weight.normal}</option>
+                  <option value="10" <#if field.weight == 10>selected</#if> >#i18n{search.solr.adminFeature.fields.form.weight.high}</option>
+            	</select>
+                </div>
+        </div>
+        <div class="control-group">
           <label class="control-label">#i18n{search.solr.adminFeature.fields.form.description} :</label>
             <div class="controls">
                 <input type="text" name="description" value="${field.description}"/>
