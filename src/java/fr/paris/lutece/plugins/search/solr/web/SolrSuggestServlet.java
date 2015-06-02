@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.search.solr.web;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
 
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.SpellCheckResponse.Collation;
 import org.apache.solr.client.solrj.response.SpellCheckResponse.Suggestion;
 
 import java.io.IOException;
@@ -80,36 +81,39 @@ public class SolrSuggestServlet extends HttpServlet
         result.append( "({\"response\":{\"docs\":[" );
 
         QueryResponse response = engine.getJsonpSuggest( terms, callback );
-        Suggestion solr = null;
+        Collation solr = null;
         //String fieldName = null;
-        int i= 1;
+        //int i= 1;
 
         //Iterate on all document
-        for ( Iterator<Suggestion> ite = response.getSpellCheckResponse().getSuggestions().iterator(); ite.hasNext(  ); )
+        for ( Iterator<Collation> ite = response.getSpellCheckResponse().getCollatedResults().iterator(); ite.hasNext(  ); )
         {
-            solr = ite.next(  );
-           
-            List<String> suggestions=solr.getAlternatives();
-            
-
-            //iterate on each field
-            for ( String suggest : suggestions )
-            {
-            	result.append( "{" );
-                result.append( "\"" ).append( "title" ).append( "\":\"" ).append( suggest )
-                      .append( "\"" );
-
-
-	            if ( suggestions.size() > i )
-	            {
-	                result.append( "}," );
-	            }
-	            else
-	            {
-	                result.append( "}" );
-	            }
-	            i++;
-            }
+        	if (ite.hasNext(  ))
+        	{
+	        	solr = ite.next(  );
+	           
+	            String collation=solr.getCollationQueryString();
+	            
+	
+	            //iterate on each field
+	            //for ( String suggest : suggestions )
+	            //{
+	            	result.append( "{" );
+	                result.append( "\"" ).append( "title" ).append( "\":\"" ).append( collation )
+	                      .append( "\"" );
+	
+	
+		            if ( ite.hasNext(  ) )
+		            {
+		                result.append( "}," );
+		            }
+		            else
+		            {
+		                result.append( "}" );
+		            }
+        	}
+	           // i++;
+            //}
         }
 
         //Close result
