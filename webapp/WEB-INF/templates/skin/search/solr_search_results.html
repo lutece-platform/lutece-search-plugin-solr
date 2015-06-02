@@ -193,12 +193,16 @@ ${encoded_facets_queries}</#macro>
         
 
         <#-- spellChecker -->
-        <#if suggestion?has_content>
+		<#if suggestion?has_content>
         <div id="spellchecker">
-            <#assign newQuery="" >
-            #i18n{search.solr.display.result.spellchecker}<a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&query=${suggestion?trim?url}<@EncodeFQ  facets_list/>">${suggestion?trim}</a>	
+          #i18n{search.solr.display.result.spellchecker}
+          <#list suggestion as sugg>
+                <#assign newQuery="" >
+                <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&query=${sugg.getCollationQueryString()?url}<@EncodeFQ  facets_list/>">${sugg.getCollationQueryString()}</a>
+        </#list>
         </div>
         </#if>
+
 
         <div>&nbsp;</div>
         <div id="pagination" class="pagination">
@@ -262,32 +266,31 @@ ${encoded_facets_queries}</#macro>
 </#macro>
 
 <script>
-    $(function() {
 
-        function formatForDisplay(doc) {
-            return doc.title;
-        }
+$(function() {
+  $('#solr').autocomplete({
+    source: function(request, response) {
+      $.ajax({
+        url: '@base_url@solrSuggest',
+        dataType: 'jsonp',
+minLength: 3,
+data: {
+q: request.term,
+},
+success: function(data) {
+var formattedResponse = $.map(data.response.docs, function (item) {
+return {
+label: item.title,
+value: item.title,
+};
+});
+response( formattedResponse );
+}
+});
+},
 
-        $("#solr").autocomplete('@base_url@solrSuggest?', {
-            dataType: "jsonp",
-            width: 300,
-            minChars: 3,
-            parse: function(data) {
-                return $.map(data.response.docs, function(doc) {
-                    return {
-                        data: doc,
-                        value: doc.uid.toString(),
-                        result: doc.title
-                    }
-                });
-            },
-            formatItem: function(doc) {
-                return formatForDisplay(doc);
-            }
-        }).result(
-                function(e, doc) {
-                    $("#content").append(
-                            "<p>selected " + formatForDisplay(doc) + "(" + doc.title + ")" + "</p>");
-                });
-    });
+});
+});
+
+
 </script>
