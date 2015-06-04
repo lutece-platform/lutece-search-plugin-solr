@@ -58,7 +58,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.store.Directory;
-import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.common.SolrInputDocument;
 
 
@@ -69,7 +69,7 @@ import org.apache.solr.common.SolrInputDocument;
  */
 public final class SolrIndexerService
 {
-    private static final SolrClient SOLR_SERVER = SolrServerService.getInstance(  ).getSolrServer(  );
+    private static final SolrServer SOLR_SERVER = SolrServerService.getInstance(  ).getSolrServer(  );
     private static final List<SolrIndexer> INDEXERS = initIndexersList(  );
     private static final String PARAM_TYPE_PAGE = "Page";
     private static StringBuffer _sbLogs;
@@ -453,11 +453,12 @@ public final class SolrIndexerService
             strBaseUrl = AppPropertiesService.getProperty( PROPERTY_PROD_URL );
         }
 
-        if ( !strBaseUrl.endsWith( "/" ) )
+        if ( !StringUtils.isBlank( strBaseUrl ) && !strBaseUrl.endsWith( "/" )   )
         {
             strBaseUrl = strBaseUrl + "/";
         }
-
+        
+        strBaseUrl = StringUtils.isBlank( strBaseUrl ) ? "" : strBaseUrl; 
         return strBaseUrl + AppPathService.getPortalUrl(  );
     }
 

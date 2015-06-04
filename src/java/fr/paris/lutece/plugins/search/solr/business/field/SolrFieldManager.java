@@ -218,5 +218,4 @@ public class SolrFieldManager
             return query;
         }
     }
-
 }

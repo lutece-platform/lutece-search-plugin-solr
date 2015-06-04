@@ -166,7 +166,6 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
 
         field.setIsFacet( request.getParameter( "isfacet" ) != null );
         field.setIsSort( request.getParameter( "issort" ) != null );
-        field.setWeight( Double.parseDouble(request.getParameter( "weight" ) ));
 
         FieldHome.update( field );
         SolrFieldManager.reloadField(  );
@@ -194,7 +193,6 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
         field.setIsSort( request.getParameter( "issort" ) != null );
         field.setEnableSort( false );
         field.setDefaultSort( false );
-        field.setWeight( Double.parseDouble(request.getParameter( "weight" ) ));
 
         FieldHome.create( field );
         SolrFieldManager.reloadField(  );

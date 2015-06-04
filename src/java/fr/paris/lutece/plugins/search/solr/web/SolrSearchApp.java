@@ -222,7 +222,7 @@ public class SolrSearchApp implements XPageApplication
         strCurrentPageIndex = (strCurrentPageIndex != null) ? strCurrentPageIndex : DEFAULT_PAGE_INDEX;
 
         SolrSearchEngine engine = SolrSearchEngine.getInstance();
-        SolrFacetedResult facetedResult = engine.getFacetedSearchResults(strQuery, facetQuery, sort, order, nLimit, Integer.parseInt(strCurrentPageIndex), nItemsPerPage, SOLR_SPELLCHECK);
+        SolrFacetedResult facetedResult = engine.getFacetedSearchResults(strQuery, facetQuery, sort, order, nLimit, Integer.parseInt(strCurrentPageIndex), nItemsPerPage);
         List<SolrSearchResult> listResults = facetedResult.getSolrSearchResults();
 
         // The page should not be added to the cache
@@ -269,7 +269,7 @@ public class SolrSearchApp implements XPageApplication
 
             if (checkResponse != null)
             {
-                model.put(MARK_SUGGESTION, facetedResult.getSolrSpellCheckResponse().getCollatedResults());
+                model.put(MARK_SUGGESTION, checkResponse.getCollatedResult());
             }
         }
 

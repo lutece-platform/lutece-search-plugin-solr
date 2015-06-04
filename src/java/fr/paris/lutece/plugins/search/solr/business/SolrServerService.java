@@ -34,9 +34,9 @@
 package fr.paris.lutece.plugins.search.solr.business;
 
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
-import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServer;
 
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 
 
 /**
@@ -54,7 +54,7 @@ public final class SolrServerService
             NO_MAX_CONNECTION_SET );
     private static final int SOLR_TIMEOUT = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_TIMEOUT, 60000 );
     private static SolrServerService _instance;
-    private SolrClient _solrServer;
+    private SolrServer _solrServer;
 
     /**
      * Private constructor that creates the SolrServer.
@@ -82,7 +82,7 @@ public final class SolrServerService
      * Returns the SolrServer.
      * @return the SolrServer
      */
-    public SolrClient getSolrServer(  )
+    public SolrServer getSolrServer(  )
     {
         if ( _solrServer == null )
         {
@@ -97,9 +97,9 @@ public final class SolrServerService
     * @param strServerUrl the Solr server url
     * @return the SolrServer.
     */
-    private SolrClient createSolrServer( String strServerUrl )
+    private SolrServer createSolrServer( String strServerUrl )
     {
-        HttpSolrClient solrServer = new HttpSolrClient( strServerUrl );
+        HttpSolrServer solrServer = new HttpSolrServer( strServerUrl );
         if ( SOLR_SERVER_MAX_CONNECTION != NO_MAX_CONNECTION_SET )
         {
             solrServer.setMaxTotalConnections( SOLR_SERVER_MAX_CONNECTION );

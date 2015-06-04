@@ -34,7 +34,6 @@
 package fr.paris.lutece.plugins.search.solr.business;
 
 import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.SpellCheckResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,9 +59,6 @@ public class SolrFacetedResult
 
     /**Commentaire. **/
     private Map<String, ArrayList<FacetField>> facetIntersection;
-    
-    /**spellcheck. **/
-    private SpellCheckResponse solrSpellCheckResponse;
     
     private int _nCount;
     
@@ -143,12 +139,4 @@ public class SolrFacetedResult
     {
         this.facetIntersection = facetIntersection;
     }
-
-	public SpellCheckResponse getSolrSpellCheckResponse() {
-		return this.solrSpellCheckResponse;
-	}
-
-	public void setSolrSpellCheckResponse(SpellCheckResponse solrSpellCheckResponse) {
-		this.solrSpellCheckResponse = solrSpellCheckResponse;
-	}
 }
