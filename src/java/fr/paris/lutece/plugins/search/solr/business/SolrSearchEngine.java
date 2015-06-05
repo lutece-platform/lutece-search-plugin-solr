@@ -79,6 +79,8 @@ public class SolrSearchEngine implements SearchEngine
     private static final String PROPERTY_SOLR_HIGHLIGHT_SNIPPETS = "solr.highlight.snippets";
     private static final String PROPERTY_SOLR_HIGHLIGHT_FRAGSIZE = "solr.highlight.fragsize";
     private static final String PROPERTY_SOLR_FACET_DATE_START = "solr.facet.date.start";
+    private static final String PROPERTY_SOLR_FACET_MIN_COUNT = "solr.facet.minCount";
+    
     private static final String SOLR_HIGHLIGHT_PRE = AppPropertiesService.getProperty( PROPERTY_SOLR_HIGHLIGHT_PRE );
     private static final String SOLR_HIGHLIGHT_POST = AppPropertiesService.getProperty( PROPERTY_SOLR_HIGHLIGHT_POST );
     private static final int SOLR_HIGHLIGHT_SNIPPETS = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_HIGHLIGHT_SNIPPETS,
@@ -86,7 +88,7 @@ public class SolrSearchEngine implements SearchEngine
     private static final int SOLR_HIGHLIGHT_FRAGSIZE = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_HIGHLIGHT_FRAGSIZE,
             100 );
     private static final String SOLR_FACET_DATE_START = AppPropertiesService.getProperty( PROPERTY_SOLR_FACET_DATE_START );
-    private static final int SOLR_FACET_MIN_COUNT = Integer.parseInt(AppPropertiesService.getProperty( "solr.facet.minCount" ));
+    private static final int SOLR_FACET_MIN_COUNT = AppPropertiesService.getPropertyInt(PROPERTY_SOLR_FACET_MIN_COUNT, 1);
     
     public static final String SOLR_FACET_DATE_GAP = AppPropertiesService.getProperty( "solr.facet.date.gap", "+1YEAR" );
     public static final String SOLR_FACET_DATE_END = AppPropertiesService
