@@ -6,6 +6,8 @@
         <th>#i18n{search.solr.adminFeature.fields.form.name}</th>
         <th>#i18n{search.solr.adminFeature.fields.form.label}</th>
         <th>#i18n{search.solr.adminFeature.fields.form.facet}</th>
+        <th>#i18n{search.solr.adminFeature.fields.form.facet.mincount}</th>
+        <th>#i18n{search.solr.adminFeature.fields.form.facet.operator}</th>
         <th>#i18n{search.solr.adminFeature.fields.form.sort}</th>
         <th>#i18n{search.solr.adminFeature.fields.form.weight}</th>
         <th>#i18n{search.solr.adminFeature.fields.form.description}</th>
@@ -15,6 +17,14 @@
                 <td>${field.name}</td>
                 <td>${field.label}</td>
                 <td>${field.isFacet?string}</td>
+                <td>
+                <#if field.facetMincount == 0>
+                  #i18n{search.solr.adminFeature.fields.form.facet.mincount.allways}
+                  <#elseif field.facetMincount == 1>
+				  #i18n{search.solr.adminFeature.fields.form.facet.mincount.onHere}
+                  </#if>
+                </td>
+                <td>${field.operator}</td>
                 <td>${field.isSort?string}</td>
                 <td>
                   <#if field.weight == 0.1>

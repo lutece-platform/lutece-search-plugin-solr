@@ -44,12 +44,30 @@
         <div class="control-group">
           <label class="control-label">#i18n{search.solr.adminFeature.fields.form.weight} :</label>
             <div class="controls">
-            	<select name="weight" id="weight">
-					<option value="0.1" <#if field.weight == 0.1>selected</#if> >#i18n{search.solr.adminFeature.fields.form.weight.low}</option>
+ <select name="weight" id="weight">
+                                        <option value="0.1" <#if field.weight == 0.1>selected</#if> >#i18n{search.solr.adminFeature.fields.form.weight.low}</option>
                   <option value="1" <#if field.weight == 1>selected</#if> >#i18n{search.solr.adminFeature.fields.form.weight.normal}</option>
                   <option value="10" <#if field.weight == 10>selected</#if> >#i18n{search.solr.adminFeature.fields.form.weight.high}</option>
-            	</select>
+                </select>
                 </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">#i18n{search.solr.adminFeature.fields.form.facet.mincount} :</label>
+            <div class="controls">
+                <select name="facetMincount" id="facetMincount" >
+                   <option value="1" <#if field.facetMincount == 1>selected</#if> >#i18n{search.solr.adminFeature.fields.form.facet.mincount.onHere}</option>
+                   <option value="0" <#if field.facetMincount == 0>selected</#if> >#i18n{search.solr.adminFeature.fields.form.facet.mincount.allways}</option>
+                </select>
+            </div>
+        </div>
+         <div class="control-group" >
+           <label class="control-label">#i18n{search.solr.adminFeature.fields.form.facet.operator} :</label>
+            <div class="controls">
+                <select name="operator" id="operator">
+                   <option value="OR" <#if field.operator?upper_case == "OR">selected</#if> >#i18n{search.solr.adminFeature.fields.form.facet.or}</option>
+                   <option value="SWITCH" <#if field.operator?upper_case == "SWITCH">selected</#if> >#i18n{search.solr.adminFeature.fields.form.facet.switch}</option>
+                </select>
+            </div>
         </div>
         <div class="control-group">
           <label class="control-label">#i18n{search.solr.adminFeature.fields.form.description} :</label>
@@ -66,7 +84,7 @@
             </button>
         <#else>
             <button class="btn btn-primary" type="submit" name="update" >
-               #i18n{portal.site.admin_page.buttonModify}
+                           #i18n{portal.site.admin_page.buttonModify}
             </button>
         </#if>
         <button class="btn btn-danger" type="button" onClick="javascript:history.go(-1);" >
@@ -75,3 +93,20 @@
     </div>
 </form>
 </div>
+<script>
+$(document).ready(function() {
+        enableOrNot();
+$( "#facetMincount" ).change(function() {
+        enableOrNot();
+});
+});
+function enableOrNot()
+{
+        var value =  $("#facetMincount").val()==0? false : true;
+        if (value)
+                $("#operator").append('<option value="AND" selected="selected">#i18n{search.solr.adminFeature.fields.form.facet.and}</option>');
+        else
+                $("#operator option[value='AND']").remove();
+        $("#operator").prop("disabled", value);
+}
+</script>           

@@ -457,7 +457,7 @@ public final class SolrIndexerService
         {
             strBaseUrl = strBaseUrl + "/";
         }
-
+        strBaseUrl = StringUtils.isBlank( strBaseUrl ) ? "" : strBaseUrl; 
         return strBaseUrl + AppPathService.getPortalUrl(  );
     }
 

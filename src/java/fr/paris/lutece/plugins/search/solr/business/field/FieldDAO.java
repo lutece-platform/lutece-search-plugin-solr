@@ -47,11 +47,11 @@ public final class FieldDAO implements IFieldDAO
 {
     // Constants
     private static final String SQL_QUERY_NEW_PK = "SELECT max( id_field ) FROM solr_fields";
-    private static final String SQL_QUERY_SELECT = "SELECT id_field, name, label, description, is_facet, enable_facet, is_sort, enable_sort, default_sort, weight FROM solr_fields WHERE id_field = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO solr_fields ( id_field, name, label, description, is_facet, enable_facet, is_sort, enable_sort, default_sort, weight ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_SELECT = "SELECT id_field, name, label, description, is_facet, enable_facet, is_sort, enable_sort, default_sort, weight, facet_mincount, operator_type FROM solr_fields WHERE id_field = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO solr_fields ( id_field, name, label, description, is_facet, enable_facet, is_sort, enable_sort, default_sort, weight, facet_mincount, operator_type ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM solr_fields WHERE id_field = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE solr_fields SET id_field = ?, name = ?, label = ?, description = ?, is_facet = ?, enable_facet = ?, is_sort = ?, enable_sort = ?, default_sort = ?, weight = ? WHERE id_field = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_field, name, label, description, is_facet, enable_facet, is_sort, enable_sort, default_sort, weight FROM solr_fields";
+    private static final String SQL_QUERY_UPDATE = "UPDATE solr_fields SET id_field = ?, name = ?, label = ?, description = ?, is_facet = ?, enable_facet = ?, is_sort = ?, enable_sort = ?, default_sort = ?, weight = ?, facet_mincount = ?, operator_type = ? WHERE id_field = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_field, name, label, description, is_facet, enable_facet, is_sort, enable_sort, default_sort, weight, facet_mincount, operator_type  FROM solr_fields";
 
     /**
      * Generates a new primary key
@@ -99,7 +99,8 @@ public final class FieldDAO implements IFieldDAO
         daoUtil.setBoolean( i++, field.getEnableSort(  ) );
         daoUtil.setBoolean( i++, field.getDefaultSort(  ) );
         daoUtil.setDouble( i++, field.getWeight() );
-
+        daoUtil.setInt( i++, field.getFacetMincount() );
+        daoUtil.setString( i++, field.getOperator() );
         daoUtil.executeUpdate(  );
         daoUtil.free(  );
     }
@@ -133,6 +134,9 @@ public final class FieldDAO implements IFieldDAO
             field.setEnableSort( daoUtil.getBoolean( i++ ) );
             field.setDefaultSort( daoUtil.getBoolean( i++ ) );
             field.setWeight( daoUtil.getDouble( i++ ) );
+            field.setFacetMincount( daoUtil.getInt( i++ ) );
+            field.setOperator( daoUtil.getString( i ));
+
         }
 
         daoUtil.free(  );
@@ -173,6 +177,8 @@ public final class FieldDAO implements IFieldDAO
         daoUtil.setBoolean( i++, field.getEnableSort(  ) );
         daoUtil.setBoolean( i++, field.getDefaultSort(  ) );
         daoUtil.setDouble(i++, field.getWeight());
+        daoUtil.setInt(i++, field.getFacetMincount());
+        daoUtil.setString( i++, field.getOperator(  ) );
         daoUtil.setInt( i++, field.getIdField(  ) );
 
         daoUtil.executeUpdate(  );
@@ -205,7 +211,8 @@ public final class FieldDAO implements IFieldDAO
             field.setEnableSort( daoUtil.getBoolean( i++ ) );
             field.setDefaultSort( daoUtil.getBoolean( i++ ) );
             field.setWeight(daoUtil.getDouble( i++ ) );
-
+            field.setFacetMincount(daoUtil.getInt( i++ ));
+            field.setOperator( daoUtil.getString( i ));
             fieldList.add( field );
         }
 

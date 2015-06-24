@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.search.solr.business.field;
 
+import org.apache.commons.lang.StringUtils;
+
 
 /**
  * This is the business class for the object Field
@@ -40,6 +42,11 @@ package fr.paris.lutece.plugins.search.solr.business.field;
 public class Field
 {
     // Variables declarations 
+	public static final String OPERATOR_TYPE_OR = "OR";
+	public static final String OPERATOR_TYPE_SWITCH = "SWITCH";
+	public static final String OPERATOR_TYPE_AND = "AND";
+
+
     private int _nIdField;
     private String _strName;
     private String _strLabel;
@@ -50,6 +57,8 @@ public class Field
     private boolean _EnableSort;
     private boolean _DefaultSort;
     private double _Weight;
+    private String _strOperator;
+    private int _FacetMincount;
 
     public Field(  )
     {
@@ -61,6 +70,8 @@ public class Field
         this._IsSort = false;
         this._EnableSort = false;
         this._DefaultSort = false;
+        this._FacetMincount = 1;
+        this._strOperator=OPERATOR_TYPE_AND;
     }
 
     public String getSolrName(  )
@@ -236,7 +247,6 @@ public class Field
      */
 	public void setWeight( double dWeight ) {
 		_Weight = dWeight;
-		
 	}
 	
 	/**
@@ -247,4 +257,37 @@ public class Field
     {
         return _Weight;
     }
+
+    /**
+     * Returns the FacetteMincount
+     * @return The FacetteMincount
+     */
+	public int getFacetMincount() {
+		return _FacetMincount;
+	}
+
+	/**
+     * Returns the FacetMincount
+     * @return The FacetteMincount
+     */
+	public void setFacetMincount(int facetMincount) {
+		this._FacetMincount = facetMincount;
+	}
+	
+	/**
+	 * Return operator
+	 * @return The Operator
+	 */
+	public String getOperator() {
+		return _strOperator;
+	}
+	/**
+	 * Set the operator
+	 * @param strOperator
+	 */
+	public void setOperator(String strOperator) {
+		strOperator= !(OPERATOR_TYPE_SWITCH.equalsIgnoreCase(strOperator) || OPERATOR_TYPE_OR.equalsIgnoreCase(strOperator))  ? OPERATOR_TYPE_AND : strOperator;
+		this._FacetMincount = OPERATOR_TYPE_AND.equalsIgnoreCase(strOperator) ? 1 : 0;
+		this. _strOperator = strOperator;
+	}
 }

@@ -48,6 +48,7 @@ import fr.paris.lutece.portal.service.security.SecurityService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrClient;
@@ -58,12 +59,17 @@ import org.apache.solr.client.solrj.response.SpellCheckResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 
+import ucar.nc2.dt.point.decode.MP;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -82,6 +88,10 @@ public class SolrSearchEngine implements SearchEngine
     private static final String PROPERTY_SOLR_HIGHLIGHT_SNIPPETS = "solr.highlight.snippets";
     private static final String PROPERTY_SOLR_HIGHLIGHT_FRAGSIZE = "solr.highlight.fragsize";
     private static final String PROPERTY_SOLR_FACET_DATE_START = "solr.facet.date.start";
+    private static final String PROPERTY_FIELD_OR = "solr.field.or";
+    private static final String PROPERTY_FIELD_SWITCH = "solr.field.switch";
+    private static final String PROPERTY_FIELD_AND = "solr.field.and";
+
     private static final String SOLR_AUTOCOMPLETE_HANDLER = AppPropertiesService.getProperty(PROPERTY_SOLR_AUTOCOMPLETE_HANDLER);
     private static final String SOLR_SPELLCHECK_HANDLER = AppPropertiesService.getProperty(PROPERTY_SOLR_SPELLCHECK_HANDLER);
     private static final String SOLR_HIGHLIGHT_PRE = AppPropertiesService.getProperty( PROPERTY_SOLR_HIGHLIGHT_PRE );
@@ -91,6 +101,12 @@ public class SolrSearchEngine implements SearchEngine
     private static final int SOLR_HIGHLIGHT_FRAGSIZE = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_HIGHLIGHT_FRAGSIZE,
             100 );
     private static final String SOLR_FACET_DATE_START = AppPropertiesService.getProperty( PROPERTY_SOLR_FACET_DATE_START );
+
+    private static final String SOLR_SPELLFIELD_OR = AppPropertiesService.getProperty(PROPERTY_FIELD_OR);
+    private static final String SOLR_SPELLFIELD_SWITCH = AppPropertiesService.getProperty(PROPERTY_FIELD_SWITCH);
+    private static final String SOLR_SPELLFIELD_AND = AppPropertiesService.getProperty(PROPERTY_FIELD_AND);
+
+    
     public static final String SOLR_FACET_DATE_GAP = AppPropertiesService.getProperty( "solr.facet.date.gap", "+1YEAR" );
     public static final String SOLR_FACET_DATE_END = AppPropertiesService
             .getProperty( "solr.facet.date.end", "NOW" );
@@ -100,7 +116,7 @@ public class SolrSearchEngine implements SearchEngine
     private static final String DATE_COLON = "date:";
     private static final String DEF_TYPE = "dismax";
     
-    /**
+     /**
     * Return search results
     * @param strQuery The search query
     * @param request The HTTP request
@@ -183,7 +199,8 @@ public class SolrSearchEngine implements SearchEngine
 
         SolrClient solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
         List<SolrSearchResult> results = new ArrayList<SolrSearchResult>(  );
-
+        Hashtable<Field, List<String>> myValuesList = new Hashtable<Field, List<String>>();
+        
         if ( solrServer != null )
         {
             SolrQuery query = new SolrQuery( strQuery );
@@ -194,7 +211,7 @@ public class SolrSearchEngine implements SearchEngine
             query.setHighlightFragsize( SOLR_HIGHLIGHT_FRAGSIZE );
             query.setFacet( true );
             query.setFacetLimit( SOLR_FACET_LIMIT );
-            query.setFacetMinCount( 1 );
+//            query.setFacetMinCount( 1 );
 
             for ( Field field : SolrFieldManager.getFacetList(  ).values(  ) )
             {
@@ -212,6 +229,8 @@ public class SolrSearchEngine implements SearchEngine
                     else
                     {
                         query.addFacetField( field.getSolrName(  ) );
+                        query.setParam( "f."+field.getSolrName()+".facet.mincount",String.valueOf(field.getFacetMincount()));
+                        myValuesList.put(field, new ArrayList<String>());
                     }
                 }
             }
@@ -263,12 +282,27 @@ public class SolrSearchEngine implements SearchEngine
                     }
                     else
                     {
-                        String strFacetQueryWithColon;
-                        strFacetQueryWithColon = strFacetQuery.replaceFirst( SolrConstants.CONSTANT_COLON, COLON_QUOTE );
-                        strFacetQueryWithColon += SolrConstants.CONSTANT_QUOTE;
-                        query.addFilterQuery( strFacetQueryWithColon );
+                        String myValues[] = strFacetQuery.split(":",2);
+                        if (myValues != null && myValues.length == 2)
+                        {
+                        	myValuesList = getFieldArrange ( myValues, myValuesList );
+                        }
+                        //strFacetQueryWithColon = strFacetQuery.replaceFirst( SolrConstants.CONSTANT_COLON, COLON_QUOTE );
+                        //strFacetQueryWithColon += SolrConstants.CONSTANT_QUOTE;
+                       // query.addFilterQuery( strFacetQuery );
                     }
                 }
+                
+                for (Field tmpFieldValue: myValuesList.keySet())
+                {
+                	List<String>strValues = myValuesList.get( tmpFieldValue );
+                	String strFacetString = "";
+                	if  (strValues.size() > 0)
+                	{
+                		strFacetString = extractQuery( strValues , tmpFieldValue.getOperator() );
+                		query.addFilterQuery( tmpFieldValue.getName()+":"+strFacetString );
+                	}
+                 }
             }
 
             try
@@ -370,8 +404,59 @@ public class SolrSearchEngine implements SearchEngine
         facetedResult.setSolrSearchResults( results );
 
         return facetedResult;
-    }
+     }
 
+	/**
+	 * @param strValues
+	 * @param strStart
+	 * @param strEnd
+	 * @return
+	 */
+	private String extractQuery(List<String> strValues , String strOperator ) {
+		String strFacetString = "";
+		String strStart = strValues.size() > 1 ? "(" : "";
+		String strEnd   = strValues.size() > 1 ? ")" : "";
+		for (String strTmpSearch : strValues)
+		{
+			if (!StringUtils.isBlank(strTmpSearch))
+			{
+				strTmpSearch = "\"" + strTmpSearch.replaceAll("\"", Matcher.quoteReplacement("\\\"")) + "\"";
+				if (SOLR_SPELLFIELD_OR.equalsIgnoreCase( strOperator ) || SOLR_SPELLFIELD_AND.equalsIgnoreCase( strOperator )) 
+					strFacetString += StringUtils.isBlank(strFacetString) ?   strTmpSearch.trim() : " " + strOperator + " " + strTmpSearch.trim();
+				if (SOLR_SPELLFIELD_SWITCH.equalsIgnoreCase( strOperator ) ) 
+					strFacetString = strTmpSearch.trim();
+			}
+		}
+		strFacetString = strStart.concat(strFacetString).concat(strEnd);
+		return strFacetString;
+	}
+   /**
+    * Get a matrice from all the fields with their values
+     * @param myValues
+     * @return
+     */
+    private Hashtable<Field, List<String>> getFieldArrange ( String myValues[], Hashtable<Field, List<String>> myTab )
+    {
+    	Hashtable<Field, List<String>> lstReturn = myTab;
+    	Field tmpField = getField( lstReturn, myValues[0] );
+    	if (tmpField != null)
+    	{
+    		boolean bAddField = true;
+    		List<String> getValuesFromFrield = lstReturn.get( tmpField );
+    		for (String strField : getValuesFromFrield)
+    			if (strField.equalsIgnoreCase( myValues[1]))
+    				bAddField = false;
+    		if (bAddField)
+    		{
+    			getValuesFromFrield.add( myValues[1] );
+    			lstReturn.put(tmpField, getValuesFromFrield);
+    		}
+    	}
+    	return lstReturn;
+    }
+    /**
+     * @return
+     */
     private String generateQueryWeightValue() {
     	List<Field> fieldList =  SolrFieldManager.getFieldList();
     	String strQueryWeight = "";
@@ -383,6 +468,34 @@ public class SolrSearchEngine implements SearchEngine
 	}
 
 	/**
+	 * Get the field
+	 * @param strName
+	 */
+	private Field getField (Hashtable<Field, List<String>> values, String strName )
+	{
+		Field fieldReturn = null;
+		for (Field tmp: values.keySet())
+		{
+			if (tmp.getName().equalsIgnoreCase(strName))
+				fieldReturn = tmp;
+		}
+		return fieldReturn;
+	}
+	/**
+	 * Get the field
+	 * @param strName
+	 */
+/*	private void setField (Hashtable<Field, List<String>> values, Field myValueField, String strName )
+	{
+		Field retour = getField ( );
+		for (Field tmp: values.keySet())
+		{
+			if (tmp.getName().equalsIgnoreCase(strName))
+				retour = tmp;
+		}
+		return retour;
+	}*/
+    /**
      * Return the suggestion terms
      * @param term the terms of search
      * @return The spell checker response
