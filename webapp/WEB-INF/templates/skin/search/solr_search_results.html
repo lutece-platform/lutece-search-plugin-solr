@@ -268,26 +268,26 @@ ${encoded_facets_queries}</#macro>
             return doc.title;
         }
 
-        $("#solr").autocomplete('@base_url@solrSuggest?', {
-            dataType: "jsonp",
-            width: 300,
-            minChars: 3,
-            parse: function(data) {
-                return $.map(data.response.docs, function(doc) {
-                    return {
-                        data: doc,
-                        value: doc.uid.toString(),
-                        result: doc.title
-                    }
+        $('#solr').autocomplete({
+			source: function(request, response) {
+				$.ajax({
+					url: '@base_url@solrSuggest?',
+					dataType: 'jsonp',
+					minLength: 3,
+					data: {
+						q: request.term,
+					},
+					success: function(data) {
+					var formattedResponse = $.map(data.response.docs, function(item) {
+						return {
+							label: item.title,
+							value: item.title,
+                        };
+					});
+                    response(formattedResponse);
+					}
                 });
             },
-            formatItem: function(doc) {
-                return formatForDisplay(doc);
-            }
-        }).result(
-                function(e, doc) {
-                    $("#content").append(
-                            "<p>selected " + formatForDisplay(doc) + "(" + doc.title + ")" + "</p>");
-                });
+        });
     });
 </script>

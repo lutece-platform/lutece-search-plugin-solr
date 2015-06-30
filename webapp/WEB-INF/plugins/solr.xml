@@ -59,18 +59,6 @@
         </admin-feature>
     </admin-features>
 
-    <!-- Specific javascripts -->
-    <javascript-files>
-        <javascript-files-scope>xpage</javascript-files-scope>
-        <javascript-file>solr/jquery.autocomplete.js</javascript-file>
-    </javascript-files>
-
-    <!-- Specific plugin CSS stylesheets -->
-    <css-stylesheets>
-        <css-stylesheets-scope>xpage</css-stylesheets-scope>
-        <css-stylesheet>solr/jquery.autocomplete.css</css-stylesheet>
-    </css-stylesheets>
-    
     <daemons>
         <daemon>
             <daemon-id>solrindexer</daemon-id>
