@@ -1,13 +1,17 @@
-<#setting url_escaping_charset=encoding>
+<#setting url_escaping_charset="UTF-8">
 
 <#-- Encode facet queries -->
 <#macro EncodeFQ list_fq optionalParam="">
 <#assign encoded_facets_queries = ""> 
 <#list list_fq as facet>
-	<#assign facet_url = facet?url>	
-	<#if !((optionalParam?has_content) && optionalParam != facet_url)>
-		<#assign encoded_facets_queries = encoded_facets_queries+"&fq="+facet_url> 
-	</#if>
+	<#assign facet_url = facet?url>
+        <#if !optionalParam?has_content>
+                <#assign encoded_facets_queries = encoded_facets_queries+"&fq="+facet_url>
+        <#else>
+                <#if optionalParam != facet_url >
+                        <#assign encoded_facets_queries = encoded_facets_queries+"&fq="+facet_url>
+                </#if>
+        </#if>
 </#list>
 ${encoded_facets_queries}
 </#macro>
@@ -19,16 +23,6 @@ ${encoded_facets_queries}
     <#-- Historique -->
     <div id="histoique" class="portlet -lutece-border-radius append-bottom">
         <table>
-            <th>
-                #i18n{search.solr.display.result.raffinement.label}
-            </th>
-            <#list historique as fh>
-            <tr>
-                <td>
-                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}${fh.query}">${fh.name}</a>
-                </td>
-            </tr>
-            </#list>
             <tr>
                 <td>
                     <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}">#i18n{search.solr.display.result.raffinement.clear}</a>
@@ -42,7 +36,7 @@ ${encoded_facets_queries}
         <#-- facets field -->
         <#if facets??><#-- empty or null when no connection to server -->
         <#list facets as facet>
-        <#if facet.values?? && solr_fields[facet.name].enableSort >
+        <#if facet.values?? >
         <#-- when there is no result, facet is not null, but facet.values is -->
         <table>
             <th>
@@ -60,9 +54,11 @@ ${encoded_facets_queries}
             			</#list>
 
                         <li>
+ 			<#if sh?has_content >
+							${count.name}(${count.count})
+                            <a  class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}<@EncodeFQ facets_list sh?url />"></a>
+            <#else>
                             <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&facetlabel=${count.name}&facetname=${facet.name}&fq=${facet.name}:${count.name?url}<@EncodeFQ facets_list />">${count.name}(${count.count})</a>
-			<#if sh!= "">
-                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}<@EncodeFQ facets_list sh />"><i class="glyphicon glyphicon-trash"></a>
 			</#if>
                         </li>
                         </#list>

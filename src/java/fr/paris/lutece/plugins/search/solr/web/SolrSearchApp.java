@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.search.solr.web;
 import fr.paris.lutece.plugins.search.solr.business.SolrFacetedResult;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchResult;
+import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
 import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
 import fr.paris.lutece.plugins.search.solr.util.SolrUtil;
@@ -55,12 +56,18 @@ import fr.paris.lutece.util.html.IPaginator;
 import fr.paris.lutece.util.html.Paginator;
 import fr.paris.lutece.util.string.StringUtil;
 import fr.paris.lutece.util.url.UrlItem;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeSet;
+
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.response.SpellCheckResponse;
 
@@ -144,7 +151,31 @@ public class SolrSearchApp implements XPageApplication
 
         return page;
     }
-
+    /**
+     * @param facetQuery
+     * @return
+     */
+    private static String getFacetNameFromIHM( String facetQuery )
+    {
+    	String strFacet = null;
+    	String myValues[] = facetQuery.split(":",2);
+        if (myValues != null && myValues.length == 2)
+        	strFacet = myValues[0];
+        return strFacet;
+    }
+    
+    /**
+     * @param facetQuery
+     * @return
+     */
+    private static String getFacetValueFromIHM( String facetQuery )
+    {
+    	String strFacet = null;
+    	String myValues[] = facetQuery.split(":",2);
+        if (myValues != null && myValues.length == 2)
+        	strFacet = myValues[1];
+        return strFacet;
+    }
     /**
      * Performs a search and fills the model (useful when a page needs to remind
      * search parameters/results)
@@ -161,28 +192,51 @@ public class SolrSearchApp implements XPageApplication
         String sort = request.getParameter(PARAMETER_SORT_NAME);
         String order = request.getParameter(PARAMETER_SORT_ORDER);
         String strCurrentPageIndex = request.getParameter(PARAMETER_PAGE_INDEX);
+
+        String fname = StringUtils.isBlank(request.getParameter("facetname")) ? null : request.getParameter("facetname").trim();
+        String flabel = StringUtils.isBlank(request.getParameter("facetlabel")) ? null : request.getParameter("facetlabel").trim();
+
         Locale locale = request.getLocale();
 
-        //String facetlabel = request.getParameter( PARAMETER_FACET_LABEL );
-        //String facetname = request.getParameter( PARAMETER_FACET_NAME );
+
         StringBuilder sbFacetQueryUrl = new StringBuilder();
         SolrFieldManager sfm = new SolrFieldManager();
 
         List<String> lstSingleFacetQueries = new ArrayList<String>();
-
-        if (facetQuery != null)
+        Hashtable<String,Boolean> switchType = getSwitched ();
+        ArrayList<String> facetQueryTmp = new ArrayList<String>();
+         if (facetQuery != null)
         {
-            for (String fq : facetQuery)
-            {
-                if (sbFacetQueryUrl.indexOf(fq) == -1)
-                {
-                    sbFacetQueryUrl.append("&fq=" + fq);
-                    sfm.addFacet(fq);
-                    lstSingleFacetQueries.add(fq);
-                }
+        	 for (String fq : facetQuery)
+        	 {
+	        	 if (sbFacetQueryUrl.indexOf(fq) == -1)
+	             {	
+	        		 String strFqNameIHM = getFacetNameFromIHM ( fq );
+	                 String strFqValueIHM = getFacetValueFromIHM ( fq );
+	                 if ( fname == null || !switchType.containsKey( fname ) ||
+	                	   (strFqNameIHM != null && strFqValueIHM != null && 
+	                	    strFqValueIHM.equalsIgnoreCase(flabel) && 
+	                	    strFqNameIHM.equalsIgnoreCase( fname ) ))
+	                {
+	                	sbFacetQueryUrl.append("&fq=" + fq);
+	                	sfm.addFacet(fq);
+	                	facetQueryTmp.add(fq);
+	                	lstSingleFacetQueries.add(fq);
+	                }
+		        }
             }
+//             for (String fq : facetQuery)
+//            {
+//                if (sbFacetQueryUrl.indexOf(fq) == -1)
+//                {	
+//                	//	sbFacetQueryUrl.append("&fq=" + fq);
+//	                    sfm.addFacet(fq);
+//	                    lstSingleFacetQueries.add(fq);
+//                }
+//            }
         }
-
+         facetQuery = new String[facetQueryTmp.size()];
+         facetQuery =  facetQueryTmp.toArray(facetQuery);
         boolean bEncodeUri = Boolean.parseBoolean(AppPropertiesService.getProperty(PROPERTY_ENCODE_URI,
                 Boolean.toString(DEFAULT_ENCODE_URI)));
 
@@ -222,6 +276,7 @@ public class SolrSearchApp implements XPageApplication
         strCurrentPageIndex = (strCurrentPageIndex != null) ? strCurrentPageIndex : DEFAULT_PAGE_INDEX;
 
         SolrSearchEngine engine = SolrSearchEngine.getInstance();
+
         SolrFacetedResult facetedResult = engine.getFacetedSearchResults(strQuery, facetQuery, sort, order, nLimit, Integer.parseInt(strCurrentPageIndex), nItemsPerPage, SOLR_SPELLCHECK);
         List<SolrSearchResult> listResults = facetedResult.getSolrSearchResults();
 
@@ -286,6 +341,30 @@ public class SolrSearchApp implements XPageApplication
         return model;
     }
 
+    private static Hashtable<String, Boolean> getSwitched ()
+    {
+    	Hashtable <String,Boolean>tabFromSwitch = new Hashtable<String,Boolean>();
+    	for (Field tmpField : SolrFieldManager.getFacetList(  ).values(  ))
+    	{
+    		if ( tmpField.getEnableFacet(  ) && 
+    			"SWITCH".equalsIgnoreCase(tmpField.getOperator()))
+    		{
+    			tabFromSwitch.put(tmpField.getName(),Boolean.FALSE);
+    		}
+    	}
+    	return tabFromSwitch;
+    }
+    
+    private static void isSwitched( String strFacetQuery, Hashtable<String, Boolean> tabType)
+    {
+          if (strFacetQuery != null && tabType!=null &&
+        	tabType.containsKey( strFacetQuery ) &&
+        	tabType.get( strFacetQuery ) == Boolean.FALSE)
+        {
+        	tabType.remove(strFacetQuery);
+        	tabType.put(strFacetQuery, Boolean.TRUE);
+        }
+    }
     /**
      * Notify all query Listeners
      *
