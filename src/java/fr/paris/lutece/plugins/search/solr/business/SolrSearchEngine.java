@@ -218,7 +218,7 @@ public class SolrSearchEngine implements SearchEngine
                 //Add facet Field
                 if ( field.getEnableFacet(  ) )
                 {
-                    if ( field.getName( ).contains( "date" ) )
+                    if ( field.getName( ).equalsIgnoreCase( "date" ) || field.getName( ).toLowerCase().endsWith("_date"))
                     {
                         query.setParam( "facet.date", field.getName( ) );
                         query.setParam( "facet.date.start", SOLR_FACET_DATE_START );
@@ -230,8 +230,8 @@ public class SolrSearchEngine implements SearchEngine
                     {
                         query.addFacetField( field.getSolrName(  ) );
                         query.setParam( "f."+field.getSolrName()+".facet.mincount",String.valueOf(field.getFacetMincount()));
-                        myValuesList.put(field, new ArrayList<String>());
                     }
+                    myValuesList.put(field, new ArrayList<String>());
                 }
             }
 
@@ -276,12 +276,12 @@ public class SolrSearchEngine implements SearchEngine
             {
                 for ( String strFacetQuery : facetQueries )
                 {
-                    if ( strFacetQuery.contains( DATE_COLON ) )
-                    {
-                        query.addFilterQuery( strFacetQuery );
-                    }
-                    else
-                    {
+//                    if ( strFacetQuery.contains( DATE_COLON ) )
+//                    {
+//                        query.addFilterQuery( strFacetQuery );
+//                    }
+//                    else
+//                    {
                         String myValues[] = strFacetQuery.split(":",2);
                         if (myValues != null && myValues.length == 2)
                         {
@@ -289,8 +289,8 @@ public class SolrSearchEngine implements SearchEngine
                         }
                         //strFacetQueryWithColon = strFacetQuery.replaceFirst( SolrConstants.CONSTANT_COLON, COLON_QUOTE );
                         //strFacetQueryWithColon += SolrConstants.CONSTANT_QUOTE;
-                       // query.addFilterQuery( strFacetQuery );
-                    }
+//                        query.addFilterQuery( strFacetQuery );
+//                    }
                 }
                 
                 for (Field tmpFieldValue: myValuesList.keySet())
@@ -300,6 +300,10 @@ public class SolrSearchEngine implements SearchEngine
                 	if  (strValues.size() > 0)
                 	{
                 		strFacetString = extractQuery( strValues , tmpFieldValue.getOperator() );
+                		if ( tmpFieldValue.getName( ).equalsIgnoreCase( "date" ) || tmpFieldValue.getName( ).toLowerCase().endsWith("_date"))
+                		{
+                			strFacetString = strFacetString.replaceAll("\"", "");
+                		}
                 		query.addFilterQuery( tmpFieldValue.getName()+":"+strFacetString );
                 	}
                  }

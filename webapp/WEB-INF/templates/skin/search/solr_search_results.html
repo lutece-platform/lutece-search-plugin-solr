@@ -1,14 +1,17 @@
 <#setting url_escaping_charset="UTF-8">
 
 <#-- Encode facet queries -->
-<#macro EncodeFQ list_fq optionalParam="">
-<#assign encoded_facets_queries = ""> 
+<#macro EncodeFQ list_fq optionalParam="" optionalParamDate=false >
+<#assign encoded_facets_queries = "">
 <#list list_fq as facet>
-	<#assign facet_url = facet?url>
+        <#assign facet_url = facet?url>
         <#if !optionalParam?has_content>
                 <#assign encoded_facets_queries = encoded_facets_queries+"&fq="+facet_url>
         <#else>
-                <#if optionalParam != facet_url >
+                <#if optionalParam != facet_url && optionalParamDate == false>
+                        <#assign encoded_facets_queries = encoded_facets_queries+"&fq="+facet_url>
+                </#if>
+                <#if optionalParam != facet_url?url && optionalParamDate== true >
                         <#assign encoded_facets_queries = encoded_facets_queries+"&fq="+facet_url>
                 </#if>
         </#if>
@@ -88,7 +91,18 @@ ${encoded_facets_queries}
                             <#assign toDate = "${count.name}"?datetime("yyyy-MM-dd'T'HH:mm:ss'Z'")>
                             <#assign daterange = "${field.name}:[${count.name} TO ${count.name}${facetDateGap}]"?url>
                             <#assign toString = "${toDate?string('yyyy')}">
+                                <#assign sh = "">
+                                <#list historique as fh>
+                                        <#if fh.name?url = daterange>
+                                                <#assign sh = daterange>
+                                        </#if>
+                                </#list>
+                        <#if sh?has_content >
+                                ${toString}(${count.count})
+                            <a class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}<@EncodeFQ  facets_list sh?url true />"></a>
+                        <#else>
                             <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&facetlabel=${toString}&facetname=${field.name}&fq=${daterange}<@EncodeFQ  facets_list />">${toString}(${count.count})</a>
+                        </#if>
                         </li>
                         </#if>
                         </#list>

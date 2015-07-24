@@ -102,8 +102,8 @@ public class SolrSearchApp implements XPageApplication
     private static final String PARAMETER_FACET_QUERY = "fq";
     private static final String PARAMETER_PREVIOUS_SEARCH = "previous_search";
 
-    //private static final String PARAMETER_FACET_LABEL = "facetlabel";
-    //private static final String PARAMETER_FACET_NAME = "facetname";
+    private static final String PARAMETER_FACET_LABEL = "facetlabel";
+    private static final String PARAMETER_FACET_NAME = "facetname";
     private static final String PARAMETER_SORT_NAME = "sort_name";
     private static final String PARAMETER_SORT_ORDER = "sort_order";
     private static final String MARK_RESULTS_LIST = "results_list";
@@ -193,8 +193,8 @@ public class SolrSearchApp implements XPageApplication
         String order = request.getParameter(PARAMETER_SORT_ORDER);
         String strCurrentPageIndex = request.getParameter(PARAMETER_PAGE_INDEX);
 
-        String fname = StringUtils.isBlank(request.getParameter("facetname")) ? null : request.getParameter("facetname").trim();
-        String flabel = StringUtils.isBlank(request.getParameter("facetlabel")) ? null : request.getParameter("facetlabel").trim();
+        String fname = StringUtils.isBlank(request.getParameter(PARAMETER_FACET_NAME)) ? null : request.getParameter(PARAMETER_FACET_LABEL).trim();
+        String flabel = StringUtils.isBlank(request.getParameter(PARAMETER_FACET_LABEL)) ? null : request.getParameter(PARAMETER_FACET_LABEL).trim();
 
         Locale locale = request.getLocale();
 
