@@ -101,6 +101,9 @@ public class SolrSearchApp implements XPageApplication
     private static final String PARAMETER_QUERY = "query";
     private static final String PARAMETER_FACET_QUERY = "fq";
     private static final String PARAMETER_PREVIOUS_SEARCH = "previous_search";
+    private static final String PARAMETER_ALL_DEPLOY = "fullDeploy";
+    private static final String PARAMETER_TO_DEPLOY = "dep";
+
 
     private static final String PARAMETER_FACET_LABEL = "facetlabel";
     private static final String PARAMETER_FACET_NAME = "facetname";
@@ -123,6 +126,7 @@ public class SolrSearchApp implements XPageApplication
     private static final String MARK_FACET_TREE = "facet_tree";
     private static final String MARK_FACETS_LIST = "facets_list";
     private static final String MARK_ENCODING = "encoding";
+    private static final String MARK_FIELD_DEPLOYED = "elegua";
     private static final String PROPERTY_ENCODE_URI = "search.encode.uri";
     private static final boolean DEFAULT_ENCODE_URI = false;
     private static final boolean SOLR_SPELLCHECK = AppPropertiesService.getPropertyBoolean("solr.spellchecker", false);
@@ -192,7 +196,10 @@ public class SolrSearchApp implements XPageApplication
         String sort = request.getParameter(PARAMETER_SORT_NAME);
         String order = request.getParameter(PARAMETER_SORT_ORDER);
         String strCurrentPageIndex = request.getParameter(PARAMETER_PAGE_INDEX);
+        String []strdeplyIndex = request.getParameter(PARAMETER_TO_DEPLOY) == null ? null : request.getParameter(PARAMETER_TO_DEPLOY).split(":");
+        String []fulldeploy = request.getParameter(PARAMETER_ALL_DEPLOY) == null ? null : request.getParameter(PARAMETER_ALL_DEPLOY).split(":");
 
+        
         String fname = StringUtils.isBlank(request.getParameter(PARAMETER_FACET_NAME)) ? null : request.getParameter(PARAMETER_FACET_LABEL).trim();
         String flabel = StringUtils.isBlank(request.getParameter(PARAMETER_FACET_LABEL)) ? null : request.getParameter(PARAMETER_FACET_LABEL).trim();
 
@@ -303,8 +310,31 @@ public class SolrSearchApp implements XPageApplication
         // nb items per page
         IPaginator<SolrSearchResult> paginator = new DelegatePaginator<SolrSearchResult>(listResults, nItemsPerPage,
                 url.getUrl(), PARAMETER_PAGE_INDEX, strCurrentPageIndex, facetedResult.getCount());
-
+        Map <String,Field>  mapNames = SolrFieldManager.getFacetList();
+        List<String> cubana = new ArrayList<String>();
         Map<String, Object> model = new HashMap<String, Object>();
+        for (String strG : mapNames.keySet())
+        {
+        	boolean addBouton=false;
+        	Field vanvan = mapNames.get( strG );
+        	if (fulldeploy != null)
+        	{
+        		for (String strTmpFullD : fulldeploy)
+        		{
+	        		if (vanvan.getName().equalsIgnoreCase(strTmpFullD))
+	        		{
+	        			addBouton = true ;
+	        		}
+        		}
+        	}
+        	if (strdeplyIndex !=null && vanvan.getName().equalsIgnoreCase(strdeplyIndex[0]))
+        	{
+        		addBouton = Boolean.parseBoolean(strdeplyIndex[1].toLowerCase()) ;
+        	}
+        	if (addBouton)
+        		cubana.add(vanvan.getName());
+        
+        }
         model.put(MARK_RESULTS_LIST, paginator.getPageItems());
         // put the query only if it's not *.*
         model.put(MARK_QUERY, ALL_SEARCH_QUERY.equals(strQuery) ? SolrConstants.CONSTANT_EMPTY_STRING : strQuery);
@@ -317,6 +347,7 @@ public class SolrSearchApp implements XPageApplication
         model.put(MARK_FACETS_DATE, facetedResult.getFacetDateList());
         model.put(MARK_HISTORIQUE, sfm.getCurrentFacet());
         model.put(MARK_FACETS_LIST, lstSingleFacetQueries);
+        model.put(MARK_FIELD_DEPLOYED, cubana);
 
         if (SOLR_SPELLCHECK && (strQuery != null) && (strQuery.compareToIgnoreCase(ALL_SEARCH_QUERY) != 0))
         {

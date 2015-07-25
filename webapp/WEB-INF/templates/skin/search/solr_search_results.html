@@ -43,8 +43,21 @@ ${encoded_facets_queries}
         <#-- when there is no result, facet is not null, but facet.values is -->
         <table>
             <th>
-                ${solr_fields[facet.name].label} 
+                <#assign allDeply = "">
+            	<#assign isDeply = true>
+            	<#list elegua as countbana>
+            		<#if countbana == solr_fields[facet.name].name>
+            			<#assign isDeply = false>
+            		<#else>
+            			<#assign allDeply = allDeply + countbana + ":">
+            		</#if>
+            	</#list>
+            	<#if  allDeply?has_content >
+            		<#assign allDeply = allDeply?remove_ending(":") >
+            	</#if>
+                ${solr_fields[facet.name].label} <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&dep=${solr_fields[facet.name].name}:${isDeply?string('true','false')}&fullDeploy=${allDeply}">${isDeply?string('-','+')}</a>
             </th>
+               <#if isDeply == true>
             <tr>
                 <td>
                     <ul>
@@ -59,15 +72,16 @@ ${encoded_facets_queries}
                         <li>
  			<#if sh?has_content >
 							${count.name}(${count.count})
-                            <a  class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}<@EncodeFQ facets_list sh?url />"></a>
+                            <a  class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&fullDeploy=${allDeply}&query=${query?url}<@EncodeFQ facets_list sh?url />"></a>
             <#else>
-                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&facetlabel=${count.name}&facetname=${facet.name}&fq=${facet.name}:${count.name?url}<@EncodeFQ facets_list />">${count.name}(${count.count})</a>
+                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&fullDeploy=${allDeply}&query=${query?url}&facetlabel=${count.name}&facetname=${facet.name}&fq=${facet.name}:${count.name?url}<@EncodeFQ facets_list />">${count.name}(${count.count})</a>
 			</#if>
                         </li>
                         </#list>
                     </ul>
                 </td>
             </tr>
+            </#if>
         </table>
         </#if>
         </#list>
@@ -79,8 +93,19 @@ ${encoded_facets_queries}
         <#if field.values??>
         <#-- when there is no result, facet is not null, but facet.values is -->
         <table>
-            <th>
-                ${solr_fields[field.name].label}
+            <th><#assign allDeply = "">
+            	<#assign isDeply = true>
+            	<#list elegua as countbana>
+            		<#if countbana == solr_fields[field.name].name>
+            			<#assign isDeply = false>
+            		<#else>
+            			<#assign allDeply = allDeply + countbana + ":">
+            		</#if>
+            	</#list>
+            	<#if  allDeply?has_content >
+            		<#assign allDeply = allDeply?remove_ending(":") >
+            	</#if>
+                ${solr_fields[field.name].label} <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&dep=${solr_fields[field.name].name}:${isDeply?string('true','false')}&fullDeploy=${allDeply}">${isDeply?string('+','-')}</a>
             </th>
             <tr>
                 <td>
@@ -97,6 +122,8 @@ ${encoded_facets_queries}
                                                 <#assign sh = daterange>
                                         </#if>
                                 </#list>
+                                
+     
                         <#if sh?has_content >
                                 ${toString}(${count.count})
                             <a class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}<@EncodeFQ  facets_list sh?url true />"></a>

@@ -218,7 +218,7 @@ public class SolrSearchEngine implements SearchEngine
                 //Add facet Field
                 if ( field.getEnableFacet(  ) )
                 {
-                    if ( field.getName( ).equalsIgnoreCase( "date" ) || field.getName( ).toLowerCase().endsWith("_date"))
+                    if ( field.getName( ).equalsIgnoreCase( "date" ))
                     {
                         query.setParam( "facet.date", field.getName( ) );
                         query.setParam( "facet.date.start", SOLR_FACET_DATE_START );
