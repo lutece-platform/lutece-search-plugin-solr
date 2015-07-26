@@ -18,7 +18,27 @@
 </#list>
 ${encoded_facets_queries}
 </#macro>
-
+<#macro EncodeDeploy fieldName>
+<#assign allDeply = "">
+<#list elegua as countbana>
+            		<#if countbana != solr_fields[fieldName].name>
+            		          <#assign allDeply = allDeply + countbana + ":">
+            		</#if>
+ </#list>
+            	<#if  allDeply?has_content >
+            		<#assign allDeply = "&fullDeploy=" + allDeply?remove_ending(":") >
+            	</#if>
+${allDeply}
+</#macro>
+<#macro isDeplied fieldName>
+<#assign isDeplyfolder = true>
+            	<#list elegua as countbana>
+            		<#if countbana == solr_fields[fieldName].name>
+            			<#assign isDeplyfolder = false>
+            		</#if>
+            	</#list>
+${isDeplyfolder?string}           	
+</#macro>
 <div class="row">
 <#-- facets -->
 <div class="col-sm-3 well" >
@@ -42,22 +62,17 @@ ${encoded_facets_queries}
         <#if facet.values?? >
         <#-- when there is no result, facet is not null, but facet.values is -->
         <table>
-            <th>
-                <#assign allDeply = "">
-            	<#assign isDeply = true>
-            	<#list elegua as countbana>
-            		<#if countbana == solr_fields[facet.name].name>
-            			<#assign isDeply = false>
-            		<#else>
-            			<#assign allDeply = allDeply + countbana + ":">
-            		</#if>
-            	</#list>
-            	<#if  allDeply?has_content >
-            		<#assign allDeply = allDeply?remove_ending(":") >
-            	</#if>
-                ${solr_fields[facet.name].label} <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&dep=${solr_fields[facet.name].name}:${isDeply?string('true','false')}&fullDeploy=${allDeply}">${isDeply?string('-','+')}</a>
+            <th>           	
+            	<#assign milouze>
+            		<@isDeplied facet.name />
+            	</#assign>
+                ${solr_fields[facet.name].label} <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&dep=${solr_fields[facet.name].name}:${milouze?trim}<@EncodeDeploy facet.name /><@EncodeFQ facets_list />">
+				<#switch milouze?trim>
+			        <#case 'true'>-<#break>
+			        <#case 'false'>+<#break>
+				</#switch></a>
             </th>
-               <#if isDeply == true>
+               <#if milouze?trim == 'true'>
             <tr>
                 <td>
                     <ul>
@@ -69,12 +84,12 @@ ${encoded_facets_queries}
 					</#if>
             			</#list>
 
-                        <li>
+                        <li> 
  			<#if sh?has_content >
 							${count.name}(${count.count})
-                            <a  class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&fullDeploy=${allDeply}&query=${query?url}<@EncodeFQ facets_list sh?url />"></a>
+                            <a  class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}<@EncodeDeploy facet.name />&query=${query?url}<@EncodeFQ facets_list sh?url />"></a>
             <#else>
-                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&fullDeploy=${allDeply}&query=${query?url}&facetlabel=${count.name}&facetname=${facet.name}&fq=${facet.name}:${count.name?url}<@EncodeFQ facets_list />">${count.name}(${count.count})</a>
+                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}<@EncodeDeploy facet.name />&query=${query?url}&facetlabel=${count.name}&facetname=${facet.name}&fq=${facet.name}:${count.name?url}<@EncodeFQ facets_list />">${count.name}(${count.count})</a>
 			</#if>
                         </li>
                         </#list>
@@ -93,20 +108,17 @@ ${encoded_facets_queries}
         <#if field.values??>
         <#-- when there is no result, facet is not null, but facet.values is -->
         <table>
-            <th><#assign allDeply = "">
-            	<#assign isDeply = true>
-            	<#list elegua as countbana>
-            		<#if countbana == solr_fields[field.name].name>
-            			<#assign isDeply = false>
-            		<#else>
-            			<#assign allDeply = allDeply + countbana + ":">
-            		</#if>
-            	</#list>
-            	<#if  allDeply?has_content >
-            		<#assign allDeply = allDeply?remove_ending(":") >
-            	</#if>
-                ${solr_fields[field.name].label} <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&dep=${solr_fields[field.name].name}:${isDeply?string('true','false')}&fullDeploy=${allDeply}">${isDeply?string('+','-')}</a>
+            <th>
+            	<#assign milouze>
+                        <@isDeplied field.name />
+                </#assign>
+                ${solr_fields[field.name].label} <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&dep=${solr_fields[field.name].name}:${milouze?trim}<@EncodeDeploy field.name /><@EncodeFQ facets_list />">
+                <#switch milouze?trim>
+			        <#case 'true'>-<#break>
+			        <#case 'false'>+<#break>
+				</#switch></a>
             </th>
+              <#if milouze?trim == 'true'>
             <tr>
                 <td>
                     <ul>
@@ -126,9 +138,9 @@ ${encoded_facets_queries}
      
                         <#if sh?has_content >
                                 ${toString}(${count.count})
-                            <a class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}<@EncodeFQ  facets_list sh?url true />"></a>
+                            <a class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}<@EncodeDeploy field.name />&query=${query?url}<@EncodeFQ  facets_list sh?url true />"></a>
                         <#else>
-                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&facetlabel=${toString}&facetname=${field.name}&fq=${daterange}<@EncodeFQ  facets_list />">${toString}(${count.count})</a>
+                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}<@EncodeDeploy field.name />&query=${query?url}&facetlabel=${toString}&facetname=${field.name}&fq=${daterange}<@EncodeFQ  facets_list />">${toString}(${count.count})</a>
                         </#if>
                         </li>
                         </#if>
@@ -136,6 +148,7 @@ ${encoded_facets_queries}
                     </ul>
                 </td>
             </tr>
+            </#if>
         </table>
         </#if>
         </#list>
@@ -267,7 +280,7 @@ ${encoded_facets_queries}
                 <#list results_list as result>
                 <div id="item" >
                     <!-- <img src="document?id=${result.id}&id_attribute=79" style="float:left; margin-right:12px"/> -->
-                    <div style="font-weight:bold; font-size:1.2em"><a href="${result.url}&terms=${query?url}&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}<@EncodeFQ  facets_list />">${result.title}</a></div>
+                    <div style="font-weight:bold; font-size:1.2em"><a href="${result.url}&terms=${query?url}&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}<@EncodeDeploy '' /><@EncodeFQ  facets_list />">${result.title}</a></div>
 
                     <#if result.summary??>${result.summary}</#if>
                     <#if result.highlight??>
