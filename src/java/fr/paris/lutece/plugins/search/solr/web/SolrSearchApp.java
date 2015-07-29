@@ -91,8 +91,13 @@ public class SolrSearchApp implements XPageApplication
     private static final String PROPERTY_PAGE_TITLE = "portal.search.search_results.pageTitle";
     private static final String PROPERTY_ONLY_FACTES = "solr.onlyFacets";
     private static final String PROPERTY_SOLR_RESPONSE_MAX = "solr.reponse.max";
+    private static final String PROPERTY_SOLR_FOLDER_MAX = "solr.client.max.folder";
+    
     private static final int SOLR_RESPONSE_MAX = Integer.parseInt(AppPropertiesService.getProperty(
             PROPERTY_SOLR_RESPONSE_MAX, "50"));
+    
+    private static final int SOLR_FIELDS_MAX = Integer.parseInt(AppPropertiesService.getProperty(
+    		PROPERTY_SOLR_FOLDER_MAX, "15"));
     private static final String MESSAGE_INVALID_SEARCH_TERMS = "portal.search.message.invalidSearchTerms";
     private static final int DEFAULT_RESULTS_PER_PAGE = 10;
     private static final String DEFAULT_PAGE_INDEX = "1";
@@ -127,6 +132,7 @@ public class SolrSearchApp implements XPageApplication
     private static final String MARK_FACETS_LIST = "facets_list";
     private static final String MARK_ENCODING = "encoding";
     private static final String MARK_FIELD_DEPLOYED = "elegua";
+    private static final String MARK_FIELD_MAX="maxResult";
     private static final String PROPERTY_ENCODE_URI = "search.encode.uri";
     private static final boolean DEFAULT_ENCODE_URI = false;
     private static final boolean SOLR_SPELLCHECK = AppPropertiesService.getPropertyBoolean("solr.spellchecker", false);
@@ -348,6 +354,7 @@ public class SolrSearchApp implements XPageApplication
         model.put(MARK_HISTORIQUE, sfm.getCurrentFacet());
         model.put(MARK_FACETS_LIST, lstSingleFacetQueries);
         model.put(MARK_FIELD_DEPLOYED, cubana);
+        model.put(MARK_FIELD_MAX, SOLR_FIELDS_MAX);
 
         if (SOLR_SPELLCHECK && (strQuery != null) && (strQuery.compareToIgnoreCase(ALL_SEARCH_QUERY) != 0))
         {
