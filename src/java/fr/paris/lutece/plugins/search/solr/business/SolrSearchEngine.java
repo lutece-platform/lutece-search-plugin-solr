@@ -230,9 +230,13 @@ public class SolrSearchEngine implements SearchEngine
                 {
                     query.setSort( sortName, ORDER.asc );
                 }
+                else if(sortOrder.equals("random"))
+                {
+                	query.setParam( "sort", sortName+"_random asc" );
+                }
                 else
                 {
-                    query.setSort( sortName, ORDER.desc );
+                	query.setSort( sortName, ORDER.desc );
                 }
             }
             else
