@@ -44,4 +44,8 @@ public class SolrConstants
     public static final String CONSTANT_COLON = ":";
     public static final String CONSTANT_QUOTE = "\"";
     public static final String CONSTANT_TRUE = "true";
+    public static final String CONSTANT_FALSE = "false";
+    public static final String CONSTANT_DEFAULT_TEMPLATE = "skin/search/solr_search_results.html";
+    public static final String CONSTANT_DEFAULT_FILTER_QUERY = "";
+    public static final boolean CONSTANT_DEFAULT_EXTRA_MAPPING_QUERY = false;
 }

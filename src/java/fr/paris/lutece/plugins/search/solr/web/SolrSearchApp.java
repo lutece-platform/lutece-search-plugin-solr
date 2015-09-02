@@ -34,9 +34,11 @@
 package fr.paris.lutece.plugins.search.solr.web;
 
 import fr.paris.lutece.plugins.search.solr.business.SolrFacetedResult;
+import fr.paris.lutece.plugins.search.solr.business.SolrSearchAppConf;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchResult;
 import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
+import fr.paris.lutece.plugins.search.solr.service.SolrSearchAppConfService;
 import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
 import fr.paris.lutece.plugins.search.solr.util.SolrUtil;
 import fr.paris.lutece.portal.service.i18n.I18nService;
@@ -92,6 +94,7 @@ public class SolrSearchApp implements XPageApplication
     private static final String PARAMETER_PAGE_INDEX = "page_index";
     private static final String PARAMETER_NB_ITEMS_PER_PAGE = "items_per_page";
     private static final String PARAMETER_QUERY = "query";
+    private static final String PARAMETER_CONF = "conf";
     private static final String PARAMETER_FACET_QUERY = "fq";
     private static final String PARAMETER_PREVIOUS_SEARCH = "previous_search";
 
@@ -116,6 +119,8 @@ public class SolrSearchApp implements XPageApplication
     private static final String MARK_FACET_TREE = "facet_tree";
     private static final String MARK_FACETS_LIST = "facets_list";
     private static final String MARK_ENCODING = "encoding";
+    private static final String MARK_CONF_QUERY = "conf_user_query";
+    private static final String MARK_CONF = "conf";
     private static final String PROPERTY_ENCODE_URI = "search.encode.uri";
     private static final boolean DEFAULT_ENCODE_URI = false;
     private static final boolean SOLR_SPELLCHECK = AppPropertiesService.getPropertyBoolean("solr.spellchecker", false);
@@ -161,7 +166,16 @@ public class SolrSearchApp implements XPageApplication
         String sort = request.getParameter(PARAMETER_SORT_NAME);
         String order = request.getParameter(PARAMETER_SORT_ORDER);
         String strCurrentPageIndex = request.getParameter(PARAMETER_PAGE_INDEX);
+        String strConfCode = request.getParameter( PARAMETER_CONF );
         Locale locale = request.getLocale();
+
+        SolrSearchAppConf conf = SolrSearchAppConfService.loadConfiguration( strConfCode );
+
+        if ( conf == null )
+        {
+            //Use default conf if the requested one doesn't exist
+            conf = SolrSearchAppConfService.loadConfiguration( null );
+        }
 
         //String facetlabel = request.getParameter( PARAMETER_FACET_LABEL );
         //String facetname = request.getParameter( PARAMETER_FACET_NAME );
@@ -181,6 +195,20 @@ public class SolrSearchApp implements XPageApplication
                     lstSingleFacetQueries.add(fq);
                 }
             }
+        }
+
+        if ( StringUtils.isNotBlank( conf.getFilterQuery(  ) ) )
+        {
+            int nNewLength = ( facetQuery == null ) ? 1 : ( facetQuery.length + 1 );
+            String[] newFacetQuery = new String[nNewLength];
+
+            for ( int i = 0; i < ( nNewLength - 1 ); i++ )
+            {
+                newFacetQuery[i] = facetQuery[i];
+            }
+
+            newFacetQuery[newFacetQuery.length - 1] = conf.getFilterQuery(  );
+            facetQuery = newFacetQuery;
         }
 
         boolean bEncodeUri = Boolean.parseBoolean(AppPropertiesService.getProperty(PROPERTY_ENCODE_URI,
@@ -240,6 +268,11 @@ public class SolrSearchApp implements XPageApplication
         url.addParameter(PARAMETER_QUERY, strQueryForPaginator);
         url.addParameter(PARAMETER_NB_ITEMS_PER_PAGE, nItemsPerPage);
 
+        if ( strConfCode != null )
+        {
+            url.addParameter( PARAMETER_CONF, strConfCode );
+        }
+
         for (String strFacetName : lstSingleFacetQueries)
         {
             url.addParameter(PARAMETER_FACET_QUERY, SolrUtil.encodeUrl(strFacetName));
@@ -262,6 +295,8 @@ public class SolrSearchApp implements XPageApplication
         model.put(MARK_FACETS_DATE, facetedResult.getFacetDateList());
         model.put(MARK_HISTORIQUE, sfm.getCurrentFacet());
         model.put(MARK_FACETS_LIST, lstSingleFacetQueries);
+        model.put( MARK_CONF_QUERY, strConfCode );
+        model.put( MARK_CONF, conf );
 
         if (SOLR_SPELLCHECK && (strQuery != null) && (strQuery.compareToIgnoreCase(ALL_SEARCH_QUERY) != 0))
         {
