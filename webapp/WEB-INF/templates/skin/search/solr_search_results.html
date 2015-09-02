@@ -1,5 +1,11 @@
 <#setting url_escaping_charset="UTF-8">
 
+<#if conf_user_query??>
+<#assign conf_query = "&conf=${conf_user_query}">
+<#else>
+<#assign conf_query = "">
+</#if>
+
 <#-- Encode facet queries -->
 <#macro EncodeFQ list_fq optionalParam="" optionalParamDate=false >
 <#assign encoded_facets_queries = "">
@@ -28,7 +34,7 @@ ${encoded_facets_queries}
         <table>
             <tr>
                 <td>
-                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}">#i18n{search.solr.display.result.raffinement.clear}</a>
+                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}${conf_query}">#i18n{search.solr.display.result.raffinement.clear}</a>
                 </td>
             </tr>
         </table>
@@ -59,9 +65,9 @@ ${encoded_facets_queries}
                         <li>
  			<#if sh?has_content >
 							${count.name}(${count.count})
-                            <a  class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}<@EncodeFQ facets_list sh?url />"></a>
+                            <a  class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}<@EncodeFQ facets_list sh?url />${conf_query}"></a>
             <#else>
-                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&facetlabel=${count.name}&facetname=${facet.name}&fq=${facet.name}:${count.name?url}<@EncodeFQ facets_list />">${count.name}(${count.count})</a>
+                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&facetlabel=${count.name}&facetname=${facet.name}&fq=${facet.name}:${count.name?url}<@EncodeFQ facets_list />${conf_query}">${count.name}(${count.count})</a>
 			</#if>
                         </li>
                         </#list>
@@ -99,9 +105,9 @@ ${encoded_facets_queries}
                                 </#list>
                         <#if sh?has_content >
                                 ${toString}(${count.count})
-                            <a class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}<@EncodeFQ  facets_list sh?url true />"></a>
+                            <a class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}<@EncodeFQ  facets_list sh?url true />${conf_query}"></a>
                         <#else>
-                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&facetlabel=${toString}&facetname=${field.name}&fq=${daterange}<@EncodeFQ  facets_list />">${toString}(${count.count})</a>
+                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&facetlabel=${toString}&facetname=${field.name}&fq=${daterange}<@EncodeFQ  facets_list />${conf_query">${toString}(${count.count})</a>
                         </#if>
                         </li>
                         </#if>
@@ -130,7 +136,7 @@ ${encoded_facets_queries}
             <#-- when there is no result, facet is not null, but facet.values is -->
             <tr>
                 <td>
-                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&fq=${field1}:${facet.name?url}<@EncodeFQ facets_list />">${facet.name}</a>
+                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&fq=${field1}:${facet.name?url}<@EncodeFQ  facets_list/>${conf_query}">${facet.name}</a>
                 </td>
             </tr>
             <tr>
@@ -138,7 +144,7 @@ ${encoded_facets_queries}
                     <ul>
                         <#list facet.values as count>
                         <li>
-                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&fq=${field1}:${facet.name?url}&fq=${field2}:${count.name?url}<@EncodeFQ facets_list />">${count.name}(${count.count})</a>
+                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&fq=${field1}:${facet.name?url}&fq=${field2}:${count.name?url}<@EncodeFQ  facets_list/>${conf_query}">${count.name}(${count.count})</a>
                         </li>
                         </#list>
                     </ul>
@@ -162,12 +168,12 @@ ${encoded_facets_queries}
             <#if field.enableSort>
             <tr>
                 <td>
-                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&query=${query?url}<@EncodeFQ facets_list />&sort_name=${field.solrName}&sort_order=desc">${field.label} desc</a>
+                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&query=${query?url}<@EncodeFQ  facets_list />&sort_name=${field.solrName}&sort_order=desc${conf_query}">${field.label} desc</a>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&query=${query?url}<@EncodeFQ facets_list />&sort_name=${field.solrName}&sort_order=asc">${field.label} asc</a>
+                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&query=${query?url}<@EncodeFQ  facets_list />&sort_name=${field.solrName}&sort_order=asc${conf_query}">${field.label} asc</a>
                 </td>
             </tr>
             </#if>
@@ -185,6 +191,9 @@ ${encoded_facets_queries}
 		<form name="search" method="post" action="${fullUrl}">
 		    <div class="hide">
 		        <input type="hidden" name="page" value="search-solr" />
+		        <#if conf_user_query??>
+		        <input type="hidden" name="conf" value="${conf_user_query}" />
+		        </#if>
 		        <input type="hidden" name="sort_name" value="${sort_name!}" />
 		        <input type="hidden" name="sort_order" value="${sort_order!}" />
 		        <#if facets_list??>
@@ -222,7 +231,7 @@ ${encoded_facets_queries}
           #i18n{search.solr.display.result.spellchecker}
           <#list suggestion as sugg>
                 <#assign newQuery="" >
-                <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&query=${sugg.getCollationQueryString()?url}<@EncodeFQ  facets_list  />">${sugg.getCollationQueryString()}</a>
+                <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&query=${sugg.getCollationQueryString()?url}<@EncodeFQ  facets_list  />${conf_query}">${sugg.getCollationQueryString()}</a>
         </#list>
         </div>
         </#if>
