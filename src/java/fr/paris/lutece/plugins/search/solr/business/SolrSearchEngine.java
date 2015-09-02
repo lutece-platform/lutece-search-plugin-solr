@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.search.solr.business;
 import fr.paris.lutece.plugins.search.solr.business.facetIntersection.FacetIntersection;
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
+import fr.paris.lutece.plugins.search.solr.indexer.SolrIndexerService;
 import fr.paris.lutece.plugins.search.solr.indexer.SolrItem;
 import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
 import fr.paris.lutece.plugins.search.solr.util.SolrUtil;
@@ -568,6 +569,7 @@ public class SolrSearchEngine implements SearchEngine
 
     public String getDocumentHighLighting( String strDocumentId, String terms )
     {
+        String strDocumentIdPrefixed = SolrIndexerService.getWebAppName() + SolrConstants.CONSTANT_UNDERSCORE + strDocumentId;
         String xmlContent = null;
         SolrClient solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
         SolrQuery query = new SolrQuery( terms );
@@ -578,7 +580,7 @@ public class SolrSearchEngine implements SearchEngine
         query.setParam( "hl.fl", SolrItem.FIELD_XML_CONTENT ); //return only the field xml_content HighLighting
         query.setFields( SearchItem.FIELD_UID ); //return only the field uid
         query.setRows( 1 );
-        query.addFilterQuery( SearchItem.FIELD_UID + ":" + strDocumentId );
+        query.addFilterQuery( SearchItem.FIELD_UID + ":" + strDocumentIdPrefixed );
 
         try
         {
@@ -588,9 +590,9 @@ public class SolrSearchEngine implements SearchEngine
             {
                 SolrHighlights highlights = new SolrHighlights( response.getHighlighting(  ) );
 
-                if ( highlights.getHighlights( strDocumentId ).getMap(  ).size(  ) > 0 )
+                if ( highlights.getHighlights( strDocumentIdPrefixed ).getMap(  ).size(  ) > 0 )
                 {
-                    xmlContent = highlights.getHighlights( strDocumentId ).getMap(  ).get( SolrItem.FIELD_XML_CONTENT )
+                    xmlContent = highlights.getHighlights( strDocumentIdPrefixed ).getMap(  ).get( SolrItem.FIELD_XML_CONTENT )
                                            .get( 0 );
                 }
             }
