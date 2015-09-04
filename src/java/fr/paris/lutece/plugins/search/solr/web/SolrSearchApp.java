@@ -33,11 +33,14 @@
  */
 package fr.paris.lutece.plugins.search.solr.web;
 
+import fr.paris.lutece.plugins.leaflet.business.GeolocItem;
+import fr.paris.lutece.plugins.leaflet.service.IconService;
 import fr.paris.lutece.plugins.search.solr.business.SolrFacetedResult;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchAppConf;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchResult;
 import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
+import fr.paris.lutece.plugins.search.solr.indexer.SolrItem;
 import fr.paris.lutece.plugins.search.solr.service.SolrSearchAppConfService;
 import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
 import fr.paris.lutece.plugins.search.solr.util.SolrUtil;
@@ -57,6 +60,7 @@ import fr.paris.lutece.util.html.IPaginator;
 import fr.paris.lutece.util.html.Paginator;
 import fr.paris.lutece.util.string.StringUtil;
 import fr.paris.lutece.util.url.UrlItem;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,6 +125,11 @@ public class SolrSearchApp implements XPageApplication
     private static final String MARK_ENCODING = "encoding";
     private static final String MARK_CONF_QUERY = "conf_user_query";
     private static final String MARK_CONF = "conf";
+    private static final String MARK_POINTS = "points";
+    private static final String MARK_POINTS_GEOJSON = "geojson";
+    private static final String MARK_POINTS_ID = "id";
+    private static final String MARK_POINTS_FIELDCODE = "code";
+    private static final String MARK_POINTS_TYPE = "type";
     private static final String PROPERTY_ENCODE_URI = "search.encode.uri";
     private static final boolean DEFAULT_ENCODE_URI = false;
     private static final boolean SOLR_SPELLCHECK = AppPropertiesService.getPropertyBoolean("solr.spellchecker", false);
@@ -253,6 +262,13 @@ public class SolrSearchApp implements XPageApplication
         SolrFacetedResult facetedResult = engine.getFacetedSearchResults(strQuery, facetQuery, sort, order, nLimit, Integer.parseInt(strCurrentPageIndex), nItemsPerPage);
         List<SolrSearchResult> listResults = facetedResult.getSolrSearchResults();
 
+        List<HashMap<String, Object>> points = null;
+        if ( conf.getExtraMappingQuery(  ) )
+        {
+            List<SolrSearchResult> listResultsGeoloc = engine.getGeolocSearchResults( strQuery, facetQuery, nLimit );
+            points = getGeolocModel(listResultsGeoloc);
+        }
+
         // The page should not be added to the cache
         // Notify results infos to QueryEventListeners 
         notifyQueryListeners(strQuery, listResults.size(), request);
@@ -297,6 +313,7 @@ public class SolrSearchApp implements XPageApplication
         model.put(MARK_FACETS_LIST, lstSingleFacetQueries);
         model.put( MARK_CONF_QUERY, strConfCode );
         model.put( MARK_CONF, conf );
+        model.put( MARK_POINTS, points );
 
         if (SOLR_SPELLCHECK && (strQuery != null) && (strQuery.compareToIgnoreCase(ALL_SEARCH_QUERY) != 0))
         {
@@ -319,6 +336,68 @@ public class SolrSearchApp implements XPageApplication
         model.put(SOLR_FACET_DATE_GAP, SolrSearchEngine.SOLR_FACET_DATE_GAP);
 
         return model;
+    }
+
+    /**
+     * Returns a model with points data from a geoloc search
+     * @param listResultsGeoloc the result of a search
+     * @return the model
+     */
+    private static List<HashMap<String, Object>> getGeolocModel( List<SolrSearchResult> listResultsGeoloc ) {
+        List<HashMap<String, Object>> points = new ArrayList<HashMap<String, Object>>( listResultsGeoloc.size(  ) );
+        HashMap<String, String> iconKeysCache = new HashMap<String, String>(  );
+
+        for ( SolrSearchResult result : listResultsGeoloc )
+        {
+            Map<String, Object> dynamicFields = result.getDynamicFields(  );
+
+            for ( String key : dynamicFields.keySet(  ) )
+            {
+                if ( key.endsWith( SolrItem.DYNAMIC_GEOJSON_FIELD_SUFFIX ) )
+                {
+                    HashMap<String, Object> h = new HashMap<String, Object>(  );
+                    String strJson = (String) dynamicFields.get( key );
+                    GeolocItem geolocItem = null;
+
+                    try
+                    {
+                        geolocItem = GeolocItem.fromJSON( strJson );
+                    }
+                    catch ( IOException e )
+                    {
+                        AppLogService.error( "SolrSearchApp: error parsing geoloc JSON: " + strJson +
+                            ", exception " + e );
+                    }
+
+                    if ( geolocItem != null )
+                    {
+                        String strType = result.getId(  ).substring( result.getId(  ).lastIndexOf( "_" ) + 1 );
+                        String strIcon;
+
+                        if ( iconKeysCache.containsKey( geolocItem.getIcon(  ) ) )
+                        {
+                            strIcon = iconKeysCache.get( geolocItem.getIcon(  ) );
+                        }
+                        else
+                        {
+                            strIcon = IconService.getIcon( strType, geolocItem.getIcon(  ) );
+                            iconKeysCache.put( geolocItem.getIcon(  ), strIcon );
+                        }
+
+                        geolocItem.setIcon( strIcon );
+                        h.put( MARK_POINTS_GEOJSON, geolocItem.toJSON(  ) );
+                        h.put( MARK_POINTS_ID,
+                            result.getId(  )
+                                  .substring( result.getId(  ).indexOf( "_" ) + 1,
+                                result.getId(  ).lastIndexOf( "_" ) ) );
+                        h.put( MARK_POINTS_FIELDCODE, key.substring( 0, key.lastIndexOf( "_" ) ) );
+                        h.put( MARK_POINTS_TYPE, strType );
+                        points.add( h );
+                    }
+                }
+            }
+        }
+        return points;
     }
 
     /**

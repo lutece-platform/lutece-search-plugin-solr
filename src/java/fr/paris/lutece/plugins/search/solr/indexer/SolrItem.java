@@ -33,13 +33,22 @@
  */
 package fr.paris.lutece.plugins.search.solr.indexer;
 
+import fr.paris.lutece.plugins.leaflet.business.GeolocItem;
 import fr.paris.lutece.portal.service.search.SearchItem;
+import fr.paris.lutece.portal.service.util.AppLogService;
 
 import org.apache.solr.client.solrj.beans.Field;
 
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+
+import java.io.IOException;
+
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -62,6 +71,11 @@ public class SolrItem
     public static final String DYNAMIC_DATE_FIELD_SUFFIX = "_date";
     public static final String DYNAMIC_LONG_FIELD_SUFFIX = "_long";
     public static final String DYNAMIC_LIST_FIELD_SUFFIX = "_list";
+    public static final String DYNAMIC_GEOLOC_FIELD_SUFFIX = "_geoloc";
+    public static final String DYNAMIC_GEOJSON_FIELD_SUFFIX = "_geojson";
+    public static final String DYNAMIC_GEOJSON_ADDRESS_FIELD_SUFFIX = "_address";
+    private static final String GEOLOC_JSON_PATH_GEOMETRY = "geometry";
+    private static final String GEOLOC_JSON_PATH_GEOMETRY_COORDINATES = "coordinates";
     @Field( SearchItem.FIELD_URL )
     private String _strUrl;
     @Field( SearchItem.FIELD_DATE )
@@ -102,6 +116,10 @@ public class SolrItem
     private Map<String, Date> _dfDate;
     @Field( "*" + DYNAMIC_LONG_FIELD_SUFFIX )
     private Map<String, Long> _dfNumericText;
+    @Field( "*" + DYNAMIC_GEOLOC_FIELD_SUFFIX )
+    private Map<String, String> _dfGeoloc;
+    @Field( "*" + DYNAMIC_GEOJSON_FIELD_SUFFIX )
+    private Map<String, String> _dfGeojson;
 
     /**
     * Creates a new SolrItem
@@ -141,6 +159,16 @@ public class SolrItem
         if ( _dfText != null )
         {
             mapDynamicFields.putAll( _dfText );
+        }
+
+        if ( _dfGeoloc != null )
+        {
+            mapDynamicFields.putAll( _dfGeoloc );
+        }
+
+        if ( _dfGeojson != null )
+        {
+            mapDynamicFields.putAll( _dfGeojson );
         }
 
         return mapDynamicFields;
@@ -219,6 +247,117 @@ public class SolrItem
         }
 
         _dfString.put( strName + DYNAMIC_STRING_FIELD_SUFFIX, strValue );
+    }
+
+    /**
+     * Add a dynamic field
+     * @param strName the name of the field
+     * @param strValue the value of the field
+     * @param codeDocumentType the codeDocumentType
+     */
+    public void addDynamicFieldGeoloc( String strName, String strValue, String codeDocumentType )
+    {
+        JsonNode object;
+
+        try
+        {
+            object = new ObjectMapper(  ).readTree( strValue );
+        }
+        catch ( IOException e )
+        {
+            AppLogService.error( "SolrItem: exception during GEOJSON parsing : " + strValue + " : " + e );
+
+            return;
+        }
+
+        JsonNode objCoordinates = object.path( GEOLOC_JSON_PATH_GEOMETRY ).path( GEOLOC_JSON_PATH_GEOMETRY_COORDINATES );
+        double[] coordinates = null;
+
+        if ( objCoordinates.isMissingNode(  ) )
+        {
+            AppLogService.error( "SolrItem: missing coordinates : " + strValue );
+        }
+        else
+        {
+            if ( !objCoordinates.isArray(  ) )
+            {
+                AppLogService.error( "SolrItem: coordinates not an array : " + strValue );
+            }
+            else
+            {
+                double[] parsedCoordinates = new double[2];
+                Iterator<JsonNode> it = objCoordinates.getElements(  );
+                boolean bCoordinatesOk = true;
+
+                for ( int i = 0; i < parsedCoordinates.length; i++ )
+                {
+                    if ( !it.hasNext(  ) )
+                    {
+                        AppLogService.error( "SolrItem: coordinates array too short : " + strValue + " at element " +
+                            Integer.toString( i ) );
+                        bCoordinatesOk = false;
+
+                        break;
+                    }
+
+                    JsonNode node = it.next(  );
+
+                    if ( !node.isNumber(  ) )
+                    {
+                        AppLogService.error( "SolrItem: coordinate not a number : " + strValue + " at element " +
+                            Integer.toString( i ) );
+                        bCoordinatesOk = false;
+
+                        break;
+                    }
+
+                    parsedCoordinates[i] = node.asDouble(  );
+                }
+
+                if ( bCoordinatesOk )
+                {
+                    coordinates = parsedCoordinates;
+                }
+            }
+        }
+
+        GeolocItem geolocItem = null;
+
+        try
+        {
+            geolocItem = GeolocItem.fromJSON( strValue );
+        }
+        catch ( IOException e )
+        {
+            AppLogService.error( "SolrItem: Error parsing JSON: " + strValue + "exception: " + e );
+        }
+
+        if ( geolocItem.getIcon(  ) == null )
+        {
+            geolocItem.setIcon( codeDocumentType + "-" + strName );
+        }
+
+        if ( ( coordinates != null ) && ( geolocItem != null ) )
+        {
+            if ( _dfGeoloc == null )
+            {
+                _dfGeoloc = new HashMap<String, String>(  );
+            }
+
+            if ( _dfGeojson == null )
+            {
+                _dfGeojson = new HashMap<String, String>(  );
+            }
+
+            String strCoordinates = String.format( Locale.ENGLISH, "%.6f,%.6f", coordinates[1], coordinates[0] );
+            _dfGeoloc.put( strName + DYNAMIC_GEOLOC_FIELD_SUFFIX, strCoordinates );
+
+            _dfGeojson.put( strName + DYNAMIC_GEOJSON_FIELD_SUFFIX, geolocItem.toJSON(  ) );
+
+            if (geolocItem.getAddress() != null) {
+                addDynamicField( strName + DYNAMIC_GEOJSON_ADDRESS_FIELD_SUFFIX , geolocItem.getAddress() );
+            }
+        }
     }
 
     /**
