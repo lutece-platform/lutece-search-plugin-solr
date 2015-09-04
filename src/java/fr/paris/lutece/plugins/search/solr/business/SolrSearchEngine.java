@@ -501,6 +501,58 @@ public class SolrSearchEngine implements SearchEngine
 		return retour;
 	}*/
     /**
+     * Return the result geojseon and uid
+     * @param strQuery the query
+     * @param facetQueries The selected facets
+     * @param nLimit Maximal number of results.
+     * @return the results geojson and uid
+     */
+    public List<SolrSearchResult> getGeolocSearchResults( String strQuery, String[] facetQueries, int nLimit )
+    {
+        SolrClient solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
+        if ( solrServer != null ) {
+            String strFields = "*" + SolrItem.DYNAMIC_GEOJSON_FIELD_SUFFIX + "," + SearchItem.FIELD_UID ;
+            SolrQuery query = new SolrQuery( strQuery );
+            query.setParam ( "fl", strFields );
+
+            //Treat HttpRequest
+            //FacetQuery
+            if ( facetQueries != null )
+            {
+                for ( String strFacetQuery : facetQueries )
+                {
+                    if ( strFacetQuery.contains( DATE_COLON ) )
+                    {
+                        query.addFilterQuery( strFacetQuery );
+                    }
+                    else
+                    {
+                        String strFacetQueryWithColon;
+                        strFacetQueryWithColon = strFacetQuery.replaceFirst( SolrConstants.CONSTANT_COLON, COLON_QUOTE );
+                        strFacetQueryWithColon += SolrConstants.CONSTANT_QUOTE;
+                        query.addFilterQuery( strFacetQueryWithColon );
+                    }
+                }
+            }
+
+            query.setStart( 0 );
+            query.setRows( nLimit );
+            QueryResponse response;
+            try {
+                response = solrServer.query(query);
+            } catch (SolrServerException | IOException e) {
+                AppLogService.error( "Solr getGeolocSearchResults error: " + e.getMessage(  ), e );
+                return new ArrayList<SolrSearchResult>();
+            }
+            //resultList
+            List<SolrItem> itemList = response.getBeans( SolrItem.class );
+            return SolrUtil.transformSolrItemsToSolrSearchResults( itemList, null );
+        } else {
+            return new ArrayList<SolrSearchResult>();
+        }
+    }
+
+    /**
      * Return the suggestion terms
      * @param term the terms of search
      * @return The spell checker response
