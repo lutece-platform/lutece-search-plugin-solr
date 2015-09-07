@@ -49,6 +49,15 @@ http://dev.lutece.paris.fr/svn/lutece/contribs/atoswordline/trunk/config-SOLR/ex
 http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/technical/plugin-solrserver/webapp/WEB-INF/plugins/solrserver/conf/schema.xml
             </p>
 			</subsection>
+
+			<subsection name="Configuration de la XPage search-solr">
+            <p>Sur la xpage search-solr, on peut utiliser des configurations différentes en ajoutant le parametre de query "conf=XXX". Les configurations ont les parametres suivants: </p>
+            <ul>
+                <li>mapping: affiche ou non une carte montrant les documents géolocalisés</li>
+                <li>fq: applique des filtres coté serveur en plus de ceux de la requète</li>
+            </ul>
+            <p>Pour créer et éditer les configurations, il suffit d'insérer ou de modifier des clefs du datastore: solr.app.conf.XXX.YYY où XXX est le nom de la configuration qui sera utilisé dans l'URL de la xpage, et YYY le nom du paramètre à modifier. Par convention, on ajoute aussi la clef datastore solr.app.conf.XXX.installed avec la valeur "true"</p>
+			</subsection>
 		</section>
 	</body>
 </document>
