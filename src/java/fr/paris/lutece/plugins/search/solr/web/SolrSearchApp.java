@@ -225,6 +225,7 @@ public class SolrSearchApp implements XPageApplication
         SolrFieldManager sfm = new SolrFieldManager();
 
         List<String> lstSingleFacetQueries = new ArrayList<String>();
+        SolrSearchEngine engine = SolrSearchEngine.getInstance();
         Hashtable<String,Boolean> switchType = getSwitched ();
         ArrayList<String> facetQueryTmp = new ArrayList<String>();
          if (facetQuery != null)
@@ -243,7 +244,10 @@ public class SolrSearchApp implements XPageApplication
 	                	sbFacetQueryUrl.append("&fq=" + fq);
 	                	sfm.addFacet(fq);
 	                	facetQueryTmp.add(fq);
-	                	lstSingleFacetQueries.add(fq);
+	                	if ( !engine.isSwitchOperator( fq ) )
+	                	{
+	                	    lstSingleFacetQueries.add(fq);
+	                	}
 	                }
 		        }
             }
@@ -312,7 +316,6 @@ public class SolrSearchApp implements XPageApplication
 
         strCurrentPageIndex = (strCurrentPageIndex != null) ? strCurrentPageIndex : DEFAULT_PAGE_INDEX;
 
-        SolrSearchEngine engine = SolrSearchEngine.getInstance();
 
         SolrFacetedResult facetedResult = engine.getFacetedSearchResults(strQuery, facetQuery, sort, order, nLimit, Integer.parseInt(strCurrentPageIndex), nItemsPerPage, SOLR_SPELLCHECK);
         List<SolrSearchResult> listResults = facetedResult.getSolrSearchResults();
@@ -344,9 +347,10 @@ public class SolrSearchApp implements XPageApplication
             url.addParameter( PARAMETER_CONF, strConfCode );
         }
 
-        for (String strFacetName : lstSingleFacetQueries)
+        for ( int i = 0; i < facetQuery.length; i++ )
         {
-            url.addParameter(PARAMETER_FACET_QUERY, SolrUtil.encodeUrl(strFacetName));
+            
+            url.addParameter( PARAMETER_FACET_QUERY, SolrUtil.encodeUrl( facetQuery[i] ) );
         }
 
         // nb items per page

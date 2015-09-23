@@ -104,6 +104,16 @@ public final class FieldHome
     }
 
     /**
+     * Returns an instance of a field whose name is specified in parameter
+     * @param strName The field name
+     * @return an instance of Field
+     */
+    public static Field findByName( String strName )
+    {
+        return _dao.load( strName, plugin );
+    }
+
+    /**
      * Load the data of all the field objects and returns them in form of a list
      * @return the list which contains the data of all the field objects
      */

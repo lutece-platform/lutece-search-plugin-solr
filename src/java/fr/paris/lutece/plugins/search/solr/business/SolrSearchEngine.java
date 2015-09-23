@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.search.solr.business;
 
 import fr.paris.lutece.plugins.search.solr.business.facetIntersection.FacetIntersection;
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
+import fr.paris.lutece.plugins.search.solr.business.field.FieldHome;
 import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
 import fr.paris.lutece.plugins.search.solr.indexer.SolrIndexerService;
 import fr.paris.lutece.plugins.search.solr.indexer.SolrItem;
@@ -696,5 +697,25 @@ public class SolrSearchEngine implements SearchEngine
         }
 
         return _instance;
+    }
+
+    /**
+     * Return true if the facet has operator set to switch
+     * @param strFq The string from fq request (like facet:name)
+     * @return boolean
+     */
+    public boolean isSwitchOperator( String strFq )
+    {
+        boolean bIsSwitchOperator = false;
+        String[] strSplitFq = strFq.split( ":" );
+        if ( strSplitFq != null && strSplitFq.length == 2 )
+        {
+            Field field = FieldHome.findByName( strSplitFq[0]);
+            if ( field != null )
+            {
+                bIsSwitchOperator = SOLR_SPELLFIELD_SWITCH.equalsIgnoreCase( field.getOperator( ) );
+            }
+        }
+        return bIsSwitchOperator;
     }
 }

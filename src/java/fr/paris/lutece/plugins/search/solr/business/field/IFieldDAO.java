@@ -76,6 +76,14 @@ public interface IFieldDAO
     Field load( int nKey, Plugin plugin );
 
     /**
+     * Load the data from the table
+     * @param strName The name of the field
+     * @param plugin the Plugin
+     * @return The instance of the field
+     */
+    Field load( String StrName, Plugin plugin );
+
+    /**
     * Load the data of all the field objects and returns them as a List
     * @param plugin the Plugin
     * @return The List which contains the data of all the field objects

@@ -48,6 +48,7 @@ public final class FieldDAO implements IFieldDAO
     // Constants
     private static final String SQL_QUERY_NEW_PK = "SELECT max( id_field ) FROM solr_fields";
     private static final String SQL_QUERY_SELECT = "SELECT id_field, name, label, description, is_facet, enable_facet, is_sort, enable_sort, default_sort, weight, facet_mincount, operator_type FROM solr_fields WHERE id_field = ?";
+    private static final String SQL_QUERY_SELECT_FROM_NAME = "SELECT id_field, name, label, description, is_facet, enable_facet, is_sort, enable_sort, default_sort, weight, facet_mincount, operator_type FROM solr_fields WHERE name = ?";
     private static final String SQL_QUERY_INSERT = "INSERT INTO solr_fields ( id_field, name, label, description, is_facet, enable_facet, is_sort, enable_sort, default_sort, weight, facet_mincount, operator_type ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM solr_fields WHERE id_field = ? ";
     private static final String SQL_QUERY_UPDATE = "UPDATE solr_fields SET id_field = ?, name = ?, label = ?, description = ?, is_facet = ?, enable_facet = ?, is_sort = ?, enable_sort = ?, default_sort = ?, weight = ?, facet_mincount = ?, operator_type = ? WHERE id_field = ?";
@@ -115,6 +116,45 @@ public final class FieldDAO implements IFieldDAO
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin );
         daoUtil.setInt( 1, nId );
+        daoUtil.executeQuery(  );
+
+        Field field = null;
+
+        if ( daoUtil.next(  ) )
+        {
+            field = new Field(  );
+
+            int i = 1;
+            field.setIdField( daoUtil.getInt( i++ ) );
+            field.setName( daoUtil.getString( i++ ) );
+            field.setLabel( daoUtil.getString( i++ ) );
+            field.setDescription( daoUtil.getString( i++ ) );
+            field.setIsFacet( daoUtil.getBoolean( i++ ) );
+            field.setEnableFacet( daoUtil.getBoolean( i++ ) );
+            field.setIsSort( daoUtil.getBoolean( i++ ) );
+            field.setEnableSort( daoUtil.getBoolean( i++ ) );
+            field.setDefaultSort( daoUtil.getBoolean( i++ ) );
+            field.setWeight( daoUtil.getDouble( i++ ) );
+            field.setFacetMincount( daoUtil.getInt( i++ ) );
+            field.setOperator( daoUtil.getString( i ));
+
+        }
+
+        daoUtil.free(  );
+
+        return field;
+    }
+
+    /**
+     * Load the data of the field from the table
+     * @param strName The identifier of the field
+     * @param plugin The plugin
+     * @return the instance of the Field
+     */
+    public Field load( String strName, Plugin plugin )
+    {
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_FROM_NAME, plugin );
+        daoUtil.setString( 1, strName );
         daoUtil.executeQuery(  );
 
         Field field = null;
