@@ -568,7 +568,7 @@ public class SolrSearchEngine implements SearchEngine
         //Activate spellChecker
         query.setParam( "spellcheck", "true" );
         //The request handler used
-        query.setRequestHandler(SOLR_SPELLCHECK_HANDLER );
+        query.setRequestHandler("/" + SOLR_SPELLCHECK_HANDLER );
                                                 //The number of suggest returned
 
         query.setParam( "spellcheck.count", "1" ); // TODO
