@@ -376,7 +376,8 @@ public class SolrSearchApp implements XPageApplication
 
             if (checkResponse != null)
             {
-                model.put(MARK_SUGGESTION, facetedResult.getSolrSpellCheckResponse().getCollatedResults());
+            	model.put(MARK_SUGGESTION, checkResponse.getCollatedResults());
+                //model.put(MARK_SUGGESTION, facetedResult.getSolrSpellCheckResponse().getCollatedResults());
             }
         }
 
