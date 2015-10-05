@@ -1,55 +1,56 @@
-<div class="content-box">
-    <h2>#i18n{search.solr.adminFeature.configuration.intersection.title}</h2>
-    <p>#i18n{search.solr.adminFeature.configuration.intersection.description}</p>
-<br/>
-    <table class="table table-striped table-condensed">
-        <th>#i18n{search.solr.adminFeature.configuration.intersection.field1}</th>
-        <th>#i18n{search.solr.adminFeature.configuration.intersection.field2}</th>
-        <th>#i18n{search.solr.adminFeature.fields.form.actions}</th>
-            <#list intersections as intersect>
+<div class="row">
+  <div class="col-xs-12 col-sm-12">
+    <div class="box box-danger">
+      <div class="box-header">
+        <h3 class="box-title">#i18n{search.solr.adminFeature.configuration.intersection.title} <small>#i18n{search.solr.adminFeature.configuration.intersection.description}</small></h3>
+      </div>
+      <div class="box-body">
+        <table class="table table-striped table-hover">
+          <tr>
+            <th>#i18n{search.solr.adminFeature.configuration.intersection.field1}</th>
+            <th>#i18n{search.solr.adminFeature.configuration.intersection.field2}</th>
+            <th>#i18n{search.solr.adminFeature.fields.form.actions}</th>
+          </tr>
+          <#list intersections as intersect>
             <tr>
-                <form method="get" name="deleteIntersection" action="jsp/admin/search/solr/DoIntersection.jsp" >
-                <td>
-                    <input type="hidden" name="field1" value="${intersect.field1.idField}" />
-                    ${intersect.field1.label}
-                </td>
-                <td>
-                    <input type="hidden" name="field2" value="${intersect.field2.idField}" />
-                    ${intersect.field2.label}
-                </td>
-                <td>
-                    <input class="button" type="submit" value="Delete" name="delete" />
-                </td>
-                </form>
+              <form method="get" name="deleteIntersection" action="jsp/admin/search/solr/DoIntersection.jsp" >
+              <input type="hidden" name="field1" value="${intersect.field1.idField}">
+              <input type="hidden" name="field2" value="${intersect.field2.idField}">
+              <td>${intersect.field1.label}</td>
+              <td>${intersect.field2.label}</td>
+              <td>
+                <button class="btn btn-danger btn-xs" type="submit" value="Delete" name="delete">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </td>
+              </form>
             </tr>
-            </#list>
-        <form method="get" name="addIntersection" action="jsp/admin/search/solr/DoIntersection.jsp" >
-            <tr>
-                <td>
-                    <select name="field1" size="1">
-                    <#list field_list as field>
-                        <#if field.isFacet >
-                            <option value="${field.idField}">${field.label}</option>
-                        </#if>
-                    </#list>
-                    </select>
-                </td>
-                <td>
-                    <select name="field2" size="1">
-                    <#list field_list as field>
-                        <#if field.isFacet >
-                            <option value="${field.idField}">${field.label}</option>
-                        </#if>
-                    </#list>
-                    </select>
-                </td>
-                <td>
-                    <button class="btn btn-primary btn-small" type="submit" name="add" >
-                       <i class="icon-white icon-plus"></i>
-                    </button>
-                </td>
-            </tr>
-        </form>
-    </table>
-    <br/>
+          </#list>
+          <tr>
+            <form method="get" name="addIntersection" action="jsp/admin/search/solr/DoIntersection.jsp" >
+            <td>
+              <select name="field1" class="form-control input-xs">
+              <#list field_list as field>
+                <#if field.isFacet ><option value="${field.idField}">${field.label}</option></#if>
+              </#list>
+              </select>
+            </td>
+            <td>
+              <select name="field2" class="form-control input-xs">
+              <#list field_list as field>
+                <#if field.isFacet ><option value="${field.idField}">${field.label}</option></#if>
+              </#list>
+              </select>
+            </td>
+            <td>
+              <button class="btn btn-primary btn-xs btn-flat" type="submit" name="add" >
+               <i class="fa fa-plus"></i>
+              </button>
+            </td>
+            </form>
+        </tr>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
