@@ -37,7 +37,6 @@
                 <li>fq: apply extra filters on the server</li>
             </ul>
             <p>To add or edit configuration, insert datastore keys in the form: solr.app.conf.XXX.YYY where XXX is the name of the configuration (the query parameter of the xpage), and YYY the parameter the previous list to modify. By convention, also add a key "solr.app.conf.XXX.installed" with the value "true".</p>
-            <p>Pour créer et éditer les configurations, il suffit d'insérer ou de modifier des clefs du datastore: solr.app.conf.XXX.YYY où XXX est le nom de la configuration qui sera utilisé dans l'URL de la xpage, et YYY le nom du paramètre à modifier. Par convention, on ajoute aussi la clef datastore solr.app.conf.XXX.installed avec la valeur "true"</p>
 			</subsection>
 			
 		</section>
