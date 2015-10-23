@@ -35,6 +35,8 @@
             <ul>
                 <li>mapping: display results on a map</li>
                 <li>fq: apply extra filters on the server</li>
+                <li>template: set the freemarker template to use instead of the default "skin/search/solr_search_results.html"</li>
+                <li>addonBeans.X: use spring beans implementing the ISolrSearchAppAddOn interface to add data to the freemarker model. Multiple beans can be used by specifying multiple values for this parameter with different values of "X" (by convention, "0", "1" ...)</li>
             </ul>
             <p>To add or edit configuration, insert datastore keys in the form: solr.app.conf.XXX.YYY where XXX is the name of the configuration (the query parameter of the xpage), and YYY the parameter the previous list to modify. By convention, also add a key "solr.app.conf.XXX.installed" with the value "true".</p>
 			</subsection>

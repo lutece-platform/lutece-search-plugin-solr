@@ -41,6 +41,7 @@ import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchResult;
 import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
 import fr.paris.lutece.plugins.search.solr.indexer.SolrItem;
+import fr.paris.lutece.plugins.search.solr.service.ISolrSearchAppAddOn;
 import fr.paris.lutece.plugins.search.solr.service.SolrSearchAppConfService;
 import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
 import fr.paris.lutece.plugins.search.solr.util.SolrUtil;
@@ -49,6 +50,7 @@ import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.search.QueryEvent;
 import fr.paris.lutece.portal.service.search.QueryListenersService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -83,7 +85,6 @@ public class SolrSearchApp implements XPageApplication
 
     ////////////////////////////////////////////////////////////////////////////
     // Constants
-    private static final String TEMPLATE_RESULTS = "skin/search/solr_search_results.html";
     private static final String PROPERTY_SEARCH_PAGE_URL = "solr.pageSearch.baseUrl";
     private static final String PROPERTY_RESULTS_PER_PAGE = "search.nb.docs.per.page";
     private static final String PROPERTY_PATH_LABEL = "portal.search.search_results.pathLabel";
@@ -148,9 +149,22 @@ public class SolrSearchApp implements XPageApplication
             throws SiteMessageException
     {
         XPage page = new XPage();
-        Map<String, Object> model = getSearchResultModel(request);
 
-        HtmlTemplate template = AppTemplateService.getTemplate(TEMPLATE_RESULTS, request.getLocale(), model);
+        String strConfCode = request.getParameter( PARAMETER_CONF );
+        SolrSearchAppConf conf = SolrSearchAppConfService.loadConfiguration( strConfCode );
+        if ( conf == null )
+        {
+            //Use default conf if the requested one doesn't exist
+            conf = SolrSearchAppConfService.loadConfiguration( null );
+        }
+
+        Map<String, Object> model = getSearchResultModel(request, conf);
+        for ( String beanName: conf.getAddonBeanNames() ) {
+            ISolrSearchAppAddOn solrSearchAppAddon = SpringContextService.getBean( beanName );
+            solrSearchAppAddon.buildPageAddOn( model, request );
+        }
+
+        HtmlTemplate template = AppTemplateService.getTemplate(conf.getTemplate(), request.getLocale(), model);
 
         page.setPathLabel(I18nService.getLocalizedString(PROPERTY_PATH_LABEL, request.getLocale()));
         page.setTitle(I18nService.getLocalizedString(PROPERTY_PAGE_TITLE, request.getLocale()));
@@ -161,13 +175,28 @@ public class SolrSearchApp implements XPageApplication
 
     /**
      * Performs a search and fills the model (useful when a page needs to remind
-     * search parameters/results)
+     * search parameters/results) with the default conf
      *
      * @param request the request
      * @return the model
      * @throws SiteMessageException if an error occurs
      */
     public static Map<String, Object> getSearchResultModel(HttpServletRequest request)
+            throws SiteMessageException
+    {
+        return getSearchResultModel(request, null);
+    }
+
+    /**
+     * Performs a search and fills the model (useful when a page needs to remind
+     * search parameters/results)
+     *
+     * @param request the request
+     * @param conf the configuration
+     * @return the model
+     * @throws SiteMessageException if an error occurs
+     */
+    public static Map<String, Object> getSearchResultModel(HttpServletRequest request, SolrSearchAppConf conf)
             throws SiteMessageException
     {
         String strQuery = request.getParameter(PARAMETER_QUERY);
@@ -178,11 +207,9 @@ public class SolrSearchApp implements XPageApplication
         String strConfCode = request.getParameter( PARAMETER_CONF );
         Locale locale = request.getLocale();
 
-        SolrSearchAppConf conf = SolrSearchAppConfService.loadConfiguration( strConfCode );
-
         if ( conf == null )
         {
-            //Use default conf if the requested one doesn't exist
+            //Use default conf if not provided
             conf = SolrSearchAppConfService.loadConfiguration( null );
         }
 

@@ -25,7 +25,7 @@
             </pre>
 			</p>
             <p>
-    Configuration a ajouter au solrconfig.xml
+    Configuration à ajouter au solrconfig.xml
     
     <pre>
     &lt;requestHandler name="autoComplete" class="solr.SearchHandler"&gt;
@@ -55,6 +55,8 @@ http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/technical/plugin-solr
             <ul>
                 <li>mapping: affiche ou non une carte montrant les documents géolocalisés</li>
                 <li>fq: applique des filtres coté serveur en plus de ceux de la requète</li>
+                <li>template: definit le template freemarker à utiliser à la place du template par défaut "skin/search/solr_search_results.html"</li>
+                <li>addonBeans.X: utilise des beans spring implémentant l'interface ISolrSearchAppAddOn pour ajouter des données au modèle freemarker. Plusieurs beans peuvent être utilisés en donnant plusieurs valeurs à ce paramètre avec différentes valeurs pour "X" (par convention "0", "1" ...)</li>
             </ul>
             <p>Pour créer et éditer les configurations, il suffit d'insérer ou de modifier des clefs du datastore: solr.app.conf.XXX.YYY où XXX est le nom de la configuration qui sera utilisé dans l'URL de la xpage, et YYY le nom du paramètre à modifier. Par convention, on ajoute aussi la clef datastore solr.app.conf.XXX.installed avec la valeur "true"</p>
 			</subsection>
