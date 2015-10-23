@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.search.solr.service;
 
+import java.util.List;
+
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchAppConf;
 import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
 import fr.paris.lutece.portal.service.datastore.DatastoreService;
@@ -53,11 +55,13 @@ public class SolrSearchAppConfService
     private static final String DSKEY_FQ = ".fq";
     private static final String DSKEY_TEMPLATE = ".template";
     private static final String DSKEY_MAPPING = ".mapping";
+    private static final String DSKEY_ADDON_BEANS = ".addonBeans.";
 
     public static SolrSearchAppConf loadConfiguration( String code )
     {
         String strSafeCode = ( code == null ) ? EMPTY_CODE : code;
-        ReferenceList referenceList = DatastoreService.getDataByPrefix( DSKEY_PREFIX + strSafeCode + "." );
+        String strPrefix = DSKEY_PREFIX + strSafeCode ;
+        ReferenceList referenceList = DatastoreService.getDataByPrefix( strPrefix + ".");
 
         if ( referenceList.isEmpty(  ) && !EMPTY_CODE.equals( strSafeCode ) )
         {
@@ -67,19 +71,26 @@ public class SolrSearchAppConfService
         SolrSearchAppConf conf = new SolrSearchAppConf(  );
         conf.setCode( strSafeCode );
 
+        String strAddonPrefix = strPrefix + DSKEY_ADDON_BEANS;
         for ( ReferenceItem referenceItem : referenceList )
         {
-            if ( referenceItem.getCode(  ).endsWith( DSKEY_FQ ) )
+            String referenceItemCode = referenceItem.getCode(  );
+            String referenceItemName = referenceItem.getName(  );
+            if ( referenceItemCode.endsWith( DSKEY_FQ ) )
             {
-                conf.setFilterQuery( referenceItem.getName(  ) );
+                conf.setFilterQuery( referenceItemName );
             }
-            else if ( referenceItem.getCode(  ).endsWith( DSKEY_TEMPLATE ) )
+            else if ( referenceItemCode.endsWith( DSKEY_TEMPLATE ) )
             {
-                conf.setTemplate( referenceItem.getName(  ) );
+                conf.setTemplate( referenceItemName );
             }
-            else if ( referenceItem.getCode(  ).endsWith( DSKEY_MAPPING ) )
+            else if ( referenceItemCode.endsWith( DSKEY_MAPPING ) )
             {
-                conf.setExtraMappingQuery( SolrConstants.CONSTANT_TRUE.equals( referenceItem.getName(  ) ) );
+                conf.setExtraMappingQuery( SolrConstants.CONSTANT_TRUE.equals( referenceItemName ) );
+            }
+            else if ( referenceItemCode.startsWith( strAddonPrefix ) )
+            {
+                conf.getAddonBeanNames().add ( referenceItemName );
             }
         }
 
@@ -88,11 +99,16 @@ public class SolrSearchAppConfService
 
     public static void saveConfiguration( SolrSearchAppConf conf )
     {
-        String code = ( conf.getCode(  ) != null ) ? conf.getCode(  ) : EMPTY_CODE;
-        DatastoreService.setDataValue( DSKEY_PREFIX + code + DSKEY_INSTALLED, SolrConstants.CONSTANT_TRUE );
-        DatastoreService.setDataValue( DSKEY_PREFIX + code + DSKEY_FQ, conf.getFilterQuery(  ) );
-        DatastoreService.setDataValue( DSKEY_PREFIX + code + DSKEY_TEMPLATE, conf.getTemplate(  ) );
-        DatastoreService.setDataValue( DSKEY_PREFIX + code + DSKEY_MAPPING,
+        String strSafeCode = ( conf.getCode(  ) != null ) ? conf.getCode(  ) : EMPTY_CODE;
+        String strPrefix = DSKEY_PREFIX + strSafeCode;
+        DatastoreService.setDataValue( strPrefix + DSKEY_INSTALLED, SolrConstants.CONSTANT_TRUE );
+        DatastoreService.setDataValue( strPrefix + DSKEY_FQ, conf.getFilterQuery(  ) );
+        DatastoreService.setDataValue( strPrefix + DSKEY_TEMPLATE, conf.getTemplate(  ) );
+        DatastoreService.setDataValue( strPrefix + DSKEY_MAPPING,
             conf.getExtraMappingQuery(  ) ? SolrConstants.CONSTANT_TRUE : SolrConstants.CONSTANT_FALSE );
+        List<String> listAddonBeanNames = conf.getAddonBeanNames();
+        for ( int i = 0; i < listAddonBeanNames.size(); i++ ) {
+            DatastoreService.setDataValue( strPrefix + DSKEY_ADDON_BEANS + i , listAddonBeanNames.get( i ) );
+        }
     }
 }

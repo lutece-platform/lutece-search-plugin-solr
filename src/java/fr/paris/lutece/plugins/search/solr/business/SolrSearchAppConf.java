@@ -33,6 +33,9 @@
  */
 package fr.paris.lutece.plugins.search.solr.business;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import fr.paris.lutece.plugins.search.solr.service.SolrSearchAppConfService;
 import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
 
@@ -48,6 +51,7 @@ public class SolrSearchAppConf
     private String _strFilterQuery = SolrConstants.CONSTANT_DEFAULT_FILTER_QUERY;
     private String _strTemplate = SolrConstants.CONSTANT_DEFAULT_TEMPLATE;
     private boolean _bExtraMappingQuery = SolrConstants.CONSTANT_DEFAULT_EXTRA_MAPPING_QUERY;
+    private List<String> _listAddonBeanNames = new ArrayList<String>(  );
 
     /**
      * Returns the code
@@ -119,5 +123,19 @@ public class SolrSearchAppConf
     public void setExtraMappingQuery( boolean bExtraMappingQuery )
     {
         _bExtraMappingQuery = bExtraMappingQuery;
+    }
+
+    /**
+     * @return the AddonBeanNames
+     */
+    public List<String> getAddonBeanNames() {
+        return _listAddonBeanNames;
+    }
+
+    /**
+     * @param listAddonBeanNames the AddonBeanNames to set
+     */
+    public void setAddonBeanNames(List<String> listAddonBeanNames) {
+        this._listAddonBeanNames = listAddonBeanNames;
     }
 }
