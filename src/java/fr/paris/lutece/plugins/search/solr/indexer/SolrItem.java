@@ -43,7 +43,7 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
-
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -252,7 +252,61 @@ public class SolrItem
     /**
      * Add a dynamic field
      * @param strName the name of the field
-     * @param strValue the value of the field
+     * @param geolocItem a GeolocItem
+     * @param codeDocumentType the codeDocumentType
+     */
+    public void addDynamicFieldGeoloc( String strName, GeolocItem geolocItem, String codeDocumentType ) {
+        if ( geolocItem.getIcon(  ) == null )
+        {
+            geolocItem.setIcon( codeDocumentType + "-" + strName );
+        }
+
+        List<Double> coordinates = geolocItem.getLonLat();
+        if ( coordinates != null )
+        {
+            if ( _dfGeoloc == null )
+            {
+                _dfGeoloc = new HashMap<String, String>(  );
+            }
+
+            if ( _dfGeojson == null )
+            {
+                _dfGeojson = new HashMap<String, String>(  );
+            }
+
+            String strCoordinates = String.format( Locale.ENGLISH, "%.6f,%.6f", coordinates.get(1), coordinates.get(0) );
+            _dfGeoloc.put( strName + DYNAMIC_GEOLOC_FIELD_SUFFIX, strCoordinates );
+
+            _dfGeojson.put( strName + DYNAMIC_GEOJSON_FIELD_SUFFIX, geolocItem.toJSON(  ) );
+
+            if (geolocItem.getAddress() != null) {
+                addDynamicField( strName + DYNAMIC_GEOJSON_ADDRESS_FIELD_SUFFIX , geolocItem.getAddress() );
+            }
+        }
+    }
+    /**
+     * Add a dynamic field
+     * @param strName the name of the field
+     * @param strAdress the adress of the field
+     * @param dLongitude the longitude of the field
+     * @param dLatitude the latitude of the field
+     * @param codeDocumentType the codeDocumentType
+     */
+    public void addDynamicFieldGeoloc( String strName, String strAdress, double dLongitude, double dLatitude, String codeDocumentType ) {
+        GeolocItem geolocItem = new GeolocItem();
+        HashMap<String, Object> properties = new HashMap<String, Object>(  );
+        properties.put( GeolocItem.PATH_PROPERTIES_ADDRESS, strAdress );
+
+        HashMap<String, Object> geometry = new HashMap<String, Object>(  );
+        geometry.put( GeolocItem.PATH_GEOMETRY_COORDINATES, Arrays.asList( new Double[] { dLongitude, dLatitude } ) );
+        geolocItem.setGeometry( geometry );
+        geolocItem.setProperties( properties );
+        addDynamicFieldGeoloc( strName, geolocItem, codeDocumentType );
+    }
+    /**
+     * Add a dynamic field
+     * @param strName the name of the field
+     * @param strValue the value of the field which should be a geojson string
      * @param codeDocumentType the codeDocumentType
      */
     public void addDynamicFieldGeoloc( String strName, String strValue, String codeDocumentType )
@@ -271,7 +325,6 @@ public class SolrItem
         }
 
         JsonNode objCoordinates = object.path( GEOLOC_JSON_PATH_GEOMETRY ).path( GEOLOC_JSON_PATH_GEOMETRY_COORDINATES );
-        double[] coordinates = null;
 
         if ( objCoordinates.isMissingNode(  ) )
         {
@@ -314,10 +367,6 @@ public class SolrItem
                     parsedCoordinates[i] = node.asDouble(  );
                 }
 
-                if ( bCoordinatesOk )
-                {
-                    coordinates = parsedCoordinates;
-                }
             }
         }
 
@@ -331,32 +380,8 @@ public class SolrItem
         {
             AppLogService.error( "SolrItem: Error parsing JSON: " + strValue + "exception: " + e );
         }
-
-        if ( geolocItem.getIcon(  ) == null )
-        {
-            geolocItem.setIcon( codeDocumentType + "-" + strName );
-        }
-
-        if ( ( coordinates != null ) && ( geolocItem != null ) )
-        {
-            if ( _dfGeoloc == null )
-            {
-                _dfGeoloc = new HashMap<String, String>(  );
-            }
-
-            if ( _dfGeojson == null )
-            {
-                _dfGeojson = new HashMap<String, String>(  );
-            }
-
-            String strCoordinates = String.format( Locale.ENGLISH, "%.6f,%.6f", coordinates[1], coordinates[0] );
-            _dfGeoloc.put( strName + DYNAMIC_GEOLOC_FIELD_SUFFIX, strCoordinates );
-
-            _dfGeojson.put( strName + DYNAMIC_GEOJSON_FIELD_SUFFIX, geolocItem.toJSON(  ) );
-
-            if (geolocItem.getAddress() != null) {
-                addDynamicField( strName + DYNAMIC_GEOJSON_ADDRESS_FIELD_SUFFIX , geolocItem.getAddress() );
-            }
+        if ( geolocItem != null ) {
+            addDynamicFieldGeoloc(strName, geolocItem, codeDocumentType);
         }
     }
 
