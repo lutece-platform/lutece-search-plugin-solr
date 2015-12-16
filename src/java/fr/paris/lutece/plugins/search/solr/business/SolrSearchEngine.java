@@ -263,10 +263,14 @@ public class SolrSearchEngine implements SearchEngine
                     }
                     else
                     {
-                        String strFacetQueryWithColon;
-                        strFacetQueryWithColon = strFacetQuery.replaceFirst( SolrConstants.CONSTANT_COLON, COLON_QUOTE );
-                        strFacetQueryWithColon += SolrConstants.CONSTANT_QUOTE;
-                        query.addFilterQuery( strFacetQueryWithColon );
+                        if ( strFacetQuery.indexOf( SolrConstants.CONSTANT_COLON ) >= 0 ) {
+                            String strFacetQueryWithColon;
+                            strFacetQueryWithColon = strFacetQuery.replaceFirst( SolrConstants.CONSTANT_COLON, COLON_QUOTE );
+                            strFacetQueryWithColon += SolrConstants.CONSTANT_QUOTE;
+                            query.addFilterQuery( strFacetQueryWithColon );
+                        } else {
+                            query.addFilterQuery( strFacetQuery );
+                        }
                     }
                 }
             }
@@ -389,10 +393,14 @@ public class SolrSearchEngine implements SearchEngine
                     }
                     else
                     {
-                        String strFacetQueryWithColon;
-                        strFacetQueryWithColon = strFacetQuery.replaceFirst( SolrConstants.CONSTANT_COLON, COLON_QUOTE );
-                        strFacetQueryWithColon += SolrConstants.CONSTANT_QUOTE;
-                        query.addFilterQuery( strFacetQueryWithColon );
+                        if ( strFacetQuery.indexOf( SolrConstants.CONSTANT_COLON ) >= 0 ) {
+                            String strFacetQueryWithColon;
+                            strFacetQueryWithColon = strFacetQuery.replaceFirst( SolrConstants.CONSTANT_COLON, COLON_QUOTE );
+                            strFacetQueryWithColon += SolrConstants.CONSTANT_QUOTE;
+                            query.addFilterQuery( strFacetQueryWithColon );
+                        } else {
+                            query.addFilterQuery( strFacetQuery );
+                        }
                     }
                 }
             }
