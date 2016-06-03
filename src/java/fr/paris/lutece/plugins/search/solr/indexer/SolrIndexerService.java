@@ -560,4 +560,8 @@ public final class SolrIndexerService
 
         return strLog;
     }
+
+    public static StringBuffer getSbLogs() {
+        return _sbLogs;
+    }
 }

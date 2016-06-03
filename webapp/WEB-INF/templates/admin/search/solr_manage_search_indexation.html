@@ -4,6 +4,7 @@
       <div class="box-header">
         <h3 class="box-title">#i18n{portal.search.manage_indexer.labelIndexersList}</h3>
         <div class="box-tools">
+<#if !(running?? && running)>
           <form method="get" name="doIndexing" action="jsp/admin/search/solr/DoIndexing.jsp" class="form-inline">
           <div class="form-group">
             <button class="btn btn-danger btn-xs btn-flat" type="submit" name="del">
@@ -20,6 +21,7 @@
             </button>
           </div>
           </form>
+</#if>
         </div>
       </div>
       <div class="box-body">
@@ -47,5 +49,40 @@
         </table>
       </div>
     </div>
+<#if running?? && running>
+    <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">
+        <i class="fa fa-gear fa-spin"></i> &nbsp; #i18n{search.solr.adminFeature.operationInProgress} :
+        <#if command = "del">
+            #i18n{search.solr.adminFeature.buttonDoDel}
+        <#elseif command = "total">
+            #i18n{portal.search.manage_indexer.buttonDoIndex}
+        <#elseif command = "incremental" >
+            #i18n{portal.search.manage_indexer.buttonDoIncrementalIndex}
+        <#else>
+            ${command}
+        </#if> ...
+      </div>
+      <div class="box-body">
+      <pre>${logs}</pre>
+      </div>
+    </div>
+    <script>
+        // Refresh the page every 3s
+        var time = new Date().getTime();
+        $(document.body).bind("mousemove keypress", function (e) {
+            time = new Date().getTime();
+        });
+
+        function refresh() {
+            if (new Date().getTime() - time >= 3000)
+                window.location.reload(true);
+            else
+                setTimeout(refresh, 3000);
+        }
+
+        setTimeout(refresh, 3000);
+    </script>
   </div>
 </div>
