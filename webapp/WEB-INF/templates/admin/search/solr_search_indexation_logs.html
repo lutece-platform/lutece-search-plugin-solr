@@ -1,12 +1,41 @@
 <div class="row-fluid">
-    <h2>#i18n{portal.search.indexer_logs.titleIndexerLogs}</h2>
+    <div class="col-xs-12">
+<#if command?has_content>
+    <h2>
+    <#if running?? && running>
+    <i class="fa fa-gear fa-spin"></i> &nbsp; #i18n{search.solr.adminFeature.operationInProgress} :
+    <script>
+        // Refresh the page every 3s
+        var time = new Date().getTime();
+        $(document.body).bind("mousemove keypress", function (e) {
+            time = new Date().getTime();
+        });
+
+        function refresh() {
+            if (new Date().getTime() - time >= 3000)
+                window.location.reload(true);
+            else
+                setTimeout(refresh, 3000);
+        }
+
+        setTimeout(refresh, 3000);
+    </script>
+    <#else>
+    #i18n{search.solr.adminFeature.operationDone} :
+    </#if>
+    <#if command = "del">
+        #i18n{search.solr.adminFeature.buttonDoDel}
+    <#elseif command = "total">
+        #i18n{portal.search.manage_indexer.buttonDoIndex}
+    <#elseif command = "incremental" >
+        #i18n{portal.search.manage_indexer.buttonDoIncrementalIndex}
+    <#else>
+        ${command}
+    </#if> ...
+    </h2>
     <pre>
     ${logs}
-    </pre>  
-
-    <form method="post" name="return" action="">
-        <button class="btn btn-primary btn-small" type="button" onClick="javascript:history.go(-1);">
-          #i18n{portal.util.labelBack}
-        </button>
-    </form>
+    </pre>
+</#if>
+    </div>
 </div>
