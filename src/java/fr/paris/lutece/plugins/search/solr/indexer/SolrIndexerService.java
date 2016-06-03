@@ -96,27 +96,28 @@ public final class SolrIndexerService
     /**
      * Index one document without committing
      * @param solrItem The item
+     * @param sbLogs StringBuffer to write to
      * @throws CorruptIndexException corruptIndexException
      * @throws IOException i/o exception
      */
-    private static void writeNoCommit( SolrItem solrItem ) throws CorruptIndexException, IOException
+    private static void writeNoCommit( SolrItem solrItem, StringBuffer sbLogs ) throws CorruptIndexException, IOException
     {
         try
         {
             SolrInputDocument solrInputDocument = solrItem2SolrInputDocument( solrItem );
             SOLR_SERVER.add( solrInputDocument );
 
-            _sbLogs.append( "Indexing " );
-            _sbLogs.append( solrItem.getType(  ) );
-            _sbLogs.append( " #" );
-            _sbLogs.append( solrItem.getUid(  ) );
-            _sbLogs.append( " - " );
-            _sbLogs.append( solrItem.getTitle(  ) );
-            _sbLogs.append( "\r\n" );
+            sbLogs.append( "Indexing " );
+            sbLogs.append( solrItem.getType(  ) );
+            sbLogs.append( " #" );
+            sbLogs.append( solrItem.getUid(  ) );
+            sbLogs.append( " - " );
+            sbLogs.append( solrItem.getTitle(  ) );
+            sbLogs.append( "\r\n" );
         }
         catch ( Exception e )
         {
-            printIndexMessage( e );
+            printIndexMessage( e, sbLogs );
         }
     }
 
@@ -128,14 +129,26 @@ public final class SolrIndexerService
      */
     public static void write( SolrItem solrItem ) throws CorruptIndexException, IOException
     {
+        write( solrItem, _sbLogs );
+    }
+
+    /**
+     * Index one document, called by external code
+     * @param solrItem The item
+     * @param sbLogs StringBuffer to write to
+     * @throws CorruptIndexException corruptIndexException
+     * @throws IOException i/o exception
+     */
+    public static void write( SolrItem solrItem, StringBuffer sbLogs ) throws CorruptIndexException, IOException
+    {
         try
         {
-            writeNoCommit( solrItem );
+            writeNoCommit( solrItem, sbLogs );
             SOLR_SERVER.commit( );
         }
         catch ( Exception e )
         {
-            printIndexMessage( e );
+            printIndexMessage( e, sbLogs );
         }
     }
 
@@ -147,16 +160,28 @@ public final class SolrIndexerService
      */
     public static void write( Collection<SolrItem> solrItems ) throws CorruptIndexException, IOException
     {
+        write( solrItems, _sbLogs );
+    }
+
+    /**
+     * Index a collection of documents, called by external code
+     * @param solrItems The item
+     * @param sbLogs StringBuffer to write to
+     * @throws CorruptIndexException corruptIndexException
+     * @throws IOException i/o exception
+     */
+    public static void write( Collection<SolrItem> solrItems, StringBuffer sbLogs ) throws CorruptIndexException, IOException
+    {
         try
         {
             for ( SolrItem solrItem: solrItems ) {
-                writeNoCommit( solrItem );
+                writeNoCommit( solrItem, sbLogs );
             }
             SOLR_SERVER.commit( );
         }
         catch ( Exception e )
         {
-            printIndexMessage( e );
+            printIndexMessage( e, sbLogs );
         }
     }
 
@@ -393,21 +418,22 @@ public final class SolrIndexerService
     }
 
     /**
-     * Adds the exception into the buffer and the logs
+     * Adds the exception into the buffer and the StringBuffer
      * @param exception Exception to report
+     * @param sbLogs StringBuffer to write to
      */
-    private static void printIndexMessage( Exception exception )
+    private static void printIndexMessage( Exception exception, StringBuffer sbLogs )
     {
-        _sbLogs.append( " - ERROR : " );
-        _sbLogs.append( exception.getMessage(  ) );
+        sbLogs.append( " - ERROR : " );
+        sbLogs.append( exception.getMessage(  ) );
 
         if ( exception.getCause(  ) != null )
         {
-            _sbLogs.append( " : " );
-            _sbLogs.append( exception.getCause(  ).getMessage(  ) );
+            sbLogs.append( " : " );
+            sbLogs.append( exception.getCause(  ).getMessage(  ) );
         }
 
-        _sbLogs.append( "</strong>\r\n" );
+        sbLogs.append( "</strong>\r\n" );
         AppLogService.error( exception.getMessage(  ), exception );
     }
 
