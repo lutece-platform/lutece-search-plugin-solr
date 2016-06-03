@@ -94,6 +94,33 @@ public final class SolrIndexerService
     }
 
     /**
+     * Index one document without committing
+     * @param solrItem The item
+     * @throws CorruptIndexException corruptIndexException
+     * @throws IOException i/o exception
+     */
+    private static void writeNoCommit( SolrItem solrItem ) throws CorruptIndexException, IOException
+    {
+        try
+        {
+            SolrInputDocument solrInputDocument = solrItem2SolrInputDocument( solrItem );
+            SOLR_SERVER.add( solrInputDocument );
+
+            _sbLogs.append( "Indexing " );
+            _sbLogs.append( solrItem.getType(  ) );
+            _sbLogs.append( " #" );
+            _sbLogs.append( solrItem.getUid(  ) );
+            _sbLogs.append( " - " );
+            _sbLogs.append( solrItem.getTitle(  ) );
+            _sbLogs.append( "\r\n" );
+        }
+        catch ( Exception e )
+        {
+            printIndexMessage( e );
+        }
+    }
+
+    /**
      * Index one document, called by plugin indexers
      * @param solrItem The item
      * @throws CorruptIndexException corruptIndexException
@@ -103,17 +130,29 @@ public final class SolrIndexerService
     {
         try
         {
-            SolrInputDocument solrInputDocument = solrItem2SolrInputDocument( solrItem );
-            SOLR_SERVER.add( solrInputDocument );
-            SOLR_SERVER.commit(  );
+            writeNoCommit( solrItem );
+            SOLR_SERVER.commit( );
+        }
+        catch ( Exception e )
+        {
+            printIndexMessage( e );
+        }
+    }
 
-            _sbLogs.append( "Indexing " );
-            _sbLogs.append( solrItem.getType(  ) );
-            _sbLogs.append( " #" );
-            _sbLogs.append( solrItem.getUid(  ) );
-            _sbLogs.append( " - " );
-            _sbLogs.append( solrItem.getTitle(  ) );
-            _sbLogs.append( "\r\n" );
+    /**
+     * Index a collection of documents, called by plugin indexers
+     * @param solrItems The item
+     * @throws CorruptIndexException corruptIndexException
+     * @throws IOException i/o exception
+     */
+    public static void write( Collection<SolrItem> solrItems ) throws CorruptIndexException, IOException
+    {
+        try
+        {
+            for ( SolrItem solrItem: solrItems ) {
+                writeNoCommit( solrItem );
+            }
+            SOLR_SERVER.commit( );
         }
         catch ( Exception e )
         {
