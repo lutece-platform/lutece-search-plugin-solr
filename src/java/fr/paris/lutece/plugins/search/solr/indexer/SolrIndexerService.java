@@ -367,7 +367,7 @@ public final class SolrIndexerService
         {
             _sbLogs.append( " caught a " );
             _sbLogs.append( e.getClass(  ) );
-            _sbLogs.append( "\n with message: " );
+            _sbLogs.append( "\r\n with message: " );
             _sbLogs.append( e.getMessage(  ) );
             _sbLogs.append( "\r\n" );
             AppLogService.error( "Indexing error : " + e.getMessage(  ), e );
@@ -539,26 +539,28 @@ public final class SolrIndexerService
      * Del sorl index related to this site.
      * @return log of what appended
      */
-    public static String processDel(  )
+    public static synchronized String processDel(  )
     {
-        String strLog = "";
+        // String buffer for building the response page;
+        _sbLogs = new StringBuffer(  );
         String strSite = AppPropertiesService.getProperty( PROPERTY_SITE );
+
+        _sbLogs.append("Delete site : " + strSite + "\r\n");
+        AppLogService.info( _sbLogs.toString() );
 
         try
         {
             SOLR_SERVER.deleteByQuery( SolrItem.FIELD_SITE + ":\"" + strSite + "\"" );
             SOLR_SERVER.commit(  );
             SOLR_SERVER.optimize(  );
-            strLog = "Delete site : " + strSite;
-            AppLogService.info( strLog );
         }
         catch ( Exception e )
         {
             AppLogService.error( "Erreur lors de la suppression de l'index solr", e );
-            strLog = ( e.getCause( ) != null ? e.getCause( ).toString( ) : e.toString( ) );
+            _sbLogs.append(( e.getCause( ) != null ? e.getCause( ).toString( ) : e.toString( ) ) + "\r\n");
         }
 
-        return strLog;
+        return _sbLogs.toString();
     }
 
     public static StringBuffer getSbLogs() {
