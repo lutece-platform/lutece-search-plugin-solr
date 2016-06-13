@@ -369,7 +369,7 @@ public final class SolrIndexerService
             _sbLogs.append( e.getClass(  ) );
             _sbLogs.append( "\r\n with message: " );
             _sbLogs.append( e.getMessage(  ) );
-            _sbLogs.append( "\r\n" );
+            _sbLogs.append( "\r\n See error logs for the stacktrace.\r\n" );
             AppLogService.error( "Indexing error : " + e.getMessage(  ), e );
         }
 
@@ -506,10 +506,10 @@ public final class SolrIndexerService
     }
 
     /**
-     * Return the url of the webapp
+     * Return the url of the Root of the webapp
      * @return strBase the webapp url
      */
-    public static String getBaseUrl(  )
+    public static String getRootUrl(  )
     {
         String strBaseUrl = AppPropertiesService.getProperty( PROPERTY_BASE_URL );
 
@@ -524,6 +524,17 @@ public final class SolrIndexerService
         }
         
         strBaseUrl = StringUtils.isBlank( strBaseUrl ) ? "" : strBaseUrl; 
+        return strBaseUrl;
+    }
+
+    /**
+     * Return the url of the Portal of the webapp (eg http://host/WEBAPP/jsp/site/Portal.jsp)
+     * @return strBase the webapp url
+     */
+    public static String getBaseUrl(  )
+    {
+        String strBaseUrl = getRootUrl( );
+
         return strBaseUrl + AppPathService.getPortalUrl(  );
     }
 
