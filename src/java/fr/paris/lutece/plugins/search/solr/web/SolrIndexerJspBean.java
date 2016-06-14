@@ -127,24 +127,32 @@ public class SolrIndexerJspBean extends PluginAdminPageJspBean
     public static synchronized String doIndexing( HttpServletRequest request )
     {
         if (_thread == null) {
-            final HttpServletRequest finalRequest = request;
+            if ( request.getParameter( "incremental" ) != null )
+            {
+                _command = "incremental";
+            }
+            else if ( request.getParameter( "total" ) != null )
+            {
+                _command = "total";
+            }
+            else if ( request.getParameter( "del" ) != null )
+            {
+                _command = "del";
+            }
             _thread = new Thread() {
                 @Override
                 public void run() {
                     try {
-                        if ( finalRequest.getParameter( "incremental" ) != null )
+                        if ( "incremental".equals(_command) )
                         {
-                            _command = "incremental";
                             _threadLogs = SolrIndexerService.processIndexing( false );
                         }
-                        else if ( finalRequest.getParameter( "total" ) != null )
+                        else if ( "total".equals(_command) )
                         {
-                            _command = "total";
                             _threadLogs = SolrIndexerService.processIndexing( true );
                         }
-                        else if ( finalRequest.getParameter( "del" ) != null )
+                        else if ( "del".equals(_command) )
                         {
-                            _command = "del";
                             _threadLogs = SolrIndexerService.processDel(  );
                         }
                     } catch (Exception e) {
