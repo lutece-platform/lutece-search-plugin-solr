@@ -315,6 +315,13 @@ public class SolrSearchEngine implements SearchEngine
 
             	// count query
             	query.setRows( 0 );
+            	if ( ! strQuery.equals( "*:*" ) )
+            	{
+                	query.setParam("defType", DEF_TYPE);
+                	String strWeightValue = generateQueryWeightValue();
+                	query.setParam("qf", strWeightValue);
+            	}
+
                 QueryResponse response = solrServer.query( query );
                 
                 int nResults = (int) response.getResults().getNumFound( );
@@ -323,12 +330,6 @@ public class SolrSearchEngine implements SearchEngine
                 query.setStart( ( nCurrentPageIndex - 1 ) * nItemsPerPage );
             	query.setRows( nItemsPerPage > nLimit ? nLimit : nItemsPerPage );
 
-            	if ( ! strQuery.equals( "*:*" ) )
-            	{
-                	query.setParam("defType", DEF_TYPE);
-                	String strWeightValue = generateQueryWeightValue();
-                	query.setParam("qf", strWeightValue);
-            	}
             	response = solrServer.query( query );
             	
                 //HighLight
