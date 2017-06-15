@@ -113,7 +113,7 @@ public class SolrSearchEngine implements SearchEngine
     private static SolrSearchEngine _instance;
     private static final String COLON_QUOTE = ":\"";
     private static final String DATE_COLON = "date:";
-    private static final String DEF_TYPE = "dismax";
+    private static final String DEF_TYPE = "edismax";
     
      /**
     * Return search results
@@ -318,6 +318,12 @@ public class SolrSearchEngine implements SearchEngine
                 	query.setParam("defType", DEF_TYPE);
                 	String strWeightValue = generateQueryWeightValue();
                 	query.setParam("qf", strWeightValue);
+
+                    // see https://issues.apache.org/jira/browse/SOLR-3085
+                    // In our case, we match against tags and text. Like one of the usecases described in the bug report,
+                    // a stopword is very unlikely to match a tag (there is no tag named "le" or "la"). So it makes sense
+                    // to autorelax mm.
+                    query.setParam("mm.autoRelax", true);
             	}
 
                 QueryResponse response = solrServer.query( query );
@@ -558,6 +564,7 @@ public class SolrSearchEngine implements SearchEngine
             if ( ! strQuery.equals( "*:*" ) )
             {
                 query.setParam("defType", DEF_TYPE);
+                query.setParam("mm.autoRelax", true);
             }
 
             query.setStart( 0 );
