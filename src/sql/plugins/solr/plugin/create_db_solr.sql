@@ -12,6 +12,9 @@ CREATE TABLE solr_fields (
 	is_sort boolean default false,
 	enable_sort boolean default false,
 	default_sort boolean default false,
+        weight FLOAT DEFAULT 1,
+        facet_mincount INT DEFAULT 1,
+        operator_type VARCHAR(30) DEFAULT 'OR',
 	PRIMARY KEY (id_field)
 );
 

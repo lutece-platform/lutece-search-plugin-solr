@@ -317,6 +317,13 @@ public class SolrSearchEngine implements SearchEngine
 
             	// count query
             	query.setRows( 0 );
+            	if ( ! strQuery.equals( "*:*" ) )
+            	{
+                	query.setParam("defType", DEF_TYPE);
+                	String strWeightValue = generateQueryWeightValue();
+                	query.setParam("qf", strWeightValue);
+            	}
+
                 QueryResponse response = solrServer.query( query );
 
                 int nResults;
@@ -332,7 +339,8 @@ public class SolrSearchEngine implements SearchEngine
                 facetedResult.setCount( nResults > nLimit ? nLimit : nResults );
                 
                 query.setStart( ( nCurrentPageIndex - 1 ) * nItemsPerPage );
-            	query.setRows( nItemsPerPage > nLimit ? nLimit : nItemsPerPage );
+            	  query.setRows( nItemsPerPage > nLimit ? nLimit : nItemsPerPage );
+
 
                 if(BooleanUtils.isTrue(group))
                 {
@@ -346,7 +354,8 @@ public class SolrSearchEngine implements SearchEngine
                     query.setParam("qf", strWeightValue);
                 }
 
-            	response = solrServer.query( query );
+
+            	  response = solrServer.query( query );
             	
                 //HighLight
                 Map<String, Map<String, List<String>>> highlightsMap = response.getHighlighting(  );
