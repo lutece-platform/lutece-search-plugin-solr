@@ -84,6 +84,7 @@ public class SolrSearchEngine implements SearchEngine
     private static final String PROPERTY_FIELD_OR = "solr.field.or";
     private static final String PROPERTY_FIELD_SWITCH = "solr.field.switch";
     private static final String PROPERTY_FIELD_AND = "solr.field.and";
+    private static final String PROPERTY_FIELD_IN = "solr.field.in";
 
     private static final String SOLR_AUTOCOMPLETE_HANDLER = AppPropertiesService.getProperty(PROPERTY_SOLR_AUTOCOMPLETE_HANDLER);
     private static final String SOLR_SPELLCHECK_HANDLER = AppPropertiesService.getProperty(PROPERTY_SOLR_SPELLCHECK_HANDLER);
@@ -98,6 +99,7 @@ public class SolrSearchEngine implements SearchEngine
     private static final String SOLR_SPELLFIELD_OR = AppPropertiesService.getProperty(PROPERTY_FIELD_OR);
     private static final String SOLR_SPELLFIELD_SWITCH = AppPropertiesService.getProperty(PROPERTY_FIELD_SWITCH);
     private static final String SOLR_SPELLFIELD_AND = AppPropertiesService.getProperty(PROPERTY_FIELD_AND);
+    private static final String SOLR_SPELLFIELD_IN = AppPropertiesService.getProperty(PROPERTY_FIELD_IN);
 
     
     public static final String SOLR_FACET_DATE_GAP = AppPropertiesService.getProperty( "solr.facet.date.gap", "+1YEAR" );
@@ -442,11 +444,17 @@ public class SolrSearchEngine implements SearchEngine
 		{
 			if (!StringUtils.isBlank(strTmpSearch))
 			{
-				strTmpSearch = "\"" + strTmpSearch.replaceAll("\"", Matcher.quoteReplacement("\\\"")) + "\"";
-				if (SOLR_SPELLFIELD_OR.equalsIgnoreCase( strOperator ) || SOLR_SPELLFIELD_AND.equalsIgnoreCase( strOperator )) 
-					strFacetString += StringUtils.isBlank(strFacetString) ?   strTmpSearch.trim() : " " + strOperator + " " + strTmpSearch.trim();
-				if (SOLR_SPELLFIELD_SWITCH.equalsIgnoreCase( strOperator ) ) 
-					strFacetString = strTmpSearch.trim();
+                if (SOLR_SPELLFIELD_IN.equalsIgnoreCase(strOperator))
+                {
+                    strFacetString = strTmpSearch.trim();
+                } else {
+                    strTmpSearch = "\"" + strTmpSearch.replaceAll("\"", Matcher.quoteReplacement("\\\"")) + "\"";
+                    if (SOLR_SPELLFIELD_OR.equalsIgnoreCase( strOperator ) || SOLR_SPELLFIELD_AND.equalsIgnoreCase( strOperator ))
+                        strFacetString += StringUtils.isBlank(strFacetString) ?   strTmpSearch.trim() : " " + strOperator + " " + strTmpSearch.trim();
+                    if (SOLR_SPELLFIELD_SWITCH.equalsIgnoreCase( strOperator ) )
+                        strFacetString = strTmpSearch.trim();
+                }
+
 			}
 		}
 		strFacetString = strStart.concat(strFacetString).concat(strEnd);

@@ -45,6 +45,7 @@ public class Field
 	public static final String OPERATOR_TYPE_OR = "OR";
 	public static final String OPERATOR_TYPE_SWITCH = "SWITCH";
 	public static final String OPERATOR_TYPE_AND = "AND";
+    public static final String OPERATOR_TYPE_IN = "IN";
 
 
     private int _nIdField;
@@ -286,7 +287,10 @@ public class Field
 	 * @param strOperator
 	 */
 	public void setOperator(String strOperator) {
-		strOperator= !(OPERATOR_TYPE_SWITCH.equalsIgnoreCase(strOperator) || OPERATOR_TYPE_OR.equalsIgnoreCase(strOperator))  ? OPERATOR_TYPE_AND : strOperator;
+        if(!(OPERATOR_TYPE_SWITCH.equalsIgnoreCase(strOperator) || OPERATOR_TYPE_OR.equalsIgnoreCase(strOperator) || OPERATOR_TYPE_IN.equalsIgnoreCase(strOperator)) )
+        {
+            strOperator =OPERATOR_TYPE_AND;
+        }
 		this._FacetMincount = OPERATOR_TYPE_AND.equalsIgnoreCase(strOperator) ? 1 : 0;
 		this. _strOperator = strOperator;
 	}
