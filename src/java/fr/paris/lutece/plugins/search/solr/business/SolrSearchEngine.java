@@ -48,11 +48,11 @@ import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
-
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -60,19 +60,11 @@ import org.apache.solr.client.solrj.response.SpellCheckResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 
-import ucar.nc2.dt.point.decode.MP;
-
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -191,10 +183,12 @@ public class SolrSearchEngine implements SearchEngine
      * @param sortName The facet name to sort by
      * @param sortOrder "asc" or "desc"
      * @param nLimit Maximal number of results.
+     * @param group true to group the results
+     * @param groupField field to group on
      * @return the result with facets
      */
     public SolrFacetedResult getFacetedSearchResults( String strQuery, String[] facetQueries, String sortName,
-        String sortOrder, int nLimit, int nCurrentPageIndex, int nItemsPerPage, Boolean bSpellCheck )
+        String sortOrder, int nLimit, int nCurrentPageIndex, int nItemsPerPage, Boolean bSpellCheck , Boolean group, String groupField)
     {
         SolrFacetedResult facetedResult = new SolrFacetedResult(  );
 
@@ -310,23 +304,46 @@ public class SolrSearchEngine implements SearchEngine
                  }
             }
 
+            if(BooleanUtils.isTrue(group)){
+                query.setParam("group", group );
+                query.setParam("group.field", groupField);
+                query.setParam("group.ngroups", "true");
+            }
+
             try
             {
 
             	// count query
             	query.setRows( 0 );
                 QueryResponse response = solrServer.query( query );
-                
-                int nResults = (int) response.getResults().getNumFound( );
+
+                int nResults;
+
+                //we don't want the number of result but the number of groups
+                if(BooleanUtils.isTrue(group))
+                {
+                    nResults =  response.getGroupResponse().getValues().get(0).getNGroups( );
+                }else{
+                    nResults = (int) response.getResults().getNumFound( );
+                }
+
                 facetedResult.setCount( nResults > nLimit ? nLimit : nResults );
                 
                 query.setStart( ( nCurrentPageIndex - 1 ) * nItemsPerPage );
             	query.setRows( nItemsPerPage > nLimit ? nLimit : nItemsPerPage );
 
-            	query.setParam("defType", DEF_TYPE);
-            	String strWeightValue = generateQueryWeightValue();
-            	query.setParam("qf", strWeightValue);
-            	
+                if(BooleanUtils.isTrue(group))
+                {
+                    query.setParam("group.main", "true");
+                }
+
+                if ( ! "*:*".equals( strQuery ) )
+                {
+                    query.setParam("defType", DEF_TYPE);
+                    String strWeightValue = generateQueryWeightValue();
+                    query.setParam("qf", strWeightValue);
+                }
+
             	response = solrServer.query( query );
             	
                 //HighLight
