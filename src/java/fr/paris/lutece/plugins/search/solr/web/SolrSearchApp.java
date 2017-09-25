@@ -63,21 +63,13 @@ import fr.paris.lutece.util.html.IPaginator;
 import fr.paris.lutece.util.html.Paginator;
 import fr.paris.lutece.util.string.StringUtil;
 import fr.paris.lutece.util.url.UrlItem;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.response.SpellCheckResponse;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * This page shows some features of Solr like Highlights or Facets.
@@ -114,6 +106,9 @@ public class SolrSearchApp implements XPageApplication
     private static final String PARAMETER_FACET_NAME = "facetname";
     private static final String PARAMETER_SORT_NAME = "sort_name";
     private static final String PARAMETER_SORT_ORDER = "sort_order";
+    private static final String PARAMETER_GROUP = "group";
+    private static final String PARAMETER_GROUP_MAIN = "group.main";
+    private static final String PARAMETER_GROUP_FIELD = "group.field";
     private static final String MARK_RESULTS_LIST = "results_list";
     private static final String MARK_QUERY = "query";
     private static final String MARK_FACET_QUERY = "facetquery";
@@ -240,6 +235,10 @@ public class SolrSearchApp implements XPageApplication
         String flabel = StringUtils.isBlank(request.getParameter(PARAMETER_FACET_LABEL)) ? null : request.getParameter(PARAMETER_FACET_LABEL).trim();
         String strConfCode = request.getParameter( PARAMETER_CONF );
 
+        Boolean group = StringUtils.isBlank(request.getParameter(PARAMETER_GROUP)) ? null : BooleanUtils.toBooleanObject(request.getParameter(PARAMETER_GROUP));
+        String groupField = StringUtils.isBlank(request.getParameter(PARAMETER_GROUP_FIELD)) ? null : request.getParameter(PARAMETER_GROUP_FIELD).trim();
+
+
         Locale locale = request.getLocale();
 
         if ( conf == null )
@@ -341,7 +340,7 @@ public class SolrSearchApp implements XPageApplication
 
         SolrSearchEngine engine = SolrSearchEngine.getInstance();
 
-        SolrFacetedResult facetedResult = engine.getFacetedSearchResults(strQuery, facetQuery, sort, order, nLimit, Integer.parseInt(strCurrentPageIndex), nItemsPerPage, SOLR_SPELLCHECK);
+        SolrFacetedResult facetedResult = engine.getFacetedSearchResults(strQuery, facetQuery, sort, order, nLimit, Integer.parseInt(strCurrentPageIndex), nItemsPerPage, SOLR_SPELLCHECK, group, groupField);
         List<SolrSearchResult> listResults = facetedResult.getSolrSearchResults();
 
         List<HashMap<String, Object>> points = null;
