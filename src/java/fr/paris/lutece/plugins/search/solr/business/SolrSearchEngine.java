@@ -511,10 +511,21 @@ public class SolrSearchEngine implements SearchEngine
     public List<SolrSearchResult> getGeolocSearchResults( String strQuery, String[] facetQueries, int nLimit )
     {
         SolrClient solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
+
+        Hashtable<Field, List<String>> myValuesList = new Hashtable<Field, List<String>>();
         if ( solrServer != null ) {
             String strFields = "*" + SolrItem.DYNAMIC_GEOJSON_FIELD_SUFFIX + "," + SearchItem.FIELD_UID ;
             SolrQuery query = new SolrQuery( strQuery );
             query.setParam ( "fl", strFields );
+
+            for ( Field field : SolrFieldManager.getFacetList(  ).values(  ) )
+            {
+                //Add facet Field
+                if ( field.getEnableFacet(  ) )
+                {
+                    myValuesList.put(field, new ArrayList<String>());
+                }
+            }
 
             //Treat HttpRequest
             //FacetQuery
@@ -522,18 +533,31 @@ public class SolrSearchEngine implements SearchEngine
             {
                 for ( String strFacetQuery : facetQueries )
                 {
-                    if ( strFacetQuery.contains( DATE_COLON ) )
-                    {
-                        query.addFilterQuery( strFacetQuery );
-                    }
-                    else
-                    {
-                        String strFacetQueryWithColon;
-                        strFacetQueryWithColon = strFacetQuery.replaceFirst( SolrConstants.CONSTANT_COLON, COLON_QUOTE );
-                        strFacetQueryWithColon += SolrConstants.CONSTANT_QUOTE;
-                        query.addFilterQuery( strFacetQueryWithColon );
-                    }
+                        String myValues[] = strFacetQuery.split(":",2);
+                        if (myValues != null && myValues.length == 2)
+                        {
+                            myValuesList = getFieldArrange ( myValues, myValuesList );
+                        }
                 }
+                for (Field tmpFieldValue: myValuesList.keySet())
+                {
+                    List<String>strValues = myValuesList.get( tmpFieldValue );
+                    String strFacetString = "";
+                    if  (strValues.size() > 0)
+                    {
+                        strFacetString = extractQuery( strValues , tmpFieldValue.getOperator() );
+                        if ( tmpFieldValue.getName( ).equalsIgnoreCase( "date" ) || tmpFieldValue.getName( ).toLowerCase().endsWith("_date"))
+                        {
+                            strFacetString = strFacetString.replaceAll("\"", "");
+                        }
+                        query.addFilterQuery( tmpFieldValue.getName()+":"+strFacetString );
+                    }
+                 }
+            }
+
+            if ( ! strQuery.equals( "*:*" ) )
+            {
+                query.setParam("defType", DEF_TYPE);
             }
 
             query.setStart( 0 );
