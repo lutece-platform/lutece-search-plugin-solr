@@ -60,8 +60,6 @@ import org.apache.solr.client.solrj.response.SpellCheckResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 
-import ucar.nc2.dt.point.decode.MP;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
