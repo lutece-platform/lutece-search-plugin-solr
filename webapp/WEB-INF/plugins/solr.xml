@@ -3,7 +3,7 @@
     <!-- Plugin Informations -->
     <name>solr</name>
     <class>fr.paris.lutece.plugins.search.solr.service.SolrPlugin</class>
-    <version>3.1.1</version>
+    <version>3.1.2-SNAPSHOT</version>
     <documentation/>
     <installation/>
     <changes/>
