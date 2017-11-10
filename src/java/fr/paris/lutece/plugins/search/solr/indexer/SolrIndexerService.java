@@ -59,6 +59,7 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.store.Directory;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrInputDocument;
 
 
@@ -198,7 +199,7 @@ public final class SolrIndexerService
         Plugin plugin = PluginService.getPlugin( SolrPlugin.PLUGIN_NAME );
 
         boolean bCreateIndex = bCreate;
-        String strWebappName = getWebAppName(  );
+        String strWebappNameEscaped = ClientUtils.escapeQueryChars( getWebAppName(  ) );
 
         try
         {
@@ -216,7 +217,7 @@ public final class SolrIndexerService
                 _sbLogs.append( "\r\nIndexing all contents ...\r\n" );
 
                 // Remove all indexed values of this site
-                SOLR_SERVER.deleteByQuery( SearchItem.FIELD_UID + ":" + strWebappName +
+                SOLR_SERVER.deleteByQuery( SearchItem.FIELD_UID + ":" + strWebappNameEscaped +
                     SolrConstants.CONSTANT_UNDERSCORE + SolrConstants.CONSTANT_WILDCARD );
 
                 for ( SolrIndexer solrIndexer : INDEXERS )
@@ -281,7 +282,7 @@ public final class SolrIndexerService
                             else
                             {
                                 //delete all index linked to uid. We get the uid of the resource to prefix it like we do during the indexation 
-                                SOLR_SERVER.deleteByQuery( SearchItem.FIELD_UID + ":" + strWebappName +
+                                SOLR_SERVER.deleteByQuery( SearchItem.FIELD_UID + ":" + strWebappNameEscaped +
                                     SolrConstants.CONSTANT_UNDERSCORE +
                                     indexer.getResourceUid( action.getIdDocument(  ), action.getTypeResource(  ) ) );
                             }
