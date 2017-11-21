@@ -72,7 +72,7 @@ public final class SolrIndexerService
 {
     private static final SolrClient SOLR_SERVER = SolrServerService.getInstance(  ).getSolrServer(  );
     private static final List<SolrIndexer> INDEXERS = initIndexersList(  );
-    private static final String PARAM_TYPE_PAGE = "Page";
+    private static final String PARAM_TYPE_PAGE = "PAGE";
     private static StringBuffer _sbLogs;
     private static final String PROPERTY_SITE = "lutece.name";
     private static final String PROPERTY_PROD_URL = "lutece.prod.url";
