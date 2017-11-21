@@ -277,7 +277,9 @@ public final class SolrIndexerService
                             {
                                 //delete only the index linked to this portlet
                                 SOLR_SERVER.deleteByQuery( SearchItem.FIELD_DOCUMENT_PORTLET_ID + ":" +
-                                    action.getIdDocument(  ) + "&" + Integer.toString( action.getIdPortlet(  ) ) );
+                                    action.getIdDocument(  ) + "&" + Integer.toString( action.getIdPortlet(  ) ) +
+                                    " AND " + SearchItem.FIELD_UID + ":" + strWebappNameEscaped +
+                                    SolrConstants.CONSTANT_UNDERSCORE + SolrConstants.CONSTANT_WILDCARD );
                             }
                             else
                             {
@@ -343,7 +345,9 @@ public final class SolrIndexerService
                 }
 
                 //reindexing all pages.
-                SOLR_SERVER.deleteByQuery( SearchItem.FIELD_TYPE + ":" + PARAM_TYPE_PAGE );
+                SOLR_SERVER.deleteByQuery( SearchItem.FIELD_TYPE + ":" + PARAM_TYPE_PAGE +
+                    " AND " + SearchItem.FIELD_UID + ":" + strWebappNameEscaped
+                    + SolrConstants.CONSTANT_UNDERSCORE + SolrConstants.CONSTANT_WILDCARD );
 
                 for ( SolrIndexer indexer : INDEXERS )
                 {
