@@ -91,6 +91,7 @@ public class SolrPageIndexer implements SolrIndexer
     {
         List<Page> listPages = PageHome.getAllPages();
         List<String> lstErrors = new ArrayList<String>();
+        List<SolrItem> lstSolrItems = new ArrayList<SolrItem>();
 
         for (Page page : listPages)
         {
@@ -101,7 +102,7 @@ public class SolrPageIndexer implements SolrIndexer
 
                 if (item != null)
                 {
-                    SolrIndexerService.write(item);
+                    lstSolrItems.add(item);
                 }
             }
             catch (Exception e)
@@ -109,6 +110,16 @@ public class SolrPageIndexer implements SolrIndexer
                 lstErrors.add(SolrIndexerService.buildErrorMessage(e));
                 AppLogService.error(PAGE_INDEXATION_ERROR + page.getId(), e);
             }
+        }
+
+        try
+        {
+            SolrIndexerService.write( lstSolrItems );
+        }
+        catch (Exception e)
+        {
+            lstErrors.add(SolrIndexerService.buildErrorMessage(e));
+            AppLogService.error(PAGE_INDEXATION_ERROR, e);
         }
 
         return lstErrors;
