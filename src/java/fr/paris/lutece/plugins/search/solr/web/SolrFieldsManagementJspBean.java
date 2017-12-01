@@ -83,10 +83,6 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
 
     public String getPage( HttpServletRequest request )
     {
-        // Update fields to add dynamic fields of indexers
-        SolrFieldManager.updateFields( SolrIndexerService.getAdditionalFields(  ) );
-        SolrFieldManager.reloadField(  );
-
         StringBuffer htmlBuffer = new StringBuffer(  );
         htmlBuffer.append( this.getFieldList( request ) );
 
@@ -134,10 +130,23 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
         {
             return this.doCreateField( request );
         }
+        else if ( request.getParameter( "refresh" ) != null )
+        {
+            return this.doRefreshFields( request );
+        }
         else
         {
             return null;
         }
+    }
+
+    public String doRefreshFields ( HttpServletRequest request )
+    {
+        // Update fields to add dynamic fields of indexers
+        SolrFieldManager.updateFields( SolrIndexerService.getAdditionalFields(  ) );
+        SolrFieldManager.reloadField(  );
+
+        return getPage( request );
     }
 
     public String doDeleteField( HttpServletRequest request )
