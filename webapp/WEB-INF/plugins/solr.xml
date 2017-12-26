@@ -68,13 +68,12 @@
         </daemon>
     </daemons>
 
-    <servlet>
-      <servlet-name>SolrSuggestServlet</servlet-name>
-      <servlet-class>fr.paris.lutece.plugins.search.solr.web.SolrSuggestServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-      <servlet-name>SolrSuggestServlet</servlet-name>
-      <url-pattern>/SolrSuggest</url-pattern>
-    </servlet-mapping>
+    <servlets>
+        <servlet>
+          <servlet-name>SolrSuggestServlet</servlet-name>
+          <servlet-class>fr.paris.lutece.plugins.search.solr.web.SolrSuggestServlet</servlet-class>
+          <url-pattern>/servlet/plugins/SolrSuggest</url-pattern>
+        </servlet>
+    </servlets>
 
 </plug-in>

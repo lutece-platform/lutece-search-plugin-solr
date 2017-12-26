@@ -486,7 +486,7 @@ $(function() {
   $('#solr').autocomplete({
     source: function(request, response) {
       $.ajax({
-        url: '@base_url@solrSuggest',
+        url: '@base_url@servlet/plugins/SolrSuggest',
         dataType: 'jsonp',
 minLength: 3,
 data: {
