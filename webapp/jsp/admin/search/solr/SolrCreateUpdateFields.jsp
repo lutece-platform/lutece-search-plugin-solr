@@ -1,4 +1,4 @@
-<!--%@ page errorPage="../../ErrorPage.jsp" %-->
+<%@ page errorPage="../../ErrorPage.jsp" %>
 <jsp:include page="../../AdminHeader.jsp" />
 
 <jsp:useBean id="solr_fields" scope="session" class="fr.paris.lutece.plugins.search.solr.web.SolrFieldsManagementJspBean" />
