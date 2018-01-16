@@ -86,6 +86,7 @@ public class SolrSearchEngine implements SearchEngine
     private static final String PROPERTY_SOLR_HIGHLIGHT_POST = "solr.highlight.post";
     private static final String PROPERTY_SOLR_HIGHLIGHT_SNIPPETS = "solr.highlight.snippets";
     private static final String PROPERTY_SOLR_HIGHLIGHT_FRAGSIZE = "solr.highlight.fragsize";
+    private static final String PROPERTY_SOLR_HIGHLIGHT_SUMMARY_FRAGSIZE = "solr.highlight.summary.fragsize";
     private static final String PROPERTY_SOLR_FACET_DATE_START = "solr.facet.date.start";
     private static final String PROPERTY_FIELD_OR = "solr.field.or";
     private static final String PROPERTY_FIELD_SWITCH = "solr.field.switch";
@@ -99,6 +100,8 @@ public class SolrSearchEngine implements SearchEngine
             5 );
     private static final int SOLR_HIGHLIGHT_FRAGSIZE = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_HIGHLIGHT_FRAGSIZE,
             100 );
+    private static final int SOLR_HIGHLIGHT_SUMMARY_FRAGSIZE = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_HIGHLIGHT_SUMMARY_FRAGSIZE,
+            0 );
     private static final String SOLR_FACET_DATE_START = AppPropertiesService.getProperty( PROPERTY_SOLR_FACET_DATE_START );
 
     private static final String SOLR_SPELLFIELD_OR = AppPropertiesService.getProperty(PROPERTY_FIELD_OR);
@@ -208,6 +211,7 @@ public class SolrSearchEngine implements SearchEngine
             query.setHighlightSimplePost( SOLR_HIGHLIGHT_POST );
             query.setHighlightSnippets( SOLR_HIGHLIGHT_SNIPPETS );
             query.setHighlightFragsize( SOLR_HIGHLIGHT_FRAGSIZE );
+            query.setParam ( "f.summary.hl.fragsize", Integer.toString( SOLR_HIGHLIGHT_SUMMARY_FRAGSIZE ) );
             query.setFacet( true );
             query.setFacetLimit( SOLR_FACET_LIMIT );
 //            query.setFacetMinCount( 1 );

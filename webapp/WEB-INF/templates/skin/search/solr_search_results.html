@@ -428,7 +428,7 @@ ${encoded_facets_queries}
                     <!-- <img src="document?id=${result.id}&id_attribute=79" style="float:left; margin-right:12px"/> -->
                     <div style="font-weight:bold; font-size:1.2em"><a href="${result.url}&terms=${query?url}&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}<@EncodeFQ  facets_list />">${result.title}</a></div>
 
-                    <#if result.summary??>${result.summary}</#if>
+                    <#if result.summary??>${(result.highlight.map["summary"][0])!result.summary}</#if>
                     <#if result.highlight??>
                     <#-- get a extract from the "content" field where there is one (or more) of the searched words -->
                     <#if result.highlight.map["content"]??>
