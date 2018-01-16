@@ -47,8 +47,10 @@
                   #i18n{search.solr.adminFeature.fields.form.weight.low}
                 <#elseif field.weight==1>
                   #i18n{search.solr.adminFeature.fields.form.weight.normal}
-                <#else>
+                <#elseif field.weight==10>
                   #i18n{search.solr.adminFeature.fields.form.weight.high}
+                <#else>
+                  ${field.weight}
                 </#if>
               </td>
               <td>${field.description}</td>
