@@ -490,7 +490,9 @@ public class SolrSearchEngine implements SearchEngine
     	String strQueryWeight = "";
     	for (Field field : fieldList)
     	{
-    		strQueryWeight += field.getSolrName() + "^" + field.getWeight() + " " ;
+    	    if (field.getWeight() > 0) {
+    	        strQueryWeight += field.getSolrName() + "^" + field.getWeight() + " " ;
+    	    }
     	}
     	return strQueryWeight;
 	}

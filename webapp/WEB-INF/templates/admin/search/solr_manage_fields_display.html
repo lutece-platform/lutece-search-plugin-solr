@@ -41,7 +41,9 @@
               <td>${field.operator}</td>
               <td>${field.isSort?string}</td>
               <td>
-                <#if field.weight==0.1>
+                <#if field.weight==0.0>
+                  #i18n{search.solr.adminFeature.fields.form.weight.ignored}
+                <#elseif field.weight==0.1>
                   #i18n{search.solr.adminFeature.fields.form.weight.low}
                 <#elseif field.weight==1>
                   #i18n{search.solr.adminFeature.fields.form.weight.normal}

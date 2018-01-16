@@ -44,6 +44,7 @@
             <label class="control-label col-xs-12 col-sm-3">#i18n{search.solr.adminFeature.fields.form.weight} :</label>
             <div class="col-xs-12 col-sm-2">
               <select name="weight" id="weight" class="form-control">
+                <option value="0.0" <#if field.weight==0.0>selected</#if> >#i18n{search.solr.adminFeature.fields.form.weight.ignored}</option>
                 <option value="0.1" <#if field.weight==0.1>selected</#if> >#i18n{search.solr.adminFeature.fields.form.weight.low}</option>
                 <option value="1" <#if field.weight==1>selected</#if> >#i18n{search.solr.adminFeature.fields.form.weight.normal}</option>
                 <option value="10" <#if field.weight==10>selected</#if> >#i18n{search.solr.adminFeature.fields.form.weight.high}</option>

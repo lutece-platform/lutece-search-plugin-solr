@@ -20,7 +20,7 @@ INSERT INTO solr_fields (id_field, name, label, description, weight, facet_minco
 (6, 'title', 'title', 'Title', 10, 1, 'AND');
 
 INSERT INTO solr_fields (id_field, name, label, description, weight, facet_mincount, operator_type) VALUES
-(7, 'content', 'content', 'Content', 1, 1, 'AND');
+(7, 'content', 'content', 'Content', 0.1, 1, 'AND');
 
 INSERT INTO solr_fields (id_field, name, label, description, weight, facet_mincount, operator_type) VALUES
 (8, 'summary', 'summary', 'Summary', 1, 1, 'AND');
