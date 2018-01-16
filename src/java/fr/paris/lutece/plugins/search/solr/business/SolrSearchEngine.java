@@ -322,6 +322,18 @@ public class SolrSearchEngine implements SearchEngine
                 	query.setParam("defType", DEF_TYPE);
                 	String strWeightValue = generateQueryWeightValue();
                 	query.setParam("qf", strWeightValue);
+                	query.setParam("pf", strWeightValue);
+                	query.setParam("pf2", strWeightValue);
+                	query.setParam("pf3", strWeightValue);
+
+                	//To allow the phrase to boost even with 2 words in between
+                	//For example "Lutece is a Framework" would match for the search "Lutece Framework"
+                	query.setParam("ps", "3");
+                	query.setParam("qs", "3"); //Slop when the user explicitly uses quotes
+
+                	//According to Apache Solr Enterprise Search Server - Third Edition
+                	//This should be a good default value
+                	query.setParam("tie", "0.1");
 
                     // see https://issues.apache.org/jira/browse/SOLR-3085
                     // In our case, we match against tags and text. Like one of the usecases described in the bug report,
