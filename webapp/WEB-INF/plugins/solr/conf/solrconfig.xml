@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0"?>
 <!--
  Licensed to the Apache Software Foundation (ASF) under one or more
  contributor license agreements.  See the NOTICE file distributed with
@@ -15,14 +15,16 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
 <!-- 
      For more details about configurations options that may appear in
      this file, see http://wiki.apache.org/solr/SolrConfigXml. 
 -->
+<!--
+     This is a trimmed down version of solrconfig.xml for use in lutece's
+     default embedded solr server
+-->
 <config>
-  <luceneMatchVersion>5.2.1</luceneMatchVersion>
-  <requestDispatcher handleSelect="false"/>
+  <luceneMatchVersion>LUCENE_CURRENT</luceneMatchVersion>
   <requestHandler name="/select" class="solr.SearchHandler">
     <lst name="defaults">
       <str name="df">content</str>
@@ -31,37 +33,29 @@
   </requestHandler>
   <requestHandler name="/update" class="solr.UpdateRequestHandler"/>
 
-  <!-- The SuggestComponent in Solr provides users with automatic suggestions for query terms. 
-       You can use this to implement a powerful auto-suggest feature in your search application.
-       As with the rest of this solrconfig.xml file, the configuration of this component is purely
-       an example that applies specifically to this configset and example documents. 
-       
-       More information about this component and other configuration options are described in the
-       "Suggester" section of the reference guide available at 
-       http://archive.apache.org/dist/lucene/solr/ref-guide
-    -->
-  <searchComponent name="suggest" class="solr.SuggestComponent">
-    <lst name="suggester">
-      <str name="name">mySuggester</str>
-      <str name="lookupImpl">FuzzyLookupFactory</str>      
+  <searchComponent class="solr.SpellCheckComponent" name="suggest">
+    <lst name="spellchecker">
+      <str name="name">suggest</str>
+      <str name="classname">org.apache.solr.spelling.suggest.Suggester</str>
+      <str name="lookupImpl">org.apache.solr.spelling.suggest.tst.TSTLookup</str>-->
       <str name="dictionaryImpl">DocumentDictionaryFactory</str>
-      <str name="field">cat</str>
-      <str name="weightField">price</str>
-      <str name="suggestAnalyzerFieldType">string</str>
-      <str name="buildOnStartup">false</str>
+      <str name="field">content</str>  <!-- the indexed field to derive suggestions from -->
+      <str name="buildOnCommit">true</str>
+      <str name="buildOnOptimize">true</str>
     </lst>
+    <str name="queryAnalyzerFieldType">text</str>
   </searchComponent>
 
-  <requestHandler name="/suggest" class="solr.SearchHandler" 
-                  startup="lazy" >
+  <requestHandler class="org.apache.solr.handler.component.SearchHandler" name="/suggest">
     <lst name="defaults">
-      <str name="suggest">true</str>
-      <str name="suggest.count">10</str>
-      <str name="suggest.dictionary">mySuggester</str>
+      <str name="spellcheck">true</str>
+      <str name="spellcheck.dictionary">suggest</str>
+      <str name="spellcheck.count">5</str>
+      <str name="spellcheck.collate">true</str>
+      <str name="spellcheck.maxCollations">5</str>
     </lst>
     <arr name="components">
       <str>suggest</str>
     </arr>
   </requestHandler>
-
 </config>
