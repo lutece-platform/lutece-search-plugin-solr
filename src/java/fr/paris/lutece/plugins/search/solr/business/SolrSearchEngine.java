@@ -92,6 +92,23 @@ public class SolrSearchEngine implements SearchEngine
     private static final String PROPERTY_FIELD_SWITCH = "solr.field.switch";
     private static final String PROPERTY_FIELD_AND = "solr.field.and";
 
+    //To allow the phrase to boost even with 2 words in between
+    //For example "Lutece is a Framework" would match for the search "Lutece Framework"
+    private static final String PROPERTY_SOLR_SEARCH_PS = "solr.search.ps";
+    private static final String DEFAULT_SOLR_SEARCH_PS = "3";
+
+    //According to Apache Solr Enterprise Search Server - Third Edition
+    //This should be a good default value
+    private static final String PROPERTY_SOLR_SEARCH_TIE = "solr.search.tie";
+    private static final String DEFAULT_SOLR_SEARCH_TIE = "0.1";
+
+    // see https://issues.apache.org/jira/browse/SOLR-3085
+    // Like one of the usecases described in the bug report,
+    // a stopword is very unlikely to match a tag (there is no tag named "le" or "la"). So it makes sense
+    // to autorelax mm by default.
+    private static final String PROPERTY_SOLR_SEARCH_AUTORELAXMM = "solr.search.autorelaxmm";
+    private static final String DEFAULT_SOLR_SEARCH_AUTORELAXMM = "true";
+
     private static final String SOLR_AUTOCOMPLETE_HANDLER = AppPropertiesService.getProperty(PROPERTY_SOLR_AUTOCOMPLETE_HANDLER);
     private static final String SOLR_SPELLCHECK_HANDLER = AppPropertiesService.getProperty(PROPERTY_SOLR_SPELLCHECK_HANDLER);
     private static final String SOLR_HIGHLIGHT_PRE = AppPropertiesService.getProperty( PROPERTY_SOLR_HIGHLIGHT_PRE );
@@ -322,24 +339,26 @@ public class SolrSearchEngine implements SearchEngine
                 	query.setParam("defType", DEF_TYPE);
                 	String strWeightValue = generateQueryWeightValue();
                 	query.setParam("qf", strWeightValue);
-                	query.setParam("pf", strWeightValue);
-                	query.setParam("pf2", strWeightValue);
-                	query.setParam("pf3", strWeightValue);
+                    String strPhraseSlop = AppPropertiesService.getProperty(PROPERTY_SOLR_SEARCH_PS, DEFAULT_SOLR_SEARCH_PS);
 
-                	//To allow the phrase to boost even with 2 words in between
-                	//For example "Lutece is a Framework" would match for the search "Lutece Framework"
-                	query.setParam("ps", "3");
-                	query.setParam("qs", "3"); //Slop when the user explicitly uses quotes
+                    if ( StringUtils.isNotBlank( strPhraseSlop ) ) {
+                        query.setParam("pf", strWeightValue);
+                        query.setParam("pf2", strWeightValue);
+                        query.setParam("pf3", strWeightValue);
 
-                	//According to Apache Solr Enterprise Search Server - Third Edition
-                	//This should be a good default value
-                	query.setParam("tie", "0.1");
+                        query.setParam("ps", strPhraseSlop);
+                        query.setParam("qs", strPhraseSlop); //Slop when the user explicitly uses quotes
+                    }
 
-                    // see https://issues.apache.org/jira/browse/SOLR-3085
-                    // In our case, we match against tags and text. Like one of the usecases described in the bug report,
-                    // a stopword is very unlikely to match a tag (there is no tag named "le" or "la"). So it makes sense
-                    // to autorelax mm.
-                    query.setParam("mm.autoRelax", true);
+                    String strTie = AppPropertiesService.getProperty(PROPERTY_SOLR_SEARCH_TIE, DEFAULT_SOLR_SEARCH_TIE);
+                    if ( StringUtils.isNotBlank( strTie ) ) {
+                        query.setParam("tie", strTie);
+                    }
+
+                    String strAutoRelaxmm = AppPropertiesService.getProperty(PROPERTY_SOLR_SEARCH_AUTORELAXMM, DEFAULT_SOLR_SEARCH_AUTORELAXMM);
+                    if ( StringUtils.isNotBlank( strAutoRelaxmm ) ) {
+                        query.setParam("mm.autoRelax", strAutoRelaxmm);
+                    }
             	}
 
                 QueryResponse response = solrServer.query( query );
