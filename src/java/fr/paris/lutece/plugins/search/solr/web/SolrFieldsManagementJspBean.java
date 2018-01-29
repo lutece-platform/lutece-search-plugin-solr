@@ -39,6 +39,7 @@ import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
 import fr.paris.lutece.plugins.search.solr.indexer.SolrIndexerService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppLogService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
@@ -64,6 +65,16 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
     private static final String TEMPLATE_DISPLAY_SOLR_FIELDS = "admin/search/solr_manage_fields_display.html";
     private static final String TEMPLATE_SOLR_FIELDS_FORM = "admin/search/solr_manage_fields_form.html";
     private static final String MARK_FIELD = "field_list";
+    private static final String MARK_WEIGHT_HIGH = "weight_high";
+    private static final String MARK_WEIGHT_NORMAL = "weight_normal";
+    private static final String MARK_WEIGHT_LOW = "weight_low";
+
+    private static final String PROPERTY_WEIGHT_HIGH = "solr.weights.high";
+    private static final String DEFAULT_WEIGHT_HIGH = "10";
+    private static final String PROPERTY_WEIGHT_NORMAL = "solr.weights.normal";
+    private static final String DEFAULT_WEIGHT_NORMAL = "1";
+    private static final String PROPERTY_WEIGHT_LOW = "solr.weights.low";
+    private static final String DEFAULT_WEIGHT_LOW = "0.1";
 
     /**
      * Displays the indexing parameters
@@ -75,6 +86,10 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
     {
         HashMap<String, Object> model = new HashMap<String, Object>(  );
         model.put( MARK_FIELD, SolrFieldManager.getFieldList(  ) );
+
+        model.put( MARK_WEIGHT_HIGH, Double.parseDouble( AppPropertiesService.getProperty( PROPERTY_WEIGHT_HIGH, DEFAULT_WEIGHT_HIGH ) ) );
+        model.put( MARK_WEIGHT_NORMAL, Double.parseDouble( AppPropertiesService.getProperty( PROPERTY_WEIGHT_NORMAL, DEFAULT_WEIGHT_NORMAL ) ) );
+        model.put( MARK_WEIGHT_LOW, Double.parseDouble( AppPropertiesService.getProperty( PROPERTY_WEIGHT_LOW, DEFAULT_WEIGHT_LOW ) ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_DISPLAY_SOLR_FIELDS, getLocale(  ), model );
 
@@ -109,6 +124,10 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
             model.put( "create", true );
             model.put( "field", createField );
         }
+
+        model.put( MARK_WEIGHT_HIGH, Double.parseDouble( AppPropertiesService.getProperty( PROPERTY_WEIGHT_HIGH, DEFAULT_WEIGHT_HIGH ) ) );
+        model.put( MARK_WEIGHT_NORMAL, Double.parseDouble( AppPropertiesService.getProperty( PROPERTY_WEIGHT_NORMAL, DEFAULT_WEIGHT_NORMAL ) ) );
+        model.put( MARK_WEIGHT_LOW, Double.parseDouble( AppPropertiesService.getProperty( PROPERTY_WEIGHT_LOW, DEFAULT_WEIGHT_LOW ) ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_SOLR_FIELDS_FORM, getLocale(  ), model );
 

@@ -43,11 +43,11 @@
               <td>
                 <#if field.weight==0.0>
                   #i18n{search.solr.adminFeature.fields.form.weight.ignored}
-                <#elseif field.weight==0.1>
+                <#elseif field.weight==weight_low>
                   #i18n{search.solr.adminFeature.fields.form.weight.low}
-                <#elseif field.weight==1>
+                <#elseif field.weight==weight_normal>
                   #i18n{search.solr.adminFeature.fields.form.weight.normal}
-                <#elseif field.weight==10>
+                <#elseif field.weight==weight_high>
                   #i18n{search.solr.adminFeature.fields.form.weight.high}
                 <#else>
                   ${field.weight}
