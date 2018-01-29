@@ -61,6 +61,12 @@
     <dynamicField name="*_geoloc" type="geoloc" indexed="true" stored="true"/>
     <dynamicField name="*_geoloc_0_coordinate" type="double" indexed="true" stored="true"/>
     <dynamicField name="*_geoloc_1_coordinate" type="double" indexed="true" stored="true"/>
+
+    <field name="text" type="text" indexed="true" stored="false" multiValued="true"/>
+    <copyField source="title" dest="text"/>
+    <copyField source="summary" dest="text"/>
+    <copyField source="content" dest="text"/>
+    <copyField source="metadata" dest="text"/>
   </fields>
   <uniqueKey>uid</uniqueKey>
 </schema>
