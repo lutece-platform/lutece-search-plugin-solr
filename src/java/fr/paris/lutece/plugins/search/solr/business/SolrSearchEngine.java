@@ -109,6 +109,9 @@ public class SolrSearchEngine implements SearchEngine
     private static final String PROPERTY_SOLR_SEARCH_AUTORELAXMM = "solr.search.autorelaxmm";
     private static final String DEFAULT_SOLR_SEARCH_AUTORELAXMM = "true";
 
+    private static final String PROPERTY_SOLR_SEARCH_BOOSTRECENT = "solr.search.boostrecent";
+    private static final String DEFAULT_SOLR_SEARCH_BOOSTRECENT = "3.16e-12"; // Pretty soft: After 10 years, the score is divided by 2.
+
     private static final String SOLR_AUTOCOMPLETE_HANDLER = AppPropertiesService.getProperty(PROPERTY_SOLR_AUTOCOMPLETE_HANDLER);
     private static final String SOLR_SPELLCHECK_HANDLER = AppPropertiesService.getProperty(PROPERTY_SOLR_SPELLCHECK_HANDLER);
     private static final String SOLR_HIGHLIGHT_PRE = AppPropertiesService.getProperty( PROPERTY_SOLR_HIGHLIGHT_PRE );
@@ -358,6 +361,12 @@ public class SolrSearchEngine implements SearchEngine
                     String strAutoRelaxmm = AppPropertiesService.getProperty(PROPERTY_SOLR_SEARCH_AUTORELAXMM, DEFAULT_SOLR_SEARCH_AUTORELAXMM);
                     if ( StringUtils.isNotBlank( strAutoRelaxmm ) ) {
                         query.setParam("mm.autoRelax", strAutoRelaxmm);
+                    }
+
+                    String strBoostRecent = AppPropertiesService.getProperty( PROPERTY_SOLR_SEARCH_BOOSTRECENT, DEFAULT_SOLR_SEARCH_BOOSTRECENT );
+                    if ( StringUtils.isNotBlank( strBoostRecent ) )
+                    {
+                        query.setParam("boost", "recip(ms(NOW/HOUR,date),"+strBoostRecent+",1,1)");
                     }
             	}
 
