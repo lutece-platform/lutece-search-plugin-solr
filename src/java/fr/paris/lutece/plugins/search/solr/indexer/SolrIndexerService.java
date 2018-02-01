@@ -105,15 +105,14 @@ public final class SolrIndexerService
     {
         try
         {
-            SolrInputDocument solrInputDocument = solrItem2SolrInputDocument( solrItem );
-            SOLR_SERVER.add( solrInputDocument );
-
             sbLogs.append( "Indexing " );
             sbLogs.append( solrItem.getType(  ) );
             sbLogs.append( " #" );
             sbLogs.append( solrItem.getUid(  ) );
             sbLogs.append( " - " );
             sbLogs.append( solrItem.getTitle(  ) );
+            SolrInputDocument solrInputDocument = solrItem2SolrInputDocument( solrItem );
+            SOLR_SERVER.add( solrInputDocument );
             sbLogs.append( "\r\n" );
         }
         catch ( Exception e )
