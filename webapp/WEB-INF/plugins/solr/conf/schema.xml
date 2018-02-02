@@ -40,7 +40,7 @@
     <field name="url" type="text" stored="true" indexed="true"/>
     <field name="date" type="date" stored="true" indexed="true"/>
     <field name="title" type="text" indexed="true" stored="true"/>
-    <field name="uid" type="string" indexed="true" stored="true" required="true" multiValued="false"/>
+    <field name="uid" type="string" indexed="true" stored="true" required="true"/>
     <field name="content" type="text" stored="true" indexed="true" required="true"/>
     <field name="site" type="string" stored="true" indexed="true"/>
     <field name="summary" type="text" stored="true" indexed="true"/>
