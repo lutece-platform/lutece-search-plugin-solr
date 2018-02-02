@@ -64,6 +64,7 @@
 
     <field name="text" type="text" indexed="true" stored="false" multiValued="true"/>
     <copyField source="title" dest="text"/>
+    <copyField source="categorie" dest="text"/>
     <copyField source="summary" dest="text"/>
     <copyField source="content" dest="text"/>
     <copyField source="metadata" dest="text"/>
