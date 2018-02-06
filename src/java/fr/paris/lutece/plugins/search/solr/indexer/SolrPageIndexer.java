@@ -107,7 +107,7 @@ public class SolrPageIndexer implements SolrIndexer
             }
             catch (Exception e)
             {
-                lstErrors.add(SolrIndexerService.buildErrorMessage(e));
+                lstErrors.add(PAGE_INDEXATION_ERROR + page.getId( ) + " : " + SolrIndexerService.buildErrorMessage(e));
                 AppLogService.error(PAGE_INDEXATION_ERROR + page.getId(), e);
             }
         }
