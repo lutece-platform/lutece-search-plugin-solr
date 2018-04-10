@@ -243,11 +243,11 @@ public class SolrSearchEngine implements SearchEngine
                 {
                     if ( field.getName( ).equalsIgnoreCase( "date" ) || field.getName( ).toLowerCase().endsWith("_date"))
                     {
-                        query.setParam( "facet.date", field.getName( ) );
-                        query.setParam( "facet.date.start", SOLR_FACET_DATE_START );
-                        query.setParam( "facet.date.gap", SOLR_FACET_DATE_GAP );
-                        query.setParam( "facet.date.end", SOLR_FACET_DATE_END );
-                        query.setParam( "facet.date.mincount", "0" );
+                        query.setParam( "facet.range", field.getName( ) );
+                        query.setParam( "facet.range.start", SOLR_FACET_DATE_START );
+                        query.setParam( "facet.range.gap", SOLR_FACET_DATE_GAP );
+                        query.setParam( "facet.range.end", SOLR_FACET_DATE_END );
+                        query.setParam( "facet.range.mincount", "0" );
                     }
                     else
                     {
@@ -396,10 +396,10 @@ public class SolrSearchEngine implements SearchEngine
                 //set the spellcheckresult
                 facetedResult.setSolrSpellCheckResponse(response.getSpellCheckResponse());
                 
-                //Date facet
-                if ( ( response.getFacetDates(  ) != null ) && !response.getFacetDates(  ).isEmpty(  ) )
+                //Range facet (dates)
+                if ( ( response.getFacetRanges(  ) != null ) && !response.getFacetRanges(  ).isEmpty(  ) )
                 {
-                    facetedResult.setFacetDateList( response.getFacetDates(  ) );
+                    facetedResult.setFacetDateList( response.getFacetRanges(  ) );
                 }
 
                 //FacetField

@@ -256,8 +256,8 @@ ${encoded_facets_queries}
         <#-- facets date refining -->
         <#if facets_date??>
         <#list facets_date as field>
-        <#if field.values??>
-        <#-- when there is no result, facet is not null, but facet.values is -->
+        <#if field.counts??>
+        <#-- when there is no result, facet is not null, but facet.counts is -->
         <table>
             <th>
                 ${solr_fields[field.name].label}
@@ -265,11 +265,11 @@ ${encoded_facets_queries}
             <tr>
                 <td>
                     <ul>
-                        <#list field.values as count>
+                        <#list field.counts as count>
                         <#if count.count != 0>
                         <li>
-                            <#assign toDate = "${count.name}"?datetime("yyyy-MM-dd'T'HH:mm:ss'Z'")>
-                            <#assign daterange = "${field.name}:[${count.name} TO ${count.name}${facetDateGap}]"?url>
+                            <#assign toDate = "${count.value}"?datetime("yyyy-MM-dd'T'HH:mm:ss'Z'")>
+                            <#assign daterange = "${field.name}:[${count.value} TO ${count.value}${facetDateGap}]"?url>
                             <#assign toString = "${toDate?string('yyyy')}">
                                 <#assign sh = "">
                                 <#list historique as fh>

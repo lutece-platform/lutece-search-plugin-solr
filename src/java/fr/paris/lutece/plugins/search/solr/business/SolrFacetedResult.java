@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.search.solr.business;
 
 import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.RangeFacet;
 import org.apache.solr.client.solrj.response.SpellCheckResponse;
 
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public class SolrFacetedResult
     private List<SolrSearchResult> searchResultsList;
 
     /**Commentaire. **/
-    private List<FacetField> facetDateList;
+    private List<RangeFacet> facetDateList;
 
     /**Commentaire. **/
     private Map<String, ArrayList<FacetField>> facetIntersection;
@@ -124,12 +125,12 @@ public class SolrFacetedResult
      * Retourne la liste de field de type date.
      * @return Une liste de field
      */
-    public final List<FacetField> getFacetDateList(  )
+    public final List<RangeFacet> getFacetDateList(  )
     {
         return facetDateList;
     }
 
-    public final void setFacetDateList( List<FacetField> facetDateList )
+    public final void setFacetDateList( List<RangeFacet> facetDateList )
     {
         this.facetDateList = facetDateList;
     }
