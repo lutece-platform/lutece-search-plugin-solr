@@ -53,6 +53,7 @@ public class SolrSearchAppConfService
     private static final String DSKEY_PREFIX = "solr.app.conf.";
     private static final String DSKEY_INSTALLED = ".installed";
     private static final String DSKEY_FQ = ".fq";
+    private static final String DSKEY_FQ_REGULAR_EXPR = "solr\\.app\\.conf\\..*\\.fq\\.\\d";
     private static final String DSKEY_TEMPLATE = ".template";
     private static final String DSKEY_MAPPING = ".mapping";
     private static final String DSKEY_ADDON_BEANS = ".addonBeans.";
@@ -79,6 +80,10 @@ public class SolrSearchAppConfService
             if ( referenceItemCode.endsWith( DSKEY_FQ ) )
             {
                 conf.setFilterQuery( referenceItemName );
+            }
+            else if ( referenceItemCode.matches( DSKEY_FQ_REGULAR_EXPR ) )
+            {
+                conf.addFilterQuery( referenceItemName );
             }
             else if ( referenceItemCode.endsWith( DSKEY_TEMPLATE ) )
             {

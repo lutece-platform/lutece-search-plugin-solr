@@ -52,6 +52,7 @@ public class SolrSearchAppConf
     private String _strTemplate = SolrConstants.CONSTANT_DEFAULT_TEMPLATE;
     private boolean _bExtraMappingQuery = SolrConstants.CONSTANT_DEFAULT_EXTRA_MAPPING_QUERY;
     private List<String> _listAddonBeanNames = new ArrayList<String>(  );
+    private List<String> _listFilterQuery = new ArrayList<String>(  );
 
     /**
      * Returns the code
@@ -108,6 +109,15 @@ public class SolrSearchAppConf
     }
 
     /**
+     * Add the filter query to the current filter query list
+     * @param strFilterQuery filter query to add
+     */
+    public void addFilterQuery( String strFilterQuery )
+    {
+        getListFilterQuery( ).add( strFilterQuery );
+    }
+
+    /**
      * Returns the boolean indicating if we need an extra query for mapping
      * @return the boolean indicating if we need an extra query for mapping
      */
@@ -137,5 +147,19 @@ public class SolrSearchAppConf
      */
     public void setAddonBeanNames(List<String> listAddonBeanNames) {
         this._listAddonBeanNames = listAddonBeanNames;
+    }
+    
+    /**
+     * @return the Filter Query list
+     */
+    public List<String> getListFilterQuery() {
+        return _listFilterQuery;
+    }
+
+    /**
+     * @param listFilterQuery the Filter Query list to set
+     */
+    public void setListFilterQuery(List<String> listFilterQuery) {
+        this._listFilterQuery = listFilterQuery;
     }
 }

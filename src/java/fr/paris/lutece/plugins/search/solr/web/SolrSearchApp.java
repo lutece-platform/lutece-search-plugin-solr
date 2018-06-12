@@ -284,8 +284,13 @@ public class SolrSearchApp implements XPageApplication
 //                }
 //            }
         }
-         facetQuery = new String[facetQueryTmp.size()];
-         facetQuery =  facetQueryTmp.toArray(facetQuery);
+         
+         if ( !conf.getListFilterQuery( ).isEmpty( ) )
+         {
+             facetQueryTmp.addAll( conf.getListFilterQuery( ) );
+         }
+         facetQuery = new String[ facetQueryTmp.size( ) ];
+         facetQuery =  facetQueryTmp.toArray( facetQuery );
 
         if ( StringUtils.isNotBlank( conf.getFilterQuery(  ) ) )
         {
