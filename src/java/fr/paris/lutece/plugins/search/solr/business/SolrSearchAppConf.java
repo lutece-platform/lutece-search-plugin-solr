@@ -48,7 +48,6 @@ import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
 public class SolrSearchAppConf
 {
     private String _strCode = SolrSearchAppConfService.EMPTY_CODE;
-    private String _strFilterQuery = SolrConstants.CONSTANT_DEFAULT_FILTER_QUERY;
     private String _strTemplate = SolrConstants.CONSTANT_DEFAULT_TEMPLATE;
     private boolean _bExtraMappingQuery = SolrConstants.CONSTANT_DEFAULT_EXTRA_MAPPING_QUERY;
     private List<String> _listAddonBeanNames = new ArrayList<String>(  );
@@ -88,33 +87,6 @@ public class SolrSearchAppConf
     public void setTemplate( String template )
     {
         _strTemplate = template;
-    }
-
-    /**
-     * Returns the filter query
-     * @return the filter query
-     */
-    public String getFilterQuery(  )
-    {
-        return _strFilterQuery;
-    }
-
-    /**
-     * Sets the filter query
-     * @param filter query the code
-     */
-    public void setFilterQuery( String strFilterQuery )
-    {
-        _strFilterQuery = strFilterQuery;
-    }
-
-    /**
-     * Add the filter query to the current filter query list
-     * @param strFilterQuery filter query to add
-     */
-    public void addFilterQuery( String strFilterQuery )
-    {
-        getListFilterQuery( ).add( strFilterQuery );
     }
 
     /**

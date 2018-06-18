@@ -292,20 +292,6 @@ public class SolrSearchApp implements XPageApplication
          facetQuery = new String[ facetQueryTmp.size( ) ];
          facetQuery =  facetQueryTmp.toArray( facetQuery );
 
-        if ( StringUtils.isNotBlank( conf.getFilterQuery(  ) ) )
-        {
-            int nNewLength = ( facetQuery == null ) ? 1 : ( facetQuery.length + 1 );
-            String[] newFacetQuery = new String[nNewLength];
-
-            for ( int i = 0; i < ( nNewLength - 1 ); i++ )
-            {
-                newFacetQuery[i] = facetQuery[i];
-            }
-
-            newFacetQuery[newFacetQuery.length - 1] = conf.getFilterQuery(  );
-            facetQuery = newFacetQuery;
-        }
-
         boolean bEncodeUri = Boolean.parseBoolean(AppPropertiesService.getProperty(PROPERTY_ENCODE_URI,
                 Boolean.toString(DEFAULT_ENCODE_URI)));
 

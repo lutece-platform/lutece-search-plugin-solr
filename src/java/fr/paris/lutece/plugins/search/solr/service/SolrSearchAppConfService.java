@@ -52,11 +52,10 @@ public class SolrSearchAppConfService
     public static final String EMPTY_CODE = "";
     private static final String DSKEY_PREFIX = "solr.app.conf.";
     private static final String DSKEY_INSTALLED = ".installed";
-    private static final String DSKEY_FQ = ".fq";
-    private static final String DSKEY_FQ_REGULAR_EXPR = "solr\\.app\\.conf\\..*\\.fq\\.\\d";
     private static final String DSKEY_TEMPLATE = ".template";
     private static final String DSKEY_MAPPING = ".mapping";
     private static final String DSKEY_ADDON_BEANS = ".addonBeans.";
+    private static final String DSKEY_FQ_LIST = ".fq.";
 
     public static SolrSearchAppConf loadConfiguration( String code )
     {
@@ -73,19 +72,12 @@ public class SolrSearchAppConfService
         conf.setCode( strSafeCode );
 
         String strAddonPrefix = strPrefix + DSKEY_ADDON_BEANS;
+        String strFqListPrefix = strPrefix + DSKEY_FQ_LIST;
         for ( ReferenceItem referenceItem : referenceList )
         {
             String referenceItemCode = referenceItem.getCode(  );
             String referenceItemName = referenceItem.getName(  );
-            if ( referenceItemCode.endsWith( DSKEY_FQ ) )
-            {
-                conf.setFilterQuery( referenceItemName );
-            }
-            else if ( referenceItemCode.matches( DSKEY_FQ_REGULAR_EXPR ) )
-            {
-                conf.addFilterQuery( referenceItemName );
-            }
-            else if ( referenceItemCode.endsWith( DSKEY_TEMPLATE ) )
+            if ( referenceItemCode.endsWith( DSKEY_TEMPLATE ) )
             {
                 conf.setTemplate( referenceItemName );
             }
@@ -97,6 +89,10 @@ public class SolrSearchAppConfService
             {
                 conf.getAddonBeanNames().add ( referenceItemName );
             }
+            else if ( referenceItemCode.startsWith( strFqListPrefix ) )
+            {
+                conf.getListFilterQuery( ).add ( referenceItemName );
+            }
         }
 
         return conf;
@@ -107,13 +103,16 @@ public class SolrSearchAppConfService
         String strSafeCode = ( conf.getCode(  ) != null ) ? conf.getCode(  ) : EMPTY_CODE;
         String strPrefix = DSKEY_PREFIX + strSafeCode;
         DatastoreService.setDataValue( strPrefix + DSKEY_INSTALLED, SolrConstants.CONSTANT_TRUE );
-        DatastoreService.setDataValue( strPrefix + DSKEY_FQ, conf.getFilterQuery(  ) );
         DatastoreService.setDataValue( strPrefix + DSKEY_TEMPLATE, conf.getTemplate(  ) );
         DatastoreService.setDataValue( strPrefix + DSKEY_MAPPING,
             conf.getExtraMappingQuery(  ) ? SolrConstants.CONSTANT_TRUE : SolrConstants.CONSTANT_FALSE );
         List<String> listAddonBeanNames = conf.getAddonBeanNames();
         for ( int i = 0; i < listAddonBeanNames.size(); i++ ) {
             DatastoreService.setDataValue( strPrefix + DSKEY_ADDON_BEANS + i , listAddonBeanNames.get( i ) );
+        }
+        List<String> listFilterQuery = conf.getListFilterQuery( );
+        for ( int i = 0; i < listFilterQuery.size(); i++ ) {
+            DatastoreService.setDataValue( strPrefix + DSKEY_FQ_LIST + i , listFilterQuery.get( i ) );
         }
     }
 }
