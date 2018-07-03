@@ -4,7 +4,7 @@
     <parent>
         <artifactId>lutece-global-pom</artifactId>
         <groupId>fr.paris.lutece.tools</groupId>
-        <version>3.0.11</version>
+        <version>4.0.3</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -35,13 +35,13 @@
         <dependency>
             <groupId>fr.paris.lutece</groupId>
             <artifactId>lutece-core</artifactId>
-            <version>[4.9.9,)</version>
+            <version>[6.1.0,)</version>
             <type>lutece-core</type>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
-            <version>4.9.1</version>
+            <version>6.5.1</version>
         </dependency>
         <dependency>
             <groupId>fr.paris.lutece.plugins</groupId>

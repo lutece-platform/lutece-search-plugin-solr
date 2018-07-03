@@ -49,9 +49,9 @@ import fr.paris.lutece.portal.service.security.SecurityService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -59,6 +59,7 @@ import org.apache.solr.client.solrj.response.SpellCheckResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -95,10 +96,13 @@ public class SolrSearchEngine implements SearchEngine
     public static final String SOLR_FACET_DATE_END = AppPropertiesService
             .getProperty( "solr.facet.date.end", "NOW" );
     public static final int SOLR_FACET_LIMIT = AppPropertiesService.getPropertyInt( "solr.facet.limit", 100 );
+    
+         
     private static SolrSearchEngine _instance;
     private static final String COLON_QUOTE = ":\"";
     private static final String DATE_COLON = "date:";
-
+    private static final String DEF_TYPE = "edismax";
+    
     /**
     * Return search results
     * @param strQuery The search query
@@ -109,7 +113,7 @@ public class SolrSearchEngine implements SearchEngine
     {
         List<SearchResult> results = new ArrayList<SearchResult>(  );
 
-        SolrServer solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
+        SolrClient solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
 
         if ( ( solrServer != null ) && !strQuery.equals( "" ) )
         {
@@ -158,6 +162,10 @@ public class SolrSearchEngine implements SearchEngine
             catch ( SolrServerException e )
             {
                 AppLogService.error( e.getMessage(  ), e );
+            } 
+            catch ( IOException e )
+            {
+                AppLogService.error( e.getMessage(  ), e );
             }
         }
 
@@ -178,7 +186,7 @@ public class SolrSearchEngine implements SearchEngine
     {
         SolrFacetedResult facetedResult = new SolrFacetedResult(  );
 
-        SolrServer solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
+        SolrClient solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
         List<SolrSearchResult> results = new ArrayList<SolrSearchResult>(  );
 
         if ( solrServer != null )
@@ -280,6 +288,14 @@ public class SolrSearchEngine implements SearchEngine
 
             	// count query
             	query.setRows( 0 );
+            	
+                if ( ! strQuery.equals( "*:*" ) )
+                {
+                    query.setParam("defType", DEF_TYPE);
+                    String strWeightValue = generateQueryWeightValue();
+                    query.setParam("qf", strWeightValue);               
+                }
+                
                 QueryResponse response = solrServer.query( query );
                 
                 int nResults = (int) response.getResults().getNumFound( );
@@ -355,6 +371,10 @@ public class SolrSearchEngine implements SearchEngine
             {
                 AppLogService.error( e.getMessage(  ), e );
             }
+            catch ( IOException e )
+            {
+                AppLogService.error( e.getMessage(  ), e );
+            }
         }
         else
         {
@@ -375,7 +395,7 @@ public class SolrSearchEngine implements SearchEngine
      */
     public List<SolrSearchResult> getGeolocSearchResults( String strQuery, String[] facetQueries, int nLimit )
     {
-        SolrServer solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
+        SolrClient solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
         if ( solrServer != null ) {
             String strFields = "*" + SolrItem.DYNAMIC_GEOJSON_FIELD_SUFFIX + "," + SearchItem.FIELD_UID ;
             SolrQuery query = new SolrQuery( strQuery );
@@ -404,7 +424,14 @@ public class SolrSearchEngine implements SearchEngine
                     }
                 }
             }
-
+            
+            if ( ! strQuery.equals( "*:*" ) )
+            {
+                query.setParam("defType", DEF_TYPE);
+                String strWeightValue = generateQueryWeightValue();
+                query.setParam("qf", strWeightValue);               
+            }
+            
             query.setStart( 0 );
             query.setRows( nLimit );
             QueryResponse response;
@@ -414,6 +441,12 @@ public class SolrSearchEngine implements SearchEngine
                 AppLogService.error( "Solr getGeolocSearchResults error: " + e.getMessage(  ), e );
                 return new ArrayList<SolrSearchResult>();
             }
+            catch ( IOException e )
+            {
+                AppLogService.error( e.getMessage(  ), e );
+                return new ArrayList<SolrSearchResult>();
+            }
+            
             //resultList
             List<SolrItem> itemList = response.getBeans( SolrItem.class );
             return SolrUtil.transformSolrItemsToSolrSearchResults( itemList, null );
@@ -430,7 +463,7 @@ public class SolrSearchEngine implements SearchEngine
     public SpellCheckResponse getSpellChecker( String term )
     {
         SpellCheckResponse spellCheck = null;
-        SolrServer solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
+        SolrClient solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
 
         SolrQuery query = new SolrQuery( term );
         //Do not return results (optimization)
@@ -438,8 +471,8 @@ public class SolrSearchEngine implements SearchEngine
         //Activate spellChecker
         query.setParam( "spellcheck", "true" );
         //The request handler used
-        query.setQueryType( "spellCheckText" ); //TODO
-                                                //The number of suggest returned
+//        query.setQueryType( "spellCheckText" ); //TODO
+//                                                //The number of suggest returned
 
         query.setParam( "spellcheck.count", "1" ); // TODO
                                                    //Returns the frequency of the terms
@@ -458,6 +491,10 @@ public class SolrSearchEngine implements SearchEngine
         {
             AppLogService.error( e.getMessage(  ), e );
         }
+        catch ( IOException e )
+        {
+            AppLogService.error( e.getMessage(  ), e );
+        }
 
         return spellCheck;
     }
@@ -465,7 +502,7 @@ public class SolrSearchEngine implements SearchEngine
     public QueryResponse getJsonpSuggest( String terms, String callback )
     {
         QueryResponse response = null;
-        SolrServer solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
+        SolrClient solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
 
         SolrQuery query = new SolrQuery( terms );
         query.setParam( "wt", "json" );
@@ -481,6 +518,10 @@ public class SolrSearchEngine implements SearchEngine
         {
             AppLogService.error( e.getMessage(  ), e );
         }
+        catch ( IOException e )
+        {
+            AppLogService.error( e.getMessage(  ), e );
+        }
 
         return response;
     }
@@ -489,7 +530,7 @@ public class SolrSearchEngine implements SearchEngine
     {
         String strDocumentIdPrefixed = SolrIndexerService.getWebAppName() + SolrConstants.CONSTANT_UNDERSCORE + strDocumentId;
         String xmlContent = null;
-        SolrServer solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
+        SolrClient solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
         SolrQuery query = new SolrQuery( terms );
         query.setHighlight( true );
         query.setHighlightSimplePre( SOLR_HIGHLIGHT_PRE );
@@ -516,6 +557,10 @@ public class SolrSearchEngine implements SearchEngine
             }
         }
         catch ( SolrServerException e )
+        {
+            AppLogService.error( e.getMessage(  ), e );
+        }
+        catch ( IOException e )
         {
             AppLogService.error( e.getMessage(  ), e );
         }
@@ -548,6 +593,20 @@ public class SolrSearchEngine implements SearchEngine
         return filterString;
     }
 
+    /**
+     * @return
+     */
+    private String generateQueryWeightValue() 
+    {
+        List<Field> fieldList =  SolrFieldManager.getFieldList();
+        String strQueryWeight = "";
+        for (Field field : fieldList)
+        {
+            strQueryWeight += field.getSolrName() + "^1.0 ";
+        }
+        return strQueryWeight;
+    }
+    
     /**
      * Returns the instance
      * @return the instance
