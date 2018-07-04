@@ -101,7 +101,8 @@ public class SolrSearchEngine implements SearchEngine
     private static SolrSearchEngine _instance;
     private static final String COLON_QUOTE = ":\"";
     private static final String DATE_COLON = "date:";
-    private static final String DEF_TYPE = "edismax";
+    private static final String DEFAULT_FIELD = "content";
+    private static final String ALL_SEARCH_QUERY = "*:*";
     
     /**
     * Return search results
@@ -121,6 +122,10 @@ public class SolrSearchEngine implements SearchEngine
 
             if ( ( strQuery != null ) && ( strQuery.length(  ) > 0 ) )
             {
+                if ( !strQuery.equals( ALL_SEARCH_QUERY ) )
+                {
+                    strQuery = buildQueryWithDefaultField( strQuery );
+                }
                 query.setQuery( strQuery );
             }
 
@@ -191,6 +196,11 @@ public class SolrSearchEngine implements SearchEngine
 
         if ( solrServer != null )
         {
+            if ( !strQuery.equals( ALL_SEARCH_QUERY ) )
+            {
+                strQuery = buildQueryWithDefaultField( strQuery );
+            }
+            
             SolrQuery query = new SolrQuery( strQuery );
             query.setHighlight( true );
             query.setHighlightSimplePre( SOLR_HIGHLIGHT_PRE );
@@ -289,13 +299,6 @@ public class SolrSearchEngine implements SearchEngine
             	// count query
             	query.setRows( 0 );
             	
-                if ( ! strQuery.equals( "*:*" ) )
-                {
-                    query.setParam("defType", DEF_TYPE);
-                    String strWeightValue = generateQueryWeightValue();
-                    query.setParam("qf", strWeightValue);               
-                }
-                
                 QueryResponse response = solrServer.query( query );
                 
                 int nResults = (int) response.getResults().getNumFound( );
@@ -398,6 +401,10 @@ public class SolrSearchEngine implements SearchEngine
         SolrClient solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
         if ( solrServer != null ) {
             String strFields = "*" + SolrItem.DYNAMIC_GEOJSON_FIELD_SUFFIX + "," + SearchItem.FIELD_UID ;
+            if ( !strQuery.equals( ALL_SEARCH_QUERY ) )
+            {
+                strQuery = buildQueryWithDefaultField( strQuery );
+            }
             SolrQuery query = new SolrQuery( strQuery );
             query.setParam ( "fl", strFields );
 
@@ -423,13 +430,6 @@ public class SolrSearchEngine implements SearchEngine
                         }
                     }
                 }
-            }
-            
-            if ( ! strQuery.equals( "*:*" ) )
-            {
-                query.setParam("defType", DEF_TYPE);
-                String strWeightValue = generateQueryWeightValue();
-                query.setParam("qf", strWeightValue);               
             }
             
             query.setStart( 0 );
@@ -471,9 +471,6 @@ public class SolrSearchEngine implements SearchEngine
         //Activate spellChecker
         query.setParam( "spellcheck", "true" );
         //The request handler used
-//        query.setQueryType( "spellCheckText" ); //TODO
-//                                                //The number of suggest returned
-
         query.setParam( "spellcheck.count", "1" ); // TODO
                                                    //Returns the frequency of the terms
 
@@ -594,19 +591,24 @@ public class SolrSearchEngine implements SearchEngine
     }
 
     /**
-     * @return
+     * Builds a query  with default field from multiple values.
+     * @param strMultipleValues the values
+     * @return the query string
      */
-    private String generateQueryWeightValue() 
+    private String buildQueryWithDefaultField( String strMultipleValues )
     {
-        List<Field> fieldList =  SolrFieldManager.getFieldList();
-        String strQueryWeight = "";
-        for (Field field : fieldList)
+        
+        String multipleValues[] = strMultipleValues.split("\\s+");
+        StringBuffer q = new StringBuffer(  );
+
+        for ( String strValue : multipleValues )
         {
-            strQueryWeight += field.getSolrName() + "^1.0 ";
+            q.append( DEFAULT_FIELD ).append( ":" ).append( strValue ).append( " " );
         }
-        return strQueryWeight;
+
+        return q.toString( ).trim( );
     }
-    
+
     /**
      * Returns the instance
      * @return the instance
