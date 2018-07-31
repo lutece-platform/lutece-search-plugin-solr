@@ -70,6 +70,10 @@ public final class SolrUtil
     private static final String PROPERTY_ENCODE_URI_ENCODING = "search.encode.uri.encoding";
     private static final String DEFAULT_URI_ENCODING = "ISO-8859-1";
 
+    private static final String PROPERTY_CALLBACK_FUNCTION_NAME_PATTERN = "search.callbackFunctionName.pattern" ;
+    private static final String CONSTANT_DEFAULT_FUNCTION_NAME_PATTERN = "[_$A-Za-z0-9]+";
+    public  static final String PROPERTY_CALLBACK_FUNCTION_NAME_ERROR_MESSAGE = "search.callbackFunctionName.error.message" ;
+
     /**
      * Empty private constructor
      */
@@ -200,5 +204,18 @@ public final class SolrUtil
         String strURIEncoding = AppPropertiesService.getProperty( PROPERTY_ENCODE_URI_ENCODING, DEFAULT_URI_ENCODING );
 
         return strURIEncoding;
+    }
+
+    /**
+     * Test if the name is a valid javascript function name
+     *
+     * @param strName 
+     * @return  true if valid
+     */
+    public static boolean isValidJavascriptFunctionName( String strName )
+    {
+        String strFunctionNamePattern = AppPropertiesService.getProperty( PROPERTY_CALLBACK_FUNCTION_NAME_PATTERN, CONSTANT_DEFAULT_FUNCTION_NAME_PATTERN );
+
+        return  ( strName != null && strName.matches( strFunctionNamePattern ) ) ;
     }
 }
