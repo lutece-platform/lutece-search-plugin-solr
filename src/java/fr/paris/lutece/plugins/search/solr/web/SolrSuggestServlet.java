@@ -34,6 +34,8 @@
 package fr.paris.lutece.plugins.search.solr.web;
 
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
+import fr.paris.lutece.plugins.search.solr.util.SolrUtil;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.SpellCheckResponse.Collation;
@@ -59,6 +61,7 @@ public class SolrSuggestServlet extends HttpServlet
 {
     private static final long serialVersionUID = -3273825949482572338L;
 
+     
     public void init(  )
     {
     }
@@ -76,6 +79,13 @@ public class SolrSuggestServlet extends HttpServlet
 
         SolrSearchEngine engine = SolrSearchEngine.getInstance(  );
         StringBuffer result = new StringBuffer(  );
+
+        // XSS control
+        if ( !SolrUtil.isValidJavascriptFunctionName( callback ) )
+        {
+            return AppPropertiesService.getProperty( SolrUtil.PROPERTY_CALLBACK_FUNCTION_NAME_ERROR_MESSAGE, "Invalid function name" ) ;
+        }
+
         result.append( callback );
 
         result.append( "({\"response\":{\"docs\":[" );
