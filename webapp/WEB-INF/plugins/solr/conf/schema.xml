@@ -55,12 +55,13 @@
     <dynamicField name="*_text" type="text" indexed="true" stored="true"/>
     <dynamicField name="*_date" type="date" indexed="true" stored="true"/>
     <dynamicField name="*_long" type="long" indexed="true" stored="true"/>
-    <dynamicField name="*_list" type="text" indexed="true" stored="true"/>
+    <dynamicField name="*_list" type="text" indexed="true" stored="true" multiValued="true"/>
     <dynamicField name="*_geojson" type="string" indexed="false" stored="true"/>
     <dynamicField name="*_geolayer" type="string" indexed="true" stored="true"/>
     <dynamicField name="*_geoloc" type="geoloc" indexed="true" stored="true"/>
     <dynamicField name="*_geoloc_0_coordinate" type="double" indexed="true" stored="true"/>
     <dynamicField name="*_geoloc_1_coordinate" type="double" indexed="true" stored="true"/>
+	<dynamicField name="*_list_date" type="date" indexed="true" stored="true" multiValued="true"/>
 
     <field name="text" type="text" indexed="true" stored="false" multiValued="true"/>
     <copyField source="title" dest="text"/>

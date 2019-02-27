@@ -69,6 +69,7 @@ public class SolrItem
     public static final String DYNAMIC_TEXT_FIELD_SUFFIX = "_text";
     public static final String DYNAMIC_URL_FIELD_SUFFIX = "_url";
     public static final String DYNAMIC_DATE_FIELD_SUFFIX = "_date";
+    public static final String DYNAMIC_LIST_DATE_FIELD_SUFFIX = "_list_date";
     public static final String DYNAMIC_LONG_FIELD_SUFFIX = "_long";
     public static final String DYNAMIC_LIST_FIELD_SUFFIX = "_list";
     public static final String DYNAMIC_GEOLOC_FIELD_SUFFIX = "_geoloc";
@@ -120,6 +121,8 @@ public class SolrItem
     private Map<String, String> _dfGeoloc;
     @Field( "*" + DYNAMIC_GEOJSON_FIELD_SUFFIX )
     private Map<String, String> _dfGeojson;
+    @Field( "*" + DYNAMIC_LIST_DATE_FIELD_SUFFIX )
+    private Map<String, List<Date>> _dfListDate;
 
     /**
     * Creates a new SolrItem
@@ -171,6 +174,10 @@ public class SolrItem
             mapDynamicFields.putAll( _dfGeojson );
         }
 
+        if ( _dfListDate != null )
+		{
+        	mapDynamicFields.putAll( _dfListDate );
+        }
         return mapDynamicFields;
     }
 
@@ -232,6 +239,21 @@ public class SolrItem
         }
 
         _dfListBox.put( strName + DYNAMIC_LIST_FIELD_SUFFIX, strValue );
+    }
+    
+    /**
+     * Add a dynamic field
+     * @param strName the name of the field
+     * @param dateValue the value of the field
+     */
+    public void addDynamicFieldListDate( String strName, List<Date> dateValue )
+    {
+        if ( _dfListDate == null )
+        {
+        	_dfListDate = new HashMap<>(  );
+        }
+
+        _dfListDate.put( strName + DYNAMIC_LIST_DATE_FIELD_SUFFIX, dateValue );
     }
 
     /**
