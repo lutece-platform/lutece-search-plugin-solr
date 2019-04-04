@@ -197,6 +197,7 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
         field.setWeight( Double.parseDouble(request.getParameter( "weight" ) ));
         field.setFacetMincount(Integer.parseInt(request.getParameter( "facetMincount" ) ));
         field.setOperator(request.getParameter( "operator" ) );
+        field.setFacetOrder( Integer.parseInt( request.getParameter( "order" ) ) );
         FieldHome.update( field );
         SolrFieldManager.reloadField(  );
 
@@ -225,7 +226,8 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
         field.setDefaultSort( false );
         field.setWeight( Double.parseDouble(request.getParameter( "weight" ) ));
         field.setFacetMincount(Integer.parseInt(request.getParameter( "facetMincount" ) ));
-
+        field.setFacetOrder( Integer.parseInt( request.getParameter( "order" ) ) );
+        
         FieldHome.create( field );
         SolrFieldManager.reloadField(  );
 

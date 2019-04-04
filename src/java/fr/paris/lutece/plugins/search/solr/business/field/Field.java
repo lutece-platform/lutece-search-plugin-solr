@@ -33,9 +33,6 @@
  */
 package fr.paris.lutece.plugins.search.solr.business.field;
 
-import org.apache.commons.lang.StringUtils;
-
-
 /**
  * This is the business class for the object Field
  */
@@ -59,6 +56,7 @@ public class Field
     private double _Weight;
     private String _strOperator;
     private int _FacetMincount;
+    private int _FacetOrder;
 
     public Field(  )
     {
@@ -72,6 +70,7 @@ public class Field
         this._DefaultSort = false;
         this._FacetMincount = 1;
         this._strOperator=OPERATOR_TYPE_AND;
+        this._FacetOrder = 0;
     }
 
     public String getSolrName(  )
@@ -289,5 +288,21 @@ public class Field
 		strOperator= !(OPERATOR_TYPE_SWITCH.equalsIgnoreCase(strOperator) || OPERATOR_TYPE_OR.equalsIgnoreCase(strOperator))  ? OPERATOR_TYPE_AND : strOperator;
 		this._FacetMincount = OPERATOR_TYPE_AND.equalsIgnoreCase(strOperator) ? 1 : 0;
 		this. _strOperator = strOperator;
+	}
+	
+	/**
+     * Returns the FacetOrder
+     * @return The FacetOrder
+     */
+	public int getFacetOrder( ) {
+		return _FacetOrder;
+	}
+
+	/**
+     * Returns the FacetOrder
+     * @return The FacetOrder
+     */
+	public void setFacetOrder( int facetOrder ) {
+		this._FacetOrder = facetOrder;
 	}
 }
