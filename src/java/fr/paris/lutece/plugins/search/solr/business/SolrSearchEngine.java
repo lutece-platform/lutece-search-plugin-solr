@@ -49,7 +49,9 @@ import fr.paris.lutece.portal.service.security.SecurityService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.util.CollectionUtil;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrClient;
@@ -62,13 +64,18 @@ import org.apache.solr.common.util.NamedList;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -221,7 +228,6 @@ public class SolrSearchEngine implements SearchEngine
 
         SolrClient solrServer = SolrServerService.getInstance(  ).getSolrServer(  );
         List<SolrSearchResult> results = new ArrayList<SolrSearchResult>(  );
-        Hashtable<Field, List<String>> myValuesList = new Hashtable<Field, List<String>>();
         
         if ( solrServer != null )
         {
@@ -235,28 +241,6 @@ public class SolrSearchEngine implements SearchEngine
             query.setFacet( true );
             query.setFacetLimit( SOLR_FACET_LIMIT );
 //            query.setFacetMinCount( 1 );
-
-            for ( Field field : SolrFieldManager.getFacetList(  ).values(  ) )
-            {
-                //Add facet Field
-                if ( field.getEnableFacet(  ) )
-                {
-                    if ( field.getName( ).equalsIgnoreCase( "date" ) || field.getName( ).toLowerCase().endsWith("_date"))
-                    {
-                        query.setParam( "facet.range", field.getName( ) );
-                        query.setParam( "facet.range.start", SOLR_FACET_DATE_START );
-                        query.setParam( "facet.range.gap", SOLR_FACET_DATE_GAP );
-                        query.setParam( "facet.range.end", SOLR_FACET_DATE_END );
-                        query.setParam( "facet.range.mincount", "0" );
-                    }
-                    else
-                    {
-                        query.addFacetField( field.getSolrName(  ) );
-                        query.setParam( "f."+field.getSolrName()+".facet.mincount",String.valueOf(field.getFacetMincount()));
-                    }
-                    myValuesList.put(field, new ArrayList<String>());
-                }
-            }
 
             //Facet intersection
             List<String> treeParam = new ArrayList<String>(  );
@@ -295,8 +279,19 @@ public class SolrSearchEngine implements SearchEngine
 
             //Treat HttpRequest
             //FacetQuery
+            List<Field> enabledFacetList = SolrFieldManager.getFacetList(  ).values(  )
+            		.stream( )
+            		.filter( f -> f.getEnableFacet( ) )
+            		.sorted(Comparator.comparing(Field::getFacetOrder).reversed())
+            		.collect( Collectors.toList( ) );
+            
             if ( facetQueries != null )
             {
+            	Hashtable<Field, List<String>> myValuesList = new Hashtable<>();
+            	for (Field tmpFieldValue: enabledFacetList)
+                {
+            		myValuesList.put(tmpFieldValue, new ArrayList<>());
+                }
                 for ( String strFacetQuery : facetQueries )
                 {
 //                    if ( strFacetQuery.contains( DATE_COLON ) )
@@ -316,12 +311,24 @@ public class SolrSearchEngine implements SearchEngine
 //                    }
                 }
                 
-                for (Field tmpFieldValue: myValuesList.keySet())
+                
+                for (Field tmpFieldValue: enabledFacetList)
                 {
-                	List<String>strValues = myValuesList.get( tmpFieldValue );
+                	List<String> strValues = myValuesList.get( tmpFieldValue );
                 	String strFacetString = "";
-                	if  (strValues.size() > 0)
+                	String exclusionTag = "";
+                	if  (CollectionUtils.isNotEmpty(strValues))
                 	{
+                		// Exclude higher order facets.
+    	            	List<String> tagToExclude = enabledFacetList.stream( )
+    	            			.filter( f -> f.getFacetOrder( ) >= tmpFieldValue.getFacetOrder( ) )
+    	            			.map( f -> "t" + f.getName( ) )
+    	            			.collect( Collectors.toList( ) );
+    	            	
+    	            	if (  CollectionUtils.isNotEmpty( tagToExclude ) ) {
+    	            		exclusionTag = "{!ex=" + tagToExclude.stream( ).collect( Collectors.joining( "," ) ) + "}";
+    	            	}
+    	            	
                 		strFacetString = extractQuery( strValues , tmpFieldValue.getOperator() );
                 		if ( tmpFieldValue.getName( ).equalsIgnoreCase( "date" ) || tmpFieldValue.getName( ).toLowerCase().endsWith("_date"))
                 		{
@@ -329,6 +336,19 @@ public class SolrSearchEngine implements SearchEngine
                 		}
                 		query.addFilterQuery( "{!tag=t" + tmpFieldValue.getName( ) +"}" + tmpFieldValue.getName( ) + ":" + strFacetString );
                 	}
+                	if ( tmpFieldValue.getName( ).equalsIgnoreCase( "date" ) || tmpFieldValue.getName( ).toLowerCase().endsWith("_date"))
+            		{
+                		query.setParam( "facet.range", exclusionTag + tmpFieldValue.getName( ) );
+ 	                    query.setParam( "facet.range.start", SOLR_FACET_DATE_START );
+ 	                    query.setParam( "facet.range.gap", SOLR_FACET_DATE_GAP );
+ 	                    query.setParam( "facet.range.end", SOLR_FACET_DATE_END );
+ 	                    query.setParam( "facet.range.mincount", "0" );
+            		}
+                	else
+	                {
+	                	query.addFacetField( exclusionTag + tmpFieldValue.getSolrName(  ) );
+	                    query.setParam( "f."+tmpFieldValue.getSolrName()+".facet.mincount",String.valueOf(tmpFieldValue.getFacetMincount()));
+	                }
                  }
             }
 
@@ -403,7 +423,14 @@ public class SolrSearchEngine implements SearchEngine
                 }
 
                 //FacetField
-                facetedResult.setFacetFields( response.getFacetFields(  ) );
+                List<FacetField> orderedFacetField = response.getFacetFields( );
+                orderedFacetField.sort((ff1, ff2) ->
+	                {
+	                	Integer order1 = findFieldOrder(enabledFacetList, ff1.getName());
+	                	Integer order2 = findFieldOrder(enabledFacetList, ff2.getName());
+	                	return order1.compareTo(order2);
+	                });
+                facetedResult.setFacetFields( orderedFacetField );
 
                 //Facet intersection (facet tree)
                 NamedList<Object> resp = (NamedList<Object>) response.getResponse(  ).get( "facet_counts" );
@@ -760,6 +787,13 @@ public class SolrSearchEngine implements SearchEngine
         filterString += ")";
 
         return filterString;
+    }
+    
+    private Integer findFieldOrder(List<Field> list, String name) {
+    		return list.stream()
+    				.filter(f -> f.getName().equals(name))
+    				.map(Field::getFacetOrder)
+    				.findFirst().orElse(0);
     }
 
     /**
