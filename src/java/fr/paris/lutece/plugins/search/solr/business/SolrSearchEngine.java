@@ -327,7 +327,7 @@ public class SolrSearchEngine implements SearchEngine
                 		{
                 			strFacetString = strFacetString.replaceAll("\"", "");
                 		}
-                		query.addFilterQuery( tmpFieldValue.getName()+":"+strFacetString );
+                		query.addFilterQuery( "{!tag=t" + tmpFieldValue.getName( ) +"}" + tmpFieldValue.getName( ) + ":" + strFacetString );
                 	}
                  }
             }
@@ -602,7 +602,7 @@ public class SolrSearchEngine implements SearchEngine
                         {
                             strFacetString = strFacetString.replaceAll("\"", "");
                         }
-                        query.addFilterQuery( tmpFieldValue.getName()+":"+strFacetString );
+                        query.addFilterQuery( "{!tag=t" + tmpFieldValue.getName( ) +"}" + tmpFieldValue.getName( ) + ":" + strFacetString );
                     }
                  }
             }
