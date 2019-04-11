@@ -48,10 +48,10 @@ import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
 public class SolrSearchAppConf
 {
     private String _strCode = SolrSearchAppConfService.EMPTY_CODE;
-    private String _strFilterQuery = SolrConstants.CONSTANT_DEFAULT_FILTER_QUERY;
     private String _strTemplate = SolrConstants.CONSTANT_DEFAULT_TEMPLATE;
     private boolean _bExtraMappingQuery = SolrConstants.CONSTANT_DEFAULT_EXTRA_MAPPING_QUERY;
     private List<String> _listAddonBeanNames = new ArrayList<String>(  );
+    private List<String> _listFilterQuery = new ArrayList<String>(  );
 
     /**
      * Returns the code
@@ -90,24 +90,6 @@ public class SolrSearchAppConf
     }
 
     /**
-     * Returns the filter query
-     * @return the filter query
-     */
-    public String getFilterQuery(  )
-    {
-        return _strFilterQuery;
-    }
-
-    /**
-     * Sets the filter query
-     * @param filter query the code
-     */
-    public void setFilterQuery( String strFilterQuery )
-    {
-        _strFilterQuery = strFilterQuery;
-    }
-
-    /**
      * Returns the boolean indicating if we need an extra query for mapping
      * @return the boolean indicating if we need an extra query for mapping
      */
@@ -137,5 +119,19 @@ public class SolrSearchAppConf
      */
     public void setAddonBeanNames(List<String> listAddonBeanNames) {
         this._listAddonBeanNames = listAddonBeanNames;
+    }
+    
+    /**
+     * @return the Filter Query list
+     */
+    public List<String> getListFilterQuery() {
+        return _listFilterQuery;
+    }
+
+    /**
+     * @param listFilterQuery the Filter Query list to set
+     */
+    public void setListFilterQuery(List<String> listFilterQuery) {
+        this._listFilterQuery = listFilterQuery;
     }
 }
