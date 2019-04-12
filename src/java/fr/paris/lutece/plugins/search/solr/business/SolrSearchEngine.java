@@ -91,6 +91,7 @@ public class SolrSearchEngine implements SearchEngine
     private static final String PROPERTY_FIELD_OR = "solr.field.or";
     private static final String PROPERTY_FIELD_SWITCH = "solr.field.switch";
     private static final String PROPERTY_FIELD_AND = "solr.field.and";
+    private static final boolean SOLR_FACET_COUNT_EXCLUDE = AppPropertiesService.getPropertyBoolean("solr.facet.count.exclude", false);
 
     //To allow the phrase to boost even with 2 words in between
     //For example "Lutece is a Framework" would match for the search "Lutece Framework"
@@ -241,9 +242,16 @@ public class SolrSearchEngine implements SearchEngine
                 //Add facet Field
                 if ( field.getEnableFacet(  ) )
                 {
+                	StringBuilder exclusionTag = new StringBuilder( );
+                	// If exclusion enabled, ignore the fq for the current facet count results.
+                	if ( SOLR_FACET_COUNT_EXCLUDE )
+                	{
+                		exclusionTag.append( "{!ex=t" ).append( field.getName() ).append( "}" );
+                	}
+                	
                     if ( field.getName( ).equalsIgnoreCase( "date" ) || field.getName( ).toLowerCase().endsWith("_date"))
                     {
-                        query.setParam( "facet.range", field.getName( ) );
+                        query.setParam( "facet.range", exclusionTag + field.getName( ) );
                         query.setParam( "facet.range.start", SOLR_FACET_DATE_START );
                         query.setParam( "facet.range.gap", SOLR_FACET_DATE_GAP );
                         query.setParam( "facet.range.end", SOLR_FACET_DATE_END );
@@ -251,7 +259,7 @@ public class SolrSearchEngine implements SearchEngine
                     }
                     else
                     {
-                        query.addFacetField( field.getSolrName(  ) );
+                        query.addFacetField( exclusionTag + field.getSolrName(  ) );
                         query.setParam( "f."+field.getSolrName()+".facet.mincount",String.valueOf(field.getFacetMincount()));
                     }
                     myValuesList.put(field, new ArrayList<String>());
@@ -327,7 +335,17 @@ public class SolrSearchEngine implements SearchEngine
                 		{
                 			strFacetString = strFacetString.replaceAll("\"", "");
                 		}
-                		query.addFilterQuery( tmpFieldValue.getName()+":"+strFacetString );
+                		
+                		StringBuilder facetFilter = new StringBuilder( tmpFieldValue.getName( ) );
+                		// If exclusion enabled, add the tag so that it can be excluded.
+                		if ( SOLR_FACET_COUNT_EXCLUDE )
+                		{
+                			StringBuilder tag = new StringBuilder( "{!tag=t" ).append( tmpFieldValue.getName( ) ).append( "}") ;
+                			facetFilter.insert( 0, tag );
+                		}
+                		facetFilter.append( ":" );
+                		facetFilter.append( strFacetString );
+                		query.addFilterQuery( facetFilter.toString( ) );
                 	}
                  }
             }
