@@ -40,19 +40,7 @@
               </td>
               <td>${field.operator}</td>
               <td>${field.isSort?string}</td>
-              <td>
-                <#if field.weight==0.0>
-                  #i18n{search.solr.adminFeature.fields.form.weight.ignored}
-                <#elseif field.weight==weight_low>
-                  #i18n{search.solr.adminFeature.fields.form.weight.low}
-                <#elseif field.weight==weight_normal>
-                  #i18n{search.solr.adminFeature.fields.form.weight.normal}
-                <#elseif field.weight==weight_high>
-                  #i18n{search.solr.adminFeature.fields.form.weight.high}
-                <#else>
-                  ${field.weight}
-                </#if>
-              </td>
+              <td>${field.weight}</td>
               <td>${field.description}</td>
               <td>
                 <form method="get" name="doFields" action="jsp/admin/search/solr/ManageSolrFields.jsp" class="form-inline">
