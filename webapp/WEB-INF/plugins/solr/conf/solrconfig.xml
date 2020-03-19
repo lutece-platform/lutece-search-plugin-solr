@@ -46,6 +46,12 @@
     <str name="queryAnalyzerFieldType">text</str>
   </searchComponent>
 
+  <updateHandler class="solr.DirectUpdateHandler2">
+      <updateLog>
+          <str name="dir">${solr.ulog.dir:}</str>
+      </updateLog>
+  </updateHandler>
+
   <requestHandler class="org.apache.solr.handler.component.SearchHandler" name="/suggest">
     <lst name="defaults">
       <str name="spellcheck">true</str>

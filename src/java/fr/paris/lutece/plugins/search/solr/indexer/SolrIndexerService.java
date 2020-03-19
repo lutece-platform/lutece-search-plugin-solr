@@ -121,6 +121,26 @@ public final class SolrIndexerService
         }
     }
 
+    private static void updateNoCommit (SolrItem solrItem, StringBuffer sbLogs )
+    {
+        try
+        {
+            sbLogs.append( "Indexing " );
+            sbLogs.append( solrItem.getType(  ) );
+            sbLogs.append( " #" );
+            sbLogs.append( solrItem.getUid(  ) );
+            sbLogs.append( " - " );
+            sbLogs.append( solrItem.getTitle(  ) );
+            SolrInputDocument solrInputDocument = solrItem2SolrInputDocumentUpdate( solrItem );
+            SOLR_SERVER.add( solrInputDocument );
+            sbLogs.append( "\r\n" );
+        }
+        catch (Exception e)
+        {
+            printIndexMessage( e, sbLogs );
+        }
+    }
+
     /**
      * Index one document, called by plugin indexers
      * @param solrItem The item
@@ -130,6 +150,11 @@ public final class SolrIndexerService
     public static void write( SolrItem solrItem ) throws CorruptIndexException, IOException
     {
         write( solrItem, _sbLogs );
+    }
+
+    public static void update( SolrItem solrItem ) throws CorruptIndexException, IOException
+    {
+        update( solrItem, _sbLogs );
     }
 
     /**
@@ -152,6 +177,19 @@ public final class SolrIndexerService
         }
     }
 
+    public static void update( SolrItem solrItem, StringBuffer sbLogs ) throws CorruptIndexException, IOException
+    {
+        try
+        {
+            updateNoCommit( solrItem, sbLogs );
+            SOLR_SERVER.commit( );
+        }
+        catch ( Exception e )
+        {
+            printIndexMessage( e, sbLogs );
+        }
+    }
+
     /**
      * Index a collection of documents, called by plugin indexers
      * @param solrItems The item
@@ -161,6 +199,11 @@ public final class SolrIndexerService
     public static void write( Collection<SolrItem> solrItems ) throws CorruptIndexException, IOException
     {
         write( solrItems, _sbLogs );
+    }
+
+    public static void update( Collection<SolrItem> solrItems ) throws CorruptIndexException, IOException
+    {
+        update( solrItems, _sbLogs );
     }
 
     /**
@@ -182,6 +225,20 @@ public final class SolrIndexerService
         catch ( Exception e )
         {
             printIndexMessage( e, sbLogs );
+        }
+    }
+
+    public static void update(Collection<SolrItem> solrItems, StringBuffer sbLogs )
+    {
+        try {
+            for ( SolrItem solrItem: solrItems ) {
+                updateNoCommit( solrItem, sbLogs );
+            }
+            SOLR_SERVER.commit( );
+        }
+        catch (Exception e)
+        {
+            printIndexMessage(e, sbLogs);
         }
     }
 
@@ -495,6 +552,25 @@ public final class SolrIndexerService
         for ( String strDynamicField : mapDynamicFields.keySet(  ) )
         {
             solrInputDocument.addField( strDynamicField, mapDynamicFields.get( strDynamicField ) );
+        }
+
+        return solrInputDocument;
+    }
+
+    private static SolrInputDocument solrItem2SolrInputDocumentUpdate (SolrItem solrItem) {
+        SolrInputDocument solrInputDocument = new SolrInputDocument(  );
+        String strWebappName = getWebAppName(  );
+
+        solrInputDocument.addField( SearchItem.FIELD_UID,
+                strWebappName + SolrConstants.CONSTANT_UNDERSCORE + solrItem.getUid(  ) );
+
+        Map<String, Object> mapDynamicFields = solrItem.getDynamicFields(  );
+
+        for ( String strDynamicField : mapDynamicFields.keySet(  ) )
+        {
+            Map<String, Object> map = new HashMap<>();
+            map.put("set", mapDynamicFields.get( strDynamicField ));
+            solrInputDocument.addField(strDynamicField, map);
         }
 
         return solrInputDocument;
