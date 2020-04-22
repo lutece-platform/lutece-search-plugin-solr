@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2015, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,17 +38,20 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 /**
-*
-*Interface ISolrSearchAppAddOn : add data to SolrSearchApp's model
-*
-*/
-public interface ISolrSearchAppAddOn {
-    
+ *
+ * Interface ISolrSearchAppAddOn : add data to SolrSearchApp's model
+ *
+ */
+public interface ISolrSearchAppAddOn
+{
+
     /**
      * Add datas to the model used by SolrSearchApp template
      *
-     * @param model The model use by document template
-     * @param request The HTTP Request
+     * @param model
+     *            The model use by document template
+     * @param request
+     *            The HTTP Request
      */
     void buildPageAddOn( Map<String, Object> model, HttpServletRequest request );
 }

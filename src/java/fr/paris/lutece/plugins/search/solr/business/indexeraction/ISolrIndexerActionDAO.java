@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,6 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 
 import java.util.List;
 
-
 /**
  *
  * IIndexerActionDAO
@@ -49,7 +48,8 @@ public interface ISolrIndexerActionDAO
     /**
      * Generates a new primary key
      *
-     * @param plugin the plugin
+     * @param plugin
+     *            the plugin
      * @return The new primary key
      */
     int newPrimaryKey( Plugin plugin );
@@ -57,31 +57,39 @@ public interface ISolrIndexerActionDAO
     /**
      * Insert a new record in the table.
      *
-     * @param indexerAction instance of the IndexerAction object to insert
-     * @param plugin the plugin
+     * @param indexerAction
+     *            instance of the IndexerAction object to insert
+     * @param plugin
+     *            the plugin
      */
     void insert( SolrIndexerAction indexerAction, Plugin plugin );
 
     /**
-     * Load the data of the IndexerAction  from the table
+     * Load the data of the IndexerAction from the table
      *
-     * @param nId The identifier of the action
-     * @param plugin the plugin
-     * @return the instance of the  IndexerAction
+     * @param nId
+     *            The identifier of the action
+     * @param plugin
+     *            the plugin
+     * @return the instance of the IndexerAction
      */
     SolrIndexerAction load( int nId, Plugin plugin );
 
     /**
      * Delete a record from the table
      *
-     * @param nId The identifier of the action
-     * @param plugin the plugin
+     * @param nId
+     *            The identifier of the action
+     * @param plugin
+     *            the plugin
      */
     void delete( int nId, Plugin plugin );
 
     /**
      * Delete a record from the table
-     * @param plugin the plugin
+     * 
+     * @param plugin
+     *            the plugin
      *
      */
     void deleteAll( Plugin plugin );
@@ -89,22 +97,29 @@ public interface ISolrIndexerActionDAO
     /**
      * Update the indexerAction in the table
      *
-     * @param indexerAction instance of the IndexerAction object to update
-     * @param plugin the plugin
+     * @param indexerAction
+     *            instance of the IndexerAction object to update
+     * @param plugin
+     *            the plugin
      */
     void store( SolrIndexerAction indexerAction, Plugin plugin );
 
     /**
      * Load the data of all indexerAction and returns them in a list
-     * @param filter the search filter
-     * @param plugin the plugin
+     * 
+     * @param filter
+     *            the search filter
+     * @param plugin
+     *            the plugin
      * @return The List which contains the data of all action
      */
     List<SolrIndexerAction> selectList( IndexerActionFilter filter, Plugin plugin );
 
     /**
      * Load the data of all indexerAction
-     * @param plugin the plugin
+     * 
+     * @param plugin
+     *            the plugin
      * @return The List which contains the data of all action
      */
     List<SolrIndexerAction> selectList( Plugin plugin );

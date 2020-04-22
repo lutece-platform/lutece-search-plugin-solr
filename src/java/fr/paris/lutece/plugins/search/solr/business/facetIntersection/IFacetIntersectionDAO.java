@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,23 +37,28 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 
 import java.util.List;
 
-
 /**
-* IFacetIntersectionDAO Interface
-*/
+ * IFacetIntersectionDAO Interface
+ */
 public interface IFacetIntersectionDAO
 {
     /**
      * Insert a new record in the table.
-     * @param facetIntersection instance of the FacetIntersection object to inssert
-     * @param plugin the Plugin
+     * 
+     * @param facetIntersection
+     *            instance of the FacetIntersection object to inssert
+     * @param plugin
+     *            the Plugin
      */
     void insert( FacetIntersection facetIntersection, Plugin plugin );
 
     /**
      * Delete a record from the table
-     * @param nIdFacetIntersection int identifier of the FacetIntersection to delete
-     * @param plugin the Plugin
+     * 
+     * @param nIdFacetIntersection
+     *            int identifier of the FacetIntersection to delete
+     * @param plugin
+     *            the Plugin
      */
     void delete( int nFacetIntersectionId, int nFacetIntersectionId2, Plugin plugin );
 
@@ -61,9 +66,11 @@ public interface IFacetIntersectionDAO
     // Finders
 
     /**
-    * Load the data of all the facetIntersection objects and returns them as a List
-    * @param plugin the Plugin
-    * @return The List which contains the data of all the facetIntersection objects
-    */
+     * Load the data of all the facetIntersection objects and returns them as a List
+     * 
+     * @param plugin
+     *            the Plugin
+     * @return The List which contains the data of all the facetIntersection objects
+     */
     List<FacetIntersection> selectFacetIntersectionsList( Plugin plugin );
 }

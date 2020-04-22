@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,15 +43,15 @@ import fr.paris.lutece.portal.service.util.AppPropertiesService;
  */
 public class SolrIndexerDaemon extends Daemon
 {
-	private static final String PROPRETY_SOLR_INCREMENTAL_INDEXING = "solr.daemon.indexer.incremental";
+    private static final String PROPRETY_SOLR_INCREMENTAL_INDEXING = "solr.daemon.indexer.incremental";
 
-	/**
-	 * 
-	 *{@inheritDoc}
-	 */
-	public void run()
-	{
-		// processindexing ==> true = CREATE, false = INCREMENTAL
-		setLastRunLogs( SolrIndexerService.processIndexing( !AppPropertiesService.getPropertyBoolean( PROPRETY_SOLR_INCREMENTAL_INDEXING, true ) ) );
-	}
+    /**
+     * 
+     * {@inheritDoc}
+     */
+    public void run( )
+    {
+        // processindexing ==> true = CREATE, false = INCREMENTAL
+        setLastRunLogs( SolrIndexerService.processIndexing( !AppPropertiesService.getPropertyBoolean( PROPRETY_SOLR_INCREMENTAL_INDEXING, true ) ) );
+    }
 }

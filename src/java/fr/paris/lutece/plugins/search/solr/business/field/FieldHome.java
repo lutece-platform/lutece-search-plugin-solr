@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,6 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 import java.util.List;
 
-
 /**
  * This class provides instances management methods (create, find, ...) for Field objects
  */
@@ -53,14 +52,16 @@ public final class FieldHome
     /**
      * Private constructor - this class need not be instantiated
      */
-    private FieldHome(  )
+    private FieldHome( )
     {
     }
 
     /**
      * Create an instance of the field class
-     * @param field The instance of the Field which contains the informations to store
-     * @return The  instance of field which has been created with its primary key.
+     * 
+     * @param field
+     *            The instance of the Field which contains the informations to store
+     * @return The instance of field which has been created with its primary key.
      */
     public static Field create( Field field )
     {
@@ -71,8 +72,10 @@ public final class FieldHome
 
     /**
      * Update of the field which is specified in parameter
-     * @param field The instance of the Field which contains the data to store
-     * @return The instance of the  field which has been updated
+     * 
+     * @param field
+     *            The instance of the Field which contains the data to store
+     * @return The instance of the field which has been updated
      */
     public static Field update( Field field )
     {
@@ -83,7 +86,9 @@ public final class FieldHome
 
     /**
      * Remove the field whose identifier is specified in parameter
-     * @param nFieldId The field Id
+     * 
+     * @param nFieldId
+     *            The field Id
      */
     public static void remove( int nFieldId )
     {
@@ -95,7 +100,9 @@ public final class FieldHome
 
     /**
      * Returns an instance of a field whose identifier is specified in parameter
-     * @param nKey The field primary key
+     * 
+     * @param nKey
+     *            The field primary key
      * @return an instance of Field
      */
     public static Field findByPrimaryKey( int nKey )
@@ -105,9 +112,10 @@ public final class FieldHome
 
     /**
      * Load the data of all the field objects and returns them in form of a list
+     * 
      * @return the list which contains the data of all the field objects
      */
-    public static List<Field> getFieldsList(  )
+    public static List<Field> getFieldsList( )
     {
         return _dao.selectFieldsList( plugin );
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,6 @@ package fr.paris.lutece.plugins.search.solr.business.indexeraction;
 
 import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
 
-
 /**
  *
  * SolrIndexerAction
@@ -49,14 +48,16 @@ public class SolrIndexerAction extends IndexerAction
      *
      * @return the type of the indexed resource
      */
-    public String getTypeResource(  )
+    public String getTypeResource( )
     {
         return _strTypeResource;
     }
 
     /**
      * set the type of the indexed resource
-     * @param strTypeResource  the type of the indexed resource
+     * 
+     * @param strTypeResource
+     *            the type of the indexed resource
      */
     public void setTypeResource( String strTypeResource )
     {

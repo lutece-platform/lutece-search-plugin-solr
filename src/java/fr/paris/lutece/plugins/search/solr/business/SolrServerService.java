@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,6 @@ import org.apache.solr.client.solrj.SolrClient;
 
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 
-
 /**
  * This service provides an instance of SolrServer.
  *
@@ -50,8 +49,7 @@ public final class SolrServerService
     private static final String PROPERTY_SOLR_TIMEOUT = "solr.server.timeout";
     private static final String SOLR_SERVER_URL = AppPropertiesService.getProperty( PROPERTY_SOLR_SERVER_URL );
     private static final int NO_MAX_CONNECTION_SET = -1;
-    private static final int SOLR_SERVER_MAX_CONNECTION = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_SERVER_MAX_CONNECTION,
-            NO_MAX_CONNECTION_SET );
+    private static final int SOLR_SERVER_MAX_CONNECTION = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_SERVER_MAX_CONNECTION, NO_MAX_CONNECTION_SET );
     private static final int SOLR_TIMEOUT = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_TIMEOUT, 60000 );
     private static SolrServerService _instance;
     private SolrClient _solrServer;
@@ -59,20 +57,21 @@ public final class SolrServerService
     /**
      * Private constructor that creates the SolrServer.
      */
-    private SolrServerService(  )
+    private SolrServerService( )
     {
         _solrServer = createSolrServer( SOLR_SERVER_URL );
     }
 
     /**
      * Return the instance.
+     * 
      * @return the instance.
      */
-    public static SolrServerService getInstance(  )
+    public static SolrServerService getInstance( )
     {
         if ( _instance == null )
         {
-            _instance = new SolrServerService(  );
+            _instance = new SolrServerService( );
         }
 
         return _instance;
@@ -80,9 +79,10 @@ public final class SolrServerService
 
     /**
      * Returns the SolrServer.
+     * 
      * @return the SolrServer
      */
-    public SolrClient getSolrServer(  )
+    public SolrClient getSolrServer( )
     {
         if ( _solrServer == null )
         {
@@ -93,10 +93,12 @@ public final class SolrServerService
     }
 
     /**
-    * Creates the SolrServer.
-    * @param strServerUrl the Solr server url
-    * @return the SolrServer.
-    */
+     * Creates the SolrServer.
+     * 
+     * @param strServerUrl
+     *            the Solr server url
+     * @return the SolrServer.
+     */
     private SolrClient createSolrServer( String strServerUrl )
     {
         HttpSolrClient solrServer = new HttpSolrClient( strServerUrl );

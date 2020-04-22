@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,6 @@ import fr.paris.lutece.util.sql.DAOUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * This class provides Data Access methods for FacetIntersection objects
  */
@@ -54,48 +53,56 @@ public final class FacetIntersectionDAO implements IFacetIntersectionDAO
 
     /**
      * Insert a new record in the table.
-     * @param facetIntersection instance of the FacetIntersection object to insert
-     * @param plugin The plugin
+     * 
+     * @param facetIntersection
+     *            instance of the FacetIntersection object to insert
+     * @param plugin
+     *            The plugin
      */
     public void insert( FacetIntersection facetIntersection, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin );
 
-        daoUtil.setInt( 1, facetIntersection.getField1(  ).getIdField(  ) );
-        daoUtil.setInt( 2, facetIntersection.getField2(  ).getIdField(  ) );
+        daoUtil.setInt( 1, facetIntersection.getField1( ).getIdField( ) );
+        daoUtil.setInt( 2, facetIntersection.getField2( ).getIdField( ) );
 
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        daoUtil.executeUpdate( );
+        daoUtil.free( );
     }
 
     /**
      * Delete a record from the table
-     * @param nFacetIntersectionId The identifier of the facetIntersection
-     * @param plugin The plugin
+     * 
+     * @param nFacetIntersectionId
+     *            The identifier of the facetIntersection
+     * @param plugin
+     *            The plugin
      */
     public void delete( int nFacetIntersectionId, int nFacetIntersectionId2, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );
         daoUtil.setInt( 1, nFacetIntersectionId );
         daoUtil.setInt( 2, nFacetIntersectionId2 );
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        daoUtil.executeUpdate( );
+        daoUtil.free( );
     }
 
     /**
      * Load the data of all the facetIntersections and returns them as a List
-     * @param plugin The plugin
+     * 
+     * @param plugin
+     *            The plugin
      * @return The List which contains the data of all the facetIntersections
      */
     public List<FacetIntersection> selectFacetIntersectionsList( Plugin plugin )
     {
-        List<FacetIntersection> facetIntersectionList = new ArrayList<FacetIntersection>(  );
+        List<FacetIntersection> facetIntersectionList = new ArrayList<FacetIntersection>( );
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin );
-        daoUtil.executeQuery(  );
+        daoUtil.executeQuery( );
 
-        while ( daoUtil.next(  ) )
+        while ( daoUtil.next( ) )
         {
-            FacetIntersection facetIntersection = new FacetIntersection(  );
+            FacetIntersection facetIntersection = new FacetIntersection( );
             Field field1 = FieldHome.findByPrimaryKey( daoUtil.getInt( 1 ) );
             Field field2 = FieldHome.findByPrimaryKey( daoUtil.getInt( 2 ) );
             facetIntersection.setField1( field1 );
@@ -104,7 +111,7 @@ public final class FacetIntersectionDAO implements IFacetIntersectionDAO
             facetIntersectionList.add( facetIntersection );
         }
 
-        daoUtil.free(  );
+        daoUtil.free( );
 
         return facetIntersectionList;
     }

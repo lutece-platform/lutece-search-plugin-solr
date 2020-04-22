@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -73,42 +73,42 @@ public class SolrPageIndexer implements SolrIndexer
     private static final String PROPERTY_INDEXER_ENABLE = "solr.indexer.page.enable";
     private static final String BEAN_PAGE_SERVICE = "pageService";
     private static final String SHORT_NAME = "page";
-    private static final List<String> LIST_RESSOURCES_NAME = new ArrayList<String>();
+    private static final List<String> LIST_RESSOURCES_NAME = new ArrayList<String>( );
     private static final String PAGE_INDEXATION_ERROR = "[SolrPageIndexer] An error occured during the indexation of the page number ";
 
     /**
      * Creates a new SolrPageIndexer
      */
-    public SolrPageIndexer()
+    public SolrPageIndexer( )
     {
-        LIST_RESSOURCES_NAME.add(SolrPageIndexerUtils.RESSOURCE_PAGE);
+        LIST_RESSOURCES_NAME.add( SolrPageIndexerUtils.RESSOURCE_PAGE );
     }
 
     /**
      * {@inheritDoc}
      */
-    public List<String> indexDocuments()
+    public List<String> indexDocuments( )
     {
-        List<Page> listPages = PageHome.getAllPages();
-        List<String> lstErrors = new ArrayList<String>();
-        List<SolrItem> lstSolrItems = new ArrayList<SolrItem>();
+        List<Page> listPages = PageHome.getAllPages( );
+        List<String> lstErrors = new ArrayList<String>( );
+        List<SolrItem> lstSolrItems = new ArrayList<SolrItem>( );
 
-        for (Page page : listPages)
+        for ( Page page : listPages )
         {
             try
             {
                 // Generates the item to index
-                SolrItem item = getItem(page, SolrIndexerService.getBaseUrl());
+                SolrItem item = getItem( page, SolrIndexerService.getBaseUrl( ) );
 
-                if (item != null)
+                if ( item != null )
                 {
-                    lstSolrItems.add(item);
+                    lstSolrItems.add( item );
                 }
             }
-            catch (Exception e)
+            catch( Exception e )
             {
-                lstErrors.add(PAGE_INDEXATION_ERROR + page.getId( ) + " : " + SolrIndexerService.buildErrorMessage(e));
-                AppLogService.error(PAGE_INDEXATION_ERROR + page.getId(), e);
+                lstErrors.add( PAGE_INDEXATION_ERROR + page.getId( ) + " : " + SolrIndexerService.buildErrorMessage( e ) );
+                AppLogService.error( PAGE_INDEXATION_ERROR + page.getId( ), e );
             }
         }
 
@@ -116,76 +116,76 @@ public class SolrPageIndexer implements SolrIndexer
         {
             SolrIndexerService.write( lstSolrItems );
         }
-        catch (Exception e)
+        catch( Exception e )
         {
-            lstErrors.add(SolrIndexerService.buildErrorMessage(e));
-            AppLogService.error(PAGE_INDEXATION_ERROR, e);
+            lstErrors.add( SolrIndexerService.buildErrorMessage( e ) );
+            AppLogService.error( PAGE_INDEXATION_ERROR, e );
         }
 
         return lstErrors;
     }
 
     /**
-     * Builds a document which will be used by Lucene during the indexing of the
-     * pages of the site with the following fields : summary, uid, url,
-     * contents, title and description.
+     * Builds a document which will be used by Lucene during the indexing of the pages of the site with the following fields : summary, uid, url, contents,
+     * title and description.
      *
      * @return the built Document
-     * @param strUrl The base URL for documents
-     * @param page the page to index
-     * @throws IOException The IO Exception
-     * @throws InterruptedException The InterruptedException
-     * @throws SiteMessageException occurs when a site message need to be
-     * displayed
+     * @param strUrl
+     *            The base URL for documents
+     * @param page
+     *            the page to index
+     * @throws IOException
+     *             The IO Exception
+     * @throws InterruptedException
+     *             The InterruptedException
+     * @throws SiteMessageException
+     *             occurs when a site message need to be displayed
      */
-    private SolrItem getItem(Page page, String strUrl)
-            throws IOException, InterruptedException, SiteMessageException
+    private SolrItem getItem( Page page, String strUrl ) throws IOException, InterruptedException, SiteMessageException
     {
         // the item
-        SolrItem item = new SolrItem();
+        SolrItem item = new SolrItem( );
 
         // indexing page content
-        String strPageContent = ((IPageService) SpringContextService.getBean(BEAN_PAGE_SERVICE)).getPageContent(page.getId(),
-                0, null);
-        ContentHandler handler = new BodyContentHandler();
-        Metadata metadata = new Metadata();
+        String strPageContent = ( (IPageService) SpringContextService.getBean( BEAN_PAGE_SERVICE ) ).getPageContent( page.getId( ), 0, null );
+        ContentHandler handler = new BodyContentHandler( );
+        Metadata metadata = new Metadata( );
         try
         {
-            new HtmlParser().parse(new ByteArrayInputStream(strPageContent.getBytes()), handler, metadata,
-                    new ParseContext());
+            new HtmlParser( ).parse( new ByteArrayInputStream( strPageContent.getBytes( ) ), handler, metadata, new ParseContext( ) );
         }
-        catch (SAXException e)
+        catch( SAXException e )
         {
-            throw new AppException("Error during page parsing.");
+            throw new AppException( "Error during page parsing." );
         }
-        catch (TikaException e)
+        catch( TikaException e )
         {
-            throw new AppException("Error during page parsing.");
+            throw new AppException( "Error during page parsing." );
         }
 
-        //the content of the article is recovered in the parser because this one
-        //had replaced the encoded caracters (as &eacute;) by the corresponding special caracter (as ?)
-        item.setContent( handler.toString() );
-        item.setTitle(page.getName());
-        item.setRole(page.getRole());
+        // the content of the article is recovered in the parser because this one
+        // had replaced the encoded caracters (as &eacute;) by the corresponding special caracter (as ?)
+        item.setContent( handler.toString( ) );
+        item.setTitle( page.getName( ) );
+        item.setRole( page.getRole( ) );
 
-        if ((page.getDescription() != null) && (page.getDescription().length() > 1))
+        if ( ( page.getDescription( ) != null ) && ( page.getDescription( ).length( ) > 1 ) )
         {
-            item.setSummary(page.getDescription());
+            item.setSummary( page.getDescription( ) );
         }
 
-        item.setType(TYPE);
-        item.setSite(SolrIndexerService.getWebAppName());
+        item.setType( TYPE );
+        item.setSite( SolrIndexerService.getWebAppName( ) );
 
-        List<String> cat = new ArrayList<String>();
-        cat.add(CATEGORIE);
-        item.setCategorie(cat);
-        item.setDate(page.getDateUpdate());
+        List<String> cat = new ArrayList<String>( );
+        cat.add( CATEGORIE );
+        item.setCategorie( cat );
+        item.setDate( page.getDateUpdate( ) );
 
-        UrlItem urlItem = new UrlItem(strUrl);
-        urlItem.addParameter(PARAMETER_PAGE_ID, page.getId());
-        item.setUrl(urlItem.getUrl());
-        item.setUid(getResourceUid(String.valueOf(page.getId()), SolrPageIndexerUtils.RESSOURCE_PAGE));
+        UrlItem urlItem = new UrlItem( strUrl );
+        urlItem.addParameter( PARAMETER_PAGE_ID, page.getId( ) );
+        item.setUrl( urlItem.getUrl( ) );
+        item.setUid( getResourceUid( String.valueOf( page.getId( ) ), SolrPageIndexerUtils.RESSOURCE_PAGE ) );
 
         return item;
     }
@@ -196,7 +196,7 @@ public class SolrPageIndexer implements SolrIndexer
      * @return the name of the indexer
      */
     @Override
-    public String getName()
+    public String getName( )
     {
         return NAME;
     }
@@ -207,7 +207,7 @@ public class SolrPageIndexer implements SolrIndexer
      * @return the version.
      */
     @Override
-    public String getVersion()
+    public String getVersion( )
     {
         return VERSION;
     }
@@ -216,7 +216,7 @@ public class SolrPageIndexer implements SolrIndexer
      * {@inheritDoc}
      */
     @Override
-    public String getDescription()
+    public String getDescription( )
     {
         return DESCRIPTION;
     }
@@ -225,16 +225,16 @@ public class SolrPageIndexer implements SolrIndexer
      * {@inheritDoc}
      */
     @Override
-    public boolean isEnable()
+    public boolean isEnable( )
     {
-        return "true".equalsIgnoreCase(AppPropertiesService.getProperty(PROPERTY_INDEXER_ENABLE));
+        return "true".equalsIgnoreCase( AppPropertiesService.getProperty( PROPERTY_INDEXER_ENABLE ) );
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<Field> getAdditionalFields()
+    public List<Field> getAdditionalFields( )
     {
         return null;
     }
@@ -243,19 +243,19 @@ public class SolrPageIndexer implements SolrIndexer
      * {@inheritDoc}
      */
     @Override
-    public List<SolrItem> getDocuments(String strIdDocument)
+    public List<SolrItem> getDocuments( String strIdDocument )
     {
-        List<SolrItem> lstItems = new ArrayList<SolrItem>();
+        List<SolrItem> lstItems = new ArrayList<SolrItem>( );
 
         try
         {
-            int nIdDocument = Integer.parseInt(strIdDocument);
-            Page page = PageHome.getPage(nIdDocument);
-            lstItems.add(getItem(page, SolrIndexerService.getBaseUrl()));
+            int nIdDocument = Integer.parseInt( strIdDocument );
+            Page page = PageHome.getPage( nIdDocument );
+            lstItems.add( getItem( page, SolrIndexerService.getBaseUrl( ) ) );
         }
-        catch (Exception e)
+        catch( Exception e )
         {
-            throw new RuntimeException(e);
+            throw new RuntimeException( e );
         }
 
         return lstItems;
@@ -265,7 +265,7 @@ public class SolrPageIndexer implements SolrIndexer
      * {@inheritDoc}
      */
     @Override
-    public List<String> getResourcesName()
+    public List<String> getResourcesName( )
     {
         return LIST_RESSOURCES_NAME;
     }
@@ -274,11 +274,11 @@ public class SolrPageIndexer implements SolrIndexer
      * {@inheritDoc}
      */
     @Override
-    public String getResourceUid(String strResourceId, String strResourceType)
+    public String getResourceUid( String strResourceId, String strResourceType )
     {
-        StringBuilder sb = new StringBuilder(strResourceId);
-        sb.append(SolrConstants.CONSTANT_UNDERSCORE).append(SHORT_NAME);
+        StringBuilder sb = new StringBuilder( strResourceId );
+        sb.append( SolrConstants.CONSTANT_UNDERSCORE ).append( SHORT_NAME );
 
-        return sb.toString();
+        return sb.toString( );
     }
 }

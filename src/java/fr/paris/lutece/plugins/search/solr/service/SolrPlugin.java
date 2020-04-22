@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,54 +43,53 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 
-
 public class SolrPlugin extends PluginDefaultImplementation
 {
     public static final String PLUGIN_NAME = "solr";
     public static final Plugin _plugin = PluginService.getPlugin( PLUGIN_NAME );
 
     @Override
-    public void init(  )
+    public void init( )
     {
-        super.init(  );
+        super.init( );
 
         // Subscribes to the EventManager
-        ResourceEventManager.register( new EventRessourceListener(  )
+        ResourceEventManager.register( new EventRessourceListener( )
+        {
+            public void updatedResource( ResourceEvent event )
             {
-                public void updatedResource( ResourceEvent event )
-                {
-                    SolrIndexerAction indexerAction = new SolrIndexerAction(  );
-                    indexerAction.setIdTask( IndexerAction.TASK_MODIFY );
-                    indexerAction.setIdDocument( event.getIdResource(  ) );
-                    indexerAction.setIdPortlet( event.getIdPortlet(  ) );
-                    indexerAction.setTypeResource( event.getTypeResource(  ) );
-                    SolrIndexerActionHome.create( indexerAction, _plugin );
-                }
+                SolrIndexerAction indexerAction = new SolrIndexerAction( );
+                indexerAction.setIdTask( IndexerAction.TASK_MODIFY );
+                indexerAction.setIdDocument( event.getIdResource( ) );
+                indexerAction.setIdPortlet( event.getIdPortlet( ) );
+                indexerAction.setTypeResource( event.getTypeResource( ) );
+                SolrIndexerActionHome.create( indexerAction, _plugin );
+            }
 
-                public void deletedResource( ResourceEvent event )
-                {
-                    SolrIndexerAction indexerAction = new SolrIndexerAction(  );
-                    indexerAction.setIdTask( IndexerAction.TASK_DELETE );
-                    indexerAction.setIdDocument( event.getIdResource(  ) );
-                    indexerAction.setIdPortlet( event.getIdPortlet(  ) );
-                    indexerAction.setTypeResource( event.getTypeResource(  ) );
-                    SolrIndexerActionHome.create( indexerAction, _plugin );
-                }
+            public void deletedResource( ResourceEvent event )
+            {
+                SolrIndexerAction indexerAction = new SolrIndexerAction( );
+                indexerAction.setIdTask( IndexerAction.TASK_DELETE );
+                indexerAction.setIdDocument( event.getIdResource( ) );
+                indexerAction.setIdPortlet( event.getIdPortlet( ) );
+                indexerAction.setTypeResource( event.getTypeResource( ) );
+                SolrIndexerActionHome.create( indexerAction, _plugin );
+            }
 
-                public void addedResource( ResourceEvent event )
-                {
-                    SolrIndexerAction indexerAction = new SolrIndexerAction(  );
-                    indexerAction.setIdTask( IndexerAction.TASK_CREATE );
-                    indexerAction.setIdDocument( event.getIdResource(  ) );
-                    indexerAction.setIdPortlet( event.getIdPortlet(  ) );
-                    indexerAction.setTypeResource( event.getTypeResource(  ) );
-                    SolrIndexerActionHome.create( indexerAction, _plugin );
-                }
+            public void addedResource( ResourceEvent event )
+            {
+                SolrIndexerAction indexerAction = new SolrIndexerAction( );
+                indexerAction.setIdTask( IndexerAction.TASK_CREATE );
+                indexerAction.setIdDocument( event.getIdResource( ) );
+                indexerAction.setIdPortlet( event.getIdPortlet( ) );
+                indexerAction.setTypeResource( event.getTypeResource( ) );
+                SolrIndexerActionHome.create( indexerAction, _plugin );
+            }
 
-                public String getName(  )
-                {
-                    return SolrPlugin.PLUGIN_NAME;
-                }
-            } );
+            public String getName( )
+            {
+                return SolrPlugin.PLUGIN_NAME;
+            }
+        } );
     }
 }

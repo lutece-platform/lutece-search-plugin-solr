@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2015, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,6 @@ import fr.paris.lutece.portal.service.datastore.DatastoreService;
 import fr.paris.lutece.util.ReferenceItem;
 import fr.paris.lutece.util.ReferenceList;
 
-
 /**
  *
  * SolrSearchApp
@@ -60,38 +59,41 @@ public class SolrSearchAppConfService
     public static SolrSearchAppConf loadConfiguration( String code )
     {
         String strSafeCode = ( code == null ) ? EMPTY_CODE : code;
-        String strPrefix = DSKEY_PREFIX + strSafeCode ;
-        ReferenceList referenceList = DatastoreService.getDataByPrefix( strPrefix + ".");
+        String strPrefix = DSKEY_PREFIX + strSafeCode;
+        ReferenceList referenceList = DatastoreService.getDataByPrefix( strPrefix + "." );
 
-        if ( referenceList.isEmpty(  ) && !EMPTY_CODE.equals( strSafeCode ) )
+        if ( referenceList.isEmpty( ) && !EMPTY_CODE.equals( strSafeCode ) )
         {
             return null;
         }
 
-        SolrSearchAppConf conf = new SolrSearchAppConf(  );
+        SolrSearchAppConf conf = new SolrSearchAppConf( );
         conf.setCode( strSafeCode );
 
         String strAddonPrefix = strPrefix + DSKEY_ADDON_BEANS;
         for ( ReferenceItem referenceItem : referenceList )
         {
-            String referenceItemCode = referenceItem.getCode(  );
-            String referenceItemName = referenceItem.getName(  );
+            String referenceItemCode = referenceItem.getCode( );
+            String referenceItemName = referenceItem.getName( );
             if ( referenceItemCode.endsWith( DSKEY_FQ ) )
             {
                 conf.setFilterQuery( referenceItemName );
             }
-            else if ( referenceItemCode.endsWith( DSKEY_TEMPLATE ) )
-            {
-                conf.setTemplate( referenceItemName );
-            }
-            else if ( referenceItemCode.endsWith( DSKEY_MAPPING ) )
-            {
-                conf.setExtraMappingQuery( SolrConstants.CONSTANT_TRUE.equals( referenceItemName ) );
-            }
-            else if ( referenceItemCode.startsWith( strAddonPrefix ) )
-            {
-                conf.getAddonBeanNames().add ( referenceItemName );
-            }
+            else
+                if ( referenceItemCode.endsWith( DSKEY_TEMPLATE ) )
+                {
+                    conf.setTemplate( referenceItemName );
+                }
+                else
+                    if ( referenceItemCode.endsWith( DSKEY_MAPPING ) )
+                    {
+                        conf.setExtraMappingQuery( SolrConstants.CONSTANT_TRUE.equals( referenceItemName ) );
+                    }
+                    else
+                        if ( referenceItemCode.startsWith( strAddonPrefix ) )
+                        {
+                            conf.getAddonBeanNames( ).add( referenceItemName );
+                        }
         }
 
         return conf;
@@ -99,16 +101,16 @@ public class SolrSearchAppConfService
 
     public static void saveConfiguration( SolrSearchAppConf conf )
     {
-        String strSafeCode = ( conf.getCode(  ) != null ) ? conf.getCode(  ) : EMPTY_CODE;
+        String strSafeCode = ( conf.getCode( ) != null ) ? conf.getCode( ) : EMPTY_CODE;
         String strPrefix = DSKEY_PREFIX + strSafeCode;
         DatastoreService.setDataValue( strPrefix + DSKEY_INSTALLED, SolrConstants.CONSTANT_TRUE );
-        DatastoreService.setDataValue( strPrefix + DSKEY_FQ, conf.getFilterQuery(  ) );
-        DatastoreService.setDataValue( strPrefix + DSKEY_TEMPLATE, conf.getTemplate(  ) );
-        DatastoreService.setDataValue( strPrefix + DSKEY_MAPPING,
-            conf.getExtraMappingQuery(  ) ? SolrConstants.CONSTANT_TRUE : SolrConstants.CONSTANT_FALSE );
-        List<String> listAddonBeanNames = conf.getAddonBeanNames();
-        for ( int i = 0; i < listAddonBeanNames.size(); i++ ) {
-            DatastoreService.setDataValue( strPrefix + DSKEY_ADDON_BEANS + i , listAddonBeanNames.get( i ) );
+        DatastoreService.setDataValue( strPrefix + DSKEY_FQ, conf.getFilterQuery( ) );
+        DatastoreService.setDataValue( strPrefix + DSKEY_TEMPLATE, conf.getTemplate( ) );
+        DatastoreService.setDataValue( strPrefix + DSKEY_MAPPING, conf.getExtraMappingQuery( ) ? SolrConstants.CONSTANT_TRUE : SolrConstants.CONSTANT_FALSE );
+        List<String> listAddonBeanNames = conf.getAddonBeanNames( );
+        for ( int i = 0; i < listAddonBeanNames.size( ); i++ )
+        {
+            DatastoreService.setDataValue( strPrefix + DSKEY_ADDON_BEANS + i, listAddonBeanNames.get( i ) );
         }
     }
 }

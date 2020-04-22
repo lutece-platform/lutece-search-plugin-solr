@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,62 +41,66 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
 /**
  *
- * SolrFacetedResult represents a list of SolrSearchResult
- * with a list of FacetField.
+ * SolrFacetedResult represents a list of SolrSearchResult with a list of FacetField.
  *
  */
 public class SolrFacetedResult
 {
-    /**Commentaire. **/
+    /** Commentaire. **/
     private List<FacetField> facetFieldsList;
 
-    /**Commentaire. **/
+    /** Commentaire. **/
     private List<SolrSearchResult> searchResultsList;
 
-    /**Commentaire. **/
+    /** Commentaire. **/
     private List<RangeFacet> facetDateList;
 
-    /**Commentaire. **/
+    /** Commentaire. **/
     private Map<String, ArrayList<FacetField>> facetIntersection;
-    
-    /**spellcheck. **/
+
+    /** spellcheck. **/
     private SpellCheckResponse solrSpellCheckResponse;
-    
+
     private int _nCount;
-    
+
     /**
      * Items count
+     * 
      * @return items count
      */
     public int getCount( )
     {
-    	return _nCount;
+        return _nCount;
     }
-    
+
     /**
      * Items count
-     * @param nCount items count
+     * 
+     * @param nCount
+     *            items count
      */
     public void setCount( int nCount )
     {
-    	_nCount = nCount;
+        _nCount = nCount;
     }
 
     /**
      * Return the FacetField List.
+     * 
      * @return the FacetField List
      */
-    public final List<FacetField> getFacetFields(  )
+    public final List<FacetField> getFacetFields( )
     {
         return facetFieldsList;
     }
 
     /**
      * Set the FacetField List.
-     * @param facetFieldsList the new FacetField List
+     * 
+     * @param facetFieldsList
+     *            the new FacetField List
      */
     public final void setFacetFields( List<FacetField> facetFieldsList )
     {
@@ -105,16 +109,19 @@ public class SolrFacetedResult
 
     /**
      * Return the SolrSearchResult List.
+     * 
      * @return the SolrSearchResult List.
      */
-    public final List<SolrSearchResult> getSolrSearchResults(  )
+    public final List<SolrSearchResult> getSolrSearchResults( )
     {
         return searchResultsList;
     }
 
     /**
      * Set the SolrSearchResult List.
-     * @param searchResultsList the new SolrSearchResult List.
+     * 
+     * @param searchResultsList
+     *            the new SolrSearchResult List.
      */
     public final void setSolrSearchResults( List<SolrSearchResult> searchResultsList )
     {
@@ -123,9 +130,10 @@ public class SolrFacetedResult
 
     /**
      * Retourne la liste de field de type date.
+     * 
      * @return Une liste de field
      */
-    public final List<RangeFacet> getFacetDateList(  )
+    public final List<RangeFacet> getFacetDateList( )
     {
         return facetDateList;
     }
@@ -135,7 +143,7 @@ public class SolrFacetedResult
         this.facetDateList = facetDateList;
     }
 
-    public final Map<String, ArrayList<FacetField>> getFacetIntersection(  )
+    public final Map<String, ArrayList<FacetField>> getFacetIntersection( )
     {
         return facetIntersection;
     }
@@ -145,11 +153,13 @@ public class SolrFacetedResult
         this.facetIntersection = facetIntersection;
     }
 
-	public SpellCheckResponse getSolrSpellCheckResponse() {
-		return this.solrSpellCheckResponse;
-	}
+    public SpellCheckResponse getSolrSpellCheckResponse( )
+    {
+        return this.solrSpellCheckResponse;
+    }
 
-	public void setSolrSpellCheckResponse(SpellCheckResponse solrSpellCheckResponse) {
-		this.solrSpellCheckResponse = solrSpellCheckResponse;
-	}
+    public void setSolrSpellCheckResponse( SpellCheckResponse solrSpellCheckResponse )
+    {
+        this.solrSpellCheckResponse = solrSpellCheckResponse;
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -50,7 +50,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
 
 /**
  *
@@ -106,7 +105,7 @@ public class SolrItem
     @Field( SearchItem.FIELD_DOCUMENT_PORTLET_ID )
     private String _strDocPortletId;
 
-    //DynamicField
+    // DynamicField
     @Field( "*" + DYNAMIC_LIST_FIELD_SUFFIX )
     private Map<String, List<String>> _dfListBox;
     @Field( "*" + DYNAMIC_TEXT_FIELD_SUFFIX )
@@ -125,19 +124,20 @@ public class SolrItem
     private Map<String, List<Date>> _dfListDate;
 
     /**
-    * Creates a new SolrItem
-    */
-    public SolrItem(  )
+     * Creates a new SolrItem
+     */
+    public SolrItem( )
     {
     }
 
     /**
      * Returns list of all dynamic fields
+     * 
      * @return the list of all dynamic fields
      */
-    public Map<String, Object> getDynamicFields(  )
+    public Map<String, Object> getDynamicFields( )
     {
-        Map<String, Object> mapDynamicFields = new HashMap<String, Object>(  );
+        Map<String, Object> mapDynamicFields = new HashMap<String, Object>( );
 
         if ( _dfString != null )
         {
@@ -175,22 +175,25 @@ public class SolrItem
         }
 
         if ( _dfListDate != null )
-		{
-        	mapDynamicFields.putAll( _dfListDate );
+        {
+            mapDynamicFields.putAll( _dfListDate );
         }
         return mapDynamicFields;
     }
 
     /**
      * Add a dynamic field
-     * @param strName the name of the field
-     * @param dValue the value of the field
+     * 
+     * @param strName
+     *            the name of the field
+     * @param dValue
+     *            the value of the field
      */
     public void addDynamicField( String strName, Date dValue )
     {
         if ( _dfDate == null )
         {
-            _dfDate = new HashMap<String, Date>(  );
+            _dfDate = new HashMap<String, Date>( );
         }
 
         _dfDate.put( strName + DYNAMIC_DATE_FIELD_SUFFIX, dValue );
@@ -198,14 +201,17 @@ public class SolrItem
 
     /**
      * Add a dynamic field
-     * @param strName the name of the field
-     * @param dValue the value of the field
+     * 
+     * @param strName
+     *            the name of the field
+     * @param dValue
+     *            the value of the field
      */
     public void addDynamicField( String strName, Long lValue )
     {
         if ( _dfNumericText == null )
         {
-            _dfNumericText = new HashMap<String, Long>(  );
+            _dfNumericText = new HashMap<String, Long>( );
         }
 
         _dfNumericText.put( strName + DYNAMIC_LONG_FIELD_SUFFIX, lValue );
@@ -213,14 +219,17 @@ public class SolrItem
 
     /**
      * Add a dynamic field
-     * @param strName the name of the field
-     * @param dValue the value of the field
+     * 
+     * @param strName
+     *            the name of the field
+     * @param dValue
+     *            the value of the field
      */
     public void addDynamicField( String strName, String strValue )
     {
         if ( _dfText == null )
         {
-            _dfText = new HashMap<String, String>(  );
+            _dfText = new HashMap<String, String>( );
         }
 
         _dfText.put( strName + DYNAMIC_TEXT_FIELD_SUFFIX, strValue );
@@ -228,29 +237,35 @@ public class SolrItem
 
     /**
      * Add a dynamic field
-     * @param strName the name of the field
-     * @param dValue the value of the field
+     * 
+     * @param strName
+     *            the name of the field
+     * @param dValue
+     *            the value of the field
      */
     public void addDynamicField( String strName, List<String> strValue )
     {
         if ( _dfListBox == null )
         {
-            _dfListBox = new HashMap<String, List<String>>(  );
+            _dfListBox = new HashMap<String, List<String>>( );
         }
 
         _dfListBox.put( strName + DYNAMIC_LIST_FIELD_SUFFIX, strValue );
     }
-    
+
     /**
      * Add a dynamic field
-     * @param strName the name of the field
-     * @param dateValue the value of the field
+     * 
+     * @param strName
+     *            the name of the field
+     * @param dateValue
+     *            the value of the field
      */
     public void addDynamicFieldListDate( String strName, List<Date> dateValue )
     {
         if ( _dfListDate == null )
         {
-        	_dfListDate = new HashMap<>(  );
+            _dfListDate = new HashMap<>( );
         }
 
         _dfListDate.put( strName + DYNAMIC_LIST_DATE_FIELD_SUFFIX, dateValue );
@@ -258,14 +273,17 @@ public class SolrItem
 
     /**
      * Add a dynamic field
-     * @param strName the name of the field
-     * @param dValue the value of the field
+     * 
+     * @param strName
+     *            the name of the field
+     * @param dValue
+     *            the value of the field
      */
     public void addDynamicFieldNotAnalysed( String strName, String strValue )
     {
         if ( _dfString == null )
         {
-            _dfString = new HashMap<String, String>(  );
+            _dfString = new HashMap<String, String>( );
         }
 
         _dfString.put( strName + DYNAMIC_STRING_FIELD_SUFFIX, strValue );
@@ -273,63 +291,84 @@ public class SolrItem
 
     /**
      * Add a dynamic field
-     * @param strName the name of the field
-     * @param geolocItem a GeolocItem
-     * @param codeDocumentType the codeDocumentType
+     * 
+     * @param strName
+     *            the name of the field
+     * @param geolocItem
+     *            a GeolocItem
+     * @param codeDocumentType
+     *            the codeDocumentType
      */
-    public void addDynamicFieldGeoloc( String strName, GeolocItem geolocItem, String codeDocumentType ) {
-        if ( geolocItem.getIcon(  ) == null )
+    public void addDynamicFieldGeoloc( String strName, GeolocItem geolocItem, String codeDocumentType )
+    {
+        if ( geolocItem.getIcon( ) == null )
         {
             geolocItem.setIcon( codeDocumentType + "-" + strName );
         }
 
-        List<Double> coordinates = geolocItem.getLonLat();
+        List<Double> coordinates = geolocItem.getLonLat( );
         if ( coordinates != null )
         {
             if ( _dfGeoloc == null )
             {
-                _dfGeoloc = new HashMap<String, String>(  );
+                _dfGeoloc = new HashMap<String, String>( );
             }
 
             if ( _dfGeojson == null )
             {
-                _dfGeojson = new HashMap<String, String>(  );
+                _dfGeojson = new HashMap<String, String>( );
             }
 
-            String strCoordinates = String.format( Locale.ENGLISH, "%.6f,%.6f", coordinates.get(1), coordinates.get(0) );
+            String strCoordinates = String.format( Locale.ENGLISH, "%.6f,%.6f", coordinates.get( 1 ), coordinates.get( 0 ) );
             _dfGeoloc.put( strName + DYNAMIC_GEOLOC_FIELD_SUFFIX, strCoordinates );
 
-            _dfGeojson.put( strName + DYNAMIC_GEOJSON_FIELD_SUFFIX, geolocItem.toJSON(  ) );
+            _dfGeojson.put( strName + DYNAMIC_GEOJSON_FIELD_SUFFIX, geolocItem.toJSON( ) );
 
-            if (geolocItem.getAddress() != null) {
-                addDynamicField( strName + DYNAMIC_GEOJSON_ADDRESS_FIELD_SUFFIX , geolocItem.getAddress() );
+            if ( geolocItem.getAddress( ) != null )
+            {
+                addDynamicField( strName + DYNAMIC_GEOJSON_ADDRESS_FIELD_SUFFIX, geolocItem.getAddress( ) );
             }
         }
     }
+
     /**
      * Add a dynamic field
-     * @param strName the name of the field
-     * @param strAdress the adress of the field
-     * @param dLongitude the longitude of the field
-     * @param dLatitude the latitude of the field
-     * @param codeDocumentType the codeDocumentType
+     * 
+     * @param strName
+     *            the name of the field
+     * @param strAdress
+     *            the adress of the field
+     * @param dLongitude
+     *            the longitude of the field
+     * @param dLatitude
+     *            the latitude of the field
+     * @param codeDocumentType
+     *            the codeDocumentType
      */
-    public void addDynamicFieldGeoloc( String strName, String strAdress, double dLongitude, double dLatitude, String codeDocumentType ) {
-        GeolocItem geolocItem = new GeolocItem();
-        HashMap<String, Object> properties = new HashMap<String, Object>(  );
+    public void addDynamicFieldGeoloc( String strName, String strAdress, double dLongitude, double dLatitude, String codeDocumentType )
+    {
+        GeolocItem geolocItem = new GeolocItem( );
+        HashMap<String, Object> properties = new HashMap<String, Object>( );
         properties.put( GeolocItem.PATH_PROPERTIES_ADDRESS, strAdress );
 
-        HashMap<String, Object> geometry = new HashMap<String, Object>(  );
-        geometry.put( GeolocItem.PATH_GEOMETRY_COORDINATES, Arrays.asList( new Double[] { dLongitude, dLatitude } ) );
+        HashMap<String, Object> geometry = new HashMap<String, Object>( );
+        geometry.put( GeolocItem.PATH_GEOMETRY_COORDINATES, Arrays.asList( new Double [ ] {
+                dLongitude, dLatitude
+        } ) );
         geolocItem.setGeometry( geometry );
         geolocItem.setProperties( properties );
         addDynamicFieldGeoloc( strName, geolocItem, codeDocumentType );
     }
+
     /**
      * Add a dynamic field
-     * @param strName the name of the field
-     * @param strValue the value of the field which should be a geojson string
-     * @param codeDocumentType the codeDocumentType
+     * 
+     * @param strName
+     *            the name of the field
+     * @param strValue
+     *            the value of the field which should be a geojson string
+     * @param codeDocumentType
+     *            the codeDocumentType
      */
     public void addDynamicFieldGeoloc( String strName, String strValue, String codeDocumentType )
     {
@@ -337,9 +376,9 @@ public class SolrItem
 
         try
         {
-            object = new ObjectMapper(  ).readTree( strValue );
+            object = new ObjectMapper( ).readTree( strValue );
         }
-        catch ( IOException e )
+        catch( IOException e )
         {
             AppLogService.error( "SolrItem: exception during GEOJSON parsing : " + strValue + " : " + e );
 
@@ -348,45 +387,43 @@ public class SolrItem
 
         JsonNode objCoordinates = object.path( GEOLOC_JSON_PATH_GEOMETRY ).path( GEOLOC_JSON_PATH_GEOMETRY_COORDINATES );
 
-        if ( objCoordinates.isMissingNode(  ) )
+        if ( objCoordinates.isMissingNode( ) )
         {
             AppLogService.error( "SolrItem: missing coordinates : " + strValue );
         }
         else
         {
-            if ( !objCoordinates.isArray(  ) )
+            if ( !objCoordinates.isArray( ) )
             {
                 AppLogService.error( "SolrItem: coordinates not an array : " + strValue );
             }
             else
             {
-                double[] parsedCoordinates = new double[2];
-                Iterator<JsonNode> it = objCoordinates.getElements(  );
+                double [ ] parsedCoordinates = new double [ 2];
+                Iterator<JsonNode> it = objCoordinates.getElements( );
                 boolean bCoordinatesOk = true;
 
                 for ( int i = 0; i < parsedCoordinates.length; i++ )
                 {
-                    if ( !it.hasNext(  ) )
+                    if ( !it.hasNext( ) )
                     {
-                        AppLogService.error( "SolrItem: coordinates array too short : " + strValue + " at element " +
-                            Integer.toString( i ) );
+                        AppLogService.error( "SolrItem: coordinates array too short : " + strValue + " at element " + Integer.toString( i ) );
                         bCoordinatesOk = false;
 
                         break;
                     }
 
-                    JsonNode node = it.next(  );
+                    JsonNode node = it.next( );
 
-                    if ( !node.isNumber(  ) )
+                    if ( !node.isNumber( ) )
                     {
-                        AppLogService.error( "SolrItem: coordinate not a number : " + strValue + " at element " +
-                            Integer.toString( i ) );
+                        AppLogService.error( "SolrItem: coordinate not a number : " + strValue + " at element " + Integer.toString( i ) );
                         bCoordinatesOk = false;
 
                         break;
                     }
 
-                    parsedCoordinates[i] = node.asDouble(  );
+                    parsedCoordinates [i] = node.asDouble( );
                 }
 
             }
@@ -398,27 +435,31 @@ public class SolrItem
         {
             geolocItem = GeolocItem.fromJSON( strValue );
         }
-        catch ( IOException e )
+        catch( IOException e )
         {
             AppLogService.error( "SolrItem: Error parsing JSON: " + strValue + "exception: " + e );
         }
-        if ( geolocItem != null ) {
-            addDynamicFieldGeoloc(strName, geolocItem, codeDocumentType);
+        if ( geolocItem != null )
+        {
+            addDynamicFieldGeoloc( strName, geolocItem, codeDocumentType );
         }
     }
 
     /**
-    * Gets the url
-    * @return the url
-    */
-    public String getUrl(  )
+     * Gets the url
+     * 
+     * @return the url
+     */
+    public String getUrl( )
     {
         return _strUrl;
     }
 
     /**
      * Sets the url
-     * @param strUrl the url
+     * 
+     * @param strUrl
+     *            the url
      */
     public void setUrl( String strUrl )
     {
@@ -427,16 +468,19 @@ public class SolrItem
 
     /**
      * Return the date
+     * 
      * @return the date
      */
-    public Date getDate(  )
+    public Date getDate( )
     {
         return _lDate;
     }
 
     /**
      * Sets the date
-     * @param lDate the date
+     * 
+     * @param lDate
+     *            the date
      */
     public void setDate( Date lDate )
     {
@@ -445,16 +489,19 @@ public class SolrItem
 
     /**
      * Gets the title
+     * 
      * @return the title
      */
-    public String getTitle(  )
+    public String getTitle( )
     {
         return _strTitle;
     }
 
     /**
      * Sets the title
-     * @param strTitle the title
+     * 
+     * @param strTitle
+     *            the title
      */
     public void setTitle( String strTitle )
     {
@@ -463,16 +510,19 @@ public class SolrItem
 
     /**
      * Gets the id
+     * 
      * @return the id
      */
-    public String getUid(  )
+    public String getUid( )
     {
         return _strUid;
     }
 
     /**
      * Sets the id
-     * @param strUid the id
+     * 
+     * @param strUid
+     *            the id
      */
     public void setUid( String strUid )
     {
@@ -481,16 +531,19 @@ public class SolrItem
 
     /**
      * Gets the content
+     * 
      * @return the content
      */
-    public String getContent(  )
+    public String getContent( )
     {
         return _strContent;
     }
 
     /**
      * Sets the content
-     * @param strContent the content
+     * 
+     * @param strContent
+     *            the content
      */
     public void setContent( String strContent )
     {
@@ -499,16 +552,19 @@ public class SolrItem
 
     /**
      * Gets the site
+     * 
      * @return the site name
      */
-    public String getSite(  )
+    public String getSite( )
     {
         return _strSite;
     }
 
     /**
      * Sets the site name
-     * @param strSite the site name
+     * 
+     * @param strSite
+     *            the site name
      */
     public void setSite( String strSite )
     {
@@ -517,16 +573,19 @@ public class SolrItem
 
     /**
      * Gets the summary
+     * 
      * @return the summary
      */
-    public String getSummary(  )
+    public String getSummary( )
     {
         return _strSummary;
     }
 
     /**
      * Sets the summary
-     * @param strSummary the summary
+     * 
+     * @param strSummary
+     *            the summary
      */
     public void setSummary( String strSummary )
     {
@@ -535,16 +594,19 @@ public class SolrItem
 
     /**
      * Gets the type
+     * 
      * @return the type
      */
-    public String getType(  )
+    public String getType( )
     {
         return _strType;
     }
 
     /**
      * Sets the type
-     * @param strType the type
+     * 
+     * @param strType
+     *            the type
      */
     public void setType( String strType )
     {
@@ -553,23 +615,26 @@ public class SolrItem
 
     /**
      * Gets the role
+     * 
      * @return the role
      */
-    public String getRole(  )
+    public String getRole( )
     {
         return _strRole;
     }
 
     /**
      * Sets the role
-     * @param strRole the role
+     * 
+     * @param strRole
+     *            the role
      */
     public void setRole( String strRole )
     {
         _strRole = strRole;
     }
 
-    public String getXmlContent(  )
+    public String getXmlContent( )
     {
         return _strXmlContent;
     }
@@ -579,7 +644,7 @@ public class SolrItem
         _strXmlContent = strXmlContent;
     }
 
-    public List<String> getCategorie(  )
+    public List<String> getCategorie( )
     {
         return _strCategorie;
     }
@@ -589,7 +654,7 @@ public class SolrItem
         _strCategorie = strCategorie;
     }
 
-    public String getHieDate(  )
+    public String getHieDate( )
     {
         return _strHieDate;
     }
@@ -601,16 +666,19 @@ public class SolrItem
 
     /**
      * Gets the metadata
+     * 
      * @return the metadata
      */
-    public String getMetadata(  )
+    public String getMetadata( )
     {
         return _strMetadata;
     }
 
     /**
      * Sets the metadata
-     * @param strMetadata the metadata
+     * 
+     * @param strMetadata
+     *            the metadata
      */
     public void setMetadata( String strMetadata )
     {
@@ -619,16 +687,19 @@ public class SolrItem
 
     /**
      * Gets the portlet document id
+     * 
      * @return the portlet document id
      */
-    public String getDocPortletId(  )
+    public String getDocPortletId( )
     {
         return _strDocPortletId;
     }
 
     /**
      * Sets the portlet document id
-     * @param strDocPortletId the portlet document id
+     * 
+     * @param strDocPortletId
+     *            the portlet document id
      */
     public void setDocPortletId( String strDocPortletId )
     {

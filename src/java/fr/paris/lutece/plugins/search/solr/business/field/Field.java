@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
+ * Copyright (c) 2002-2020, City of Paris
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
  *
@@ -33,19 +33,15 @@
  */
 package fr.paris.lutece.plugins.search.solr.business.field;
 
-import org.apache.commons.lang.StringUtils;
-
-
 /**
  * This is the business class for the object Field
  */
 public class Field
 {
-    // Variables declarations 
-	public static final String OPERATOR_TYPE_OR = "OR";
-	public static final String OPERATOR_TYPE_SWITCH = "SWITCH";
-	public static final String OPERATOR_TYPE_AND = "AND";
-
+    // Variables declarations
+    public static final String OPERATOR_TYPE_OR = "OR";
+    public static final String OPERATOR_TYPE_SWITCH = "SWITCH";
+    public static final String OPERATOR_TYPE_AND = "AND";
 
     private int _nIdField;
     private String _strName;
@@ -60,7 +56,7 @@ public class Field
     private String _strOperator;
     private int _FacetMincount;
 
-    public Field(  )
+    public Field( )
     {
         this._strName = "";
         this._strLabel = "";
@@ -71,26 +67,29 @@ public class Field
         this._EnableSort = false;
         this._DefaultSort = false;
         this._FacetMincount = 1;
-        this._strOperator=OPERATOR_TYPE_AND;
+        this._strOperator = OPERATOR_TYPE_AND;
     }
 
-    public String getSolrName(  )
+    public String getSolrName( )
     {
         return this._strName;
     }
 
     /**
      * Returns the IdField
+     * 
      * @return The IdField
      */
-    public int getIdField(  )
+    public int getIdField( )
     {
         return _nIdField;
     }
 
     /**
      * Sets the IdField
-     * @param nIdField The IdField
+     * 
+     * @param nIdField
+     *            The IdField
      */
     public void setIdField( int nIdField )
     {
@@ -99,16 +98,19 @@ public class Field
 
     /**
      * Returns the Name
+     * 
      * @return The Name
      */
-    public String getName(  )
+    public String getName( )
     {
         return _strName;
     }
 
     /**
      * Sets the Name
-     * @param strName The Name
+     * 
+     * @param strName
+     *            The Name
      */
     public void setName( String strName )
     {
@@ -117,16 +119,19 @@ public class Field
 
     /**
      * Returns the Label
+     * 
      * @return The Label
      */
-    public String getLabel(  )
+    public String getLabel( )
     {
         return _strLabel;
     }
 
     /**
      * Sets the Label
-     * @param strLabel The Label
+     * 
+     * @param strLabel
+     *            The Label
      */
     public void setLabel( String strLabel )
     {
@@ -135,16 +140,19 @@ public class Field
 
     /**
      * Returns the Description
+     * 
      * @return The Description
      */
-    public String getDescription(  )
+    public String getDescription( )
     {
         return _strDescription;
     }
 
     /**
      * Sets the Description
-     * @param strDescription The Description
+     * 
+     * @param strDescription
+     *            The Description
      */
     public void setDescription( String strDescription )
     {
@@ -153,16 +161,19 @@ public class Field
 
     /**
      * Returns the IsFacet
+     * 
      * @return The IsFacet
      */
-    public boolean getIsFacet(  )
+    public boolean getIsFacet( )
     {
         return _IsFacet;
     }
 
     /**
      * Sets the IsFacet
-     * @param IsFacet The IsFacet
+     * 
+     * @param IsFacet
+     *            The IsFacet
      */
     public void setIsFacet( boolean IsFacet )
     {
@@ -171,16 +182,19 @@ public class Field
 
     /**
      * Returns the EnableFacet
+     * 
      * @return The EnableFacet
      */
-    public boolean getEnableFacet(  )
+    public boolean getEnableFacet( )
     {
         return _EnableFacet;
     }
 
     /**
      * Sets the EnableFacet
-     * @param EnableFacet The EnableFacet
+     * 
+     * @param EnableFacet
+     *            The EnableFacet
      */
     public void setEnableFacet( boolean EnableFacet )
     {
@@ -189,16 +203,19 @@ public class Field
 
     /**
      * Returns the IsSort
+     * 
      * @return The IsSort
      */
-    public boolean getIsSort(  )
+    public boolean getIsSort( )
     {
         return _IsSort;
     }
 
     /**
      * Sets the IsSort
-     * @param IsSort The IsSort
+     * 
+     * @param IsSort
+     *            The IsSort
      */
     public void setIsSort( boolean IsSort )
     {
@@ -207,16 +224,19 @@ public class Field
 
     /**
      * Returns the EnableSort
+     * 
      * @return The EnableSort
      */
-    public boolean getEnableSort(  )
+    public boolean getEnableSort( )
     {
         return _EnableSort;
     }
 
     /**
      * Sets the EnableSort
-     * @param EnableSort The EnableSort
+     * 
+     * @param EnableSort
+     *            The EnableSort
      */
     public void setEnableSort( boolean EnableSort )
     {
@@ -225,16 +245,19 @@ public class Field
 
     /**
      * Returns the DefaultSort
+     * 
      * @return The DefaultSort
      */
-    public boolean getDefaultSort(  )
+    public boolean getDefaultSort( )
     {
         return _DefaultSort;
     }
 
     /**
      * Sets the DefaultSort
-     * @param DefaultSort The DefaultSort
+     * 
+     * @param DefaultSort
+     *            The DefaultSort
      */
     public void setDefaultSort( boolean DefaultSort )
     {
@@ -243,51 +266,65 @@ public class Field
 
     /**
      * Sets the weight
-     * @param Weight The Weight
+     * 
+     * @param Weight
+     *            The Weight
      */
-	public void setWeight( double dWeight ) {
-		_Weight = dWeight;
-	}
-	
-	/**
+    public void setWeight( double dWeight )
+    {
+        _Weight = dWeight;
+    }
+
+    /**
      * Returns the weight
+     * 
      * @return The weight
      */
-    public double getWeight(  )
+    public double getWeight( )
     {
         return _Weight;
     }
 
     /**
      * Returns the FacetteMincount
+     * 
      * @return The FacetteMincount
      */
-	public int getFacetMincount() {
-		return _FacetMincount;
-	}
+    public int getFacetMincount( )
+    {
+        return _FacetMincount;
+    }
 
-	/**
+    /**
      * Returns the FacetMincount
+     * 
      * @return The FacetteMincount
      */
-	public void setFacetMincount(int facetMincount) {
-		this._FacetMincount = facetMincount;
-	}
-	
-	/**
-	 * Return operator
-	 * @return The Operator
-	 */
-	public String getOperator() {
-		return _strOperator;
-	}
-	/**
-	 * Set the operator
-	 * @param strOperator
-	 */
-	public void setOperator(String strOperator) {
-		strOperator= !(OPERATOR_TYPE_SWITCH.equalsIgnoreCase(strOperator) || OPERATOR_TYPE_OR.equalsIgnoreCase(strOperator))  ? OPERATOR_TYPE_AND : strOperator;
-		this._FacetMincount = OPERATOR_TYPE_AND.equalsIgnoreCase(strOperator) ? 1 : 0;
-		this. _strOperator = strOperator;
-	}
+    public void setFacetMincount( int facetMincount )
+    {
+        this._FacetMincount = facetMincount;
+    }
+
+    /**
+     * Return operator
+     * 
+     * @return The Operator
+     */
+    public String getOperator( )
+    {
+        return _strOperator;
+    }
+
+    /**
+     * Set the operator
+     * 
+     * @param strOperator
+     */
+    public void setOperator( String strOperator )
+    {
+        strOperator = !( OPERATOR_TYPE_SWITCH.equalsIgnoreCase( strOperator ) || OPERATOR_TYPE_OR.equalsIgnoreCase( strOperator ) ) ? OPERATOR_TYPE_AND
+                : strOperator;
+        this._FacetMincount = OPERATOR_TYPE_AND.equalsIgnoreCase( strOperator ) ? 1 : 0;
+        this._strOperator = strOperator;
+    }
 }

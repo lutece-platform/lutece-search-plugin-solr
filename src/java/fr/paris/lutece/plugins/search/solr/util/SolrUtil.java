@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-
 /**
  *
  * Util class for Solr search.
@@ -73,70 +72,74 @@ public final class SolrUtil
     /**
      * Empty private constructor
      */
-    private SolrUtil(  )
+    private SolrUtil( )
     {
     }
 
     /**
      * Transform a DocumentList to SearchResult List.
-     * @param documentList the document list to transform
+     * 
+     * @param documentList
+     *            the document list to transform
      * @return a SearchResult List.
      */
     public static List<SearchResult> transformSolrDocumentList( SolrDocumentList documentList )
     {
-        Map<String, SearchResult> mapResults = new HashMap<String, SearchResult>(  );
+        Map<String, SearchResult> mapResults = new HashMap<String, SearchResult>( );
 
         for ( SolrDocument document : documentList )
         {
             SolrSearchItem searchItem = new SolrSearchItem( document );
-            SearchResult searchResult = new SearchResult(  );
-            searchResult.setId( searchItem.getId(  ) );
-            searchResult.setSummary( searchItem.getSummary(  ) );
-            searchResult.setTitle( searchItem.getTitle(  ) );
-            searchResult.setType( searchItem.getType(  ) );
-            searchResult.setUrl( searchItem.getUrl(  ) );
-            searchResult.setDate( searchItem.getDate(  ) );
-            searchResult.setRole( new ArrayList<String>(  ) );
-            mapResults.put( searchResult.getUrl(  ), searchResult );
+            SearchResult searchResult = new SearchResult( );
+            searchResult.setId( searchItem.getId( ) );
+            searchResult.setSummary( searchItem.getSummary( ) );
+            searchResult.setTitle( searchItem.getTitle( ) );
+            searchResult.setType( searchItem.getType( ) );
+            searchResult.setUrl( searchItem.getUrl( ) );
+            searchResult.setDate( searchItem.getDate( ) );
+            searchResult.setRole( new ArrayList<String>( ) );
+            mapResults.put( searchResult.getUrl( ), searchResult );
         }
 
-        return new ArrayList<SearchResult>( mapResults.values(  ) );
+        return new ArrayList<SearchResult>( mapResults.values( ) );
     }
 
     /**
      * Transforms a list of SolrItems to SolrSearchResults List.
-     * @param itemList the SolrItem List.
-     * @param highlights the SolrHighlights.
+     * 
+     * @param itemList
+     *            the SolrItem List.
+     * @param highlights
+     *            the SolrHighlights.
      * @return SolrSearchResult List.
      */
-    public static List<SolrSearchResult> transformSolrItemsToSolrSearchResults( List<SolrItem> itemList,
-        SolrHighlights highlights )
+    public static List<SolrSearchResult> transformSolrItemsToSolrSearchResults( List<SolrItem> itemList, SolrHighlights highlights )
     {
-        List<SolrSearchResult> resultList = new ArrayList<SolrSearchResult>( itemList.size(  ) );
+        List<SolrSearchResult> resultList = new ArrayList<SolrSearchResult>( itemList.size( ) );
 
         for ( SolrItem item : itemList )
         {
-            SolrSearchResult searchResult = new SolrSearchResult(  );
-            searchResult.setDate( item.getDate(  ) );
-            searchResult.setId( item.getUid(  ) );
-            searchResult.setRole( new ArrayList<String>(  ) );
-            searchResult.setSummary( item.getSummary(  ) );
-            searchResult.setSite( item.getSite(  ) );
-            searchResult.setTitle( item.getTitle(  ) );
-            searchResult.setType( item.getType(  ) );
-            searchResult.setUrl( item.getUrl(  ) );
-            searchResult.setCategorie( item.getCategorie(  ) );
-            searchResult.setXmlContent( item.getXmlContent(  ) );
-            searchResult.setMetadata( item.getMetadata(  ) );
-            searchResult.setDocPortletId( item.getDocPortletId(  ) );
-            searchResult.setHieDate( item.getHieDate(  ) );
+            SolrSearchResult searchResult = new SolrSearchResult( );
+            searchResult.setDate( item.getDate( ) );
+            searchResult.setId( item.getUid( ) );
+            searchResult.setRole( new ArrayList<String>( ) );
+            searchResult.setSummary( item.getSummary( ) );
+            searchResult.setSite( item.getSite( ) );
+            searchResult.setTitle( item.getTitle( ) );
+            searchResult.setType( item.getType( ) );
+            searchResult.setUrl( item.getUrl( ) );
+            searchResult.setCategorie( item.getCategorie( ) );
+            searchResult.setXmlContent( item.getXmlContent( ) );
+            searchResult.setMetadata( item.getMetadata( ) );
+            searchResult.setDocPortletId( item.getDocPortletId( ) );
+            searchResult.setHieDate( item.getHieDate( ) );
 
             // The name of the dynamic fields is like NAME_XXX where XXX is a SolrItem dynamic field type
-            searchResult.setDynamicFields( item.getDynamicFields(  ) );
+            searchResult.setDynamicFields( item.getDynamicFields( ) );
 
             if ( highlights != null )
             {
-                searchResult.setHighlight( highlights.getHighlights( searchResult.getId(  ) ) );
+                searchResult.setHighlight( highlights.getHighlights( searchResult.getId( ) ) );
             }
 
             resultList.add( searchResult );
@@ -147,7 +150,9 @@ public final class SolrUtil
 
     /**
      * encode url
-     * @param strSource source
+     * 
+     * @param strSource
+     *            source
      * @return encoded url, null otherwise
      */
     public static String encodeUrl( String strSource )
@@ -156,7 +161,7 @@ public final class SolrUtil
         {
             return encodeUrl( null, strSource );
         }
-        catch ( SiteMessageException sme )
+        catch( SiteMessageException sme )
         {
             return null;
         }
@@ -164,23 +169,26 @@ public final class SolrUtil
 
     /**
      * Encode an url string
-     * @param strSource The string to encode
-     * @param request the http request (can be null)
+     * 
+     * @param strSource
+     *            The string to encode
+     * @param request
+     *            the http request (can be null)
      * @return The encoded string
-     * @throws SiteMessageException exception and request != null
+     * @throws SiteMessageException
+     *             exception and request != null
      */
-    public static String encodeUrl( HttpServletRequest request, String strSource )
-        throws SiteMessageException
+    public static String encodeUrl( HttpServletRequest request, String strSource ) throws SiteMessageException
     {
         String strEncoded = SolrConstants.CONSTANT_EMPTY_STRING;
 
         try
         {
-            strEncoded = URLEncoder.encode( strSource, getEncoding(  ) );
+            strEncoded = URLEncoder.encode( strSource, getEncoding( ) );
         }
-        catch ( UnsupportedEncodingException e )
+        catch( UnsupportedEncodingException e )
         {
-            AppLogService.error( e.getMessage(  ), e );
+            AppLogService.error( e.getMessage( ), e );
 
             if ( request != null )
             {
@@ -193,9 +201,10 @@ public final class SolrUtil
 
     /**
      * Return the encoding define in the properties
+     * 
      * @return the encoding define in the properties
      */
-    public static String getEncoding(  )
+    public static String getEncoding( )
     {
         String strURIEncoding = AppPropertiesService.getProperty( PROPERTY_ENCODE_URI_ENCODING, DEFAULT_URI_ENCODING );
 
