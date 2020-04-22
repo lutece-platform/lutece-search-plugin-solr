@@ -124,20 +124,13 @@ public class SolrItem
     private Map<String, List<Date>> _dfListDate;
 
     /**
-     * Creates a new SolrItem
-     */
-    public SolrItem( )
-    {
-    }
-
-    /**
      * Returns list of all dynamic fields
      * 
      * @return the list of all dynamic fields
      */
     public Map<String, Object> getDynamicFields( )
     {
-        Map<String, Object> mapDynamicFields = new HashMap<String, Object>( );
+        Map<String, Object> mapDynamicFields = new HashMap<>( );
 
         if ( _dfString != null )
         {
@@ -193,7 +186,7 @@ public class SolrItem
     {
         if ( _dfDate == null )
         {
-            _dfDate = new HashMap<String, Date>( );
+            _dfDate = new HashMap<>( );
         }
 
         _dfDate.put( strName + DYNAMIC_DATE_FIELD_SUFFIX, dValue );
@@ -211,7 +204,7 @@ public class SolrItem
     {
         if ( _dfNumericText == null )
         {
-            _dfNumericText = new HashMap<String, Long>( );
+            _dfNumericText = new HashMap<>( );
         }
 
         _dfNumericText.put( strName + DYNAMIC_LONG_FIELD_SUFFIX, lValue );
@@ -229,7 +222,7 @@ public class SolrItem
     {
         if ( _dfText == null )
         {
-            _dfText = new HashMap<String, String>( );
+            _dfText = new HashMap<>( );
         }
 
         _dfText.put( strName + DYNAMIC_TEXT_FIELD_SUFFIX, strValue );
@@ -247,7 +240,7 @@ public class SolrItem
     {
         if ( _dfListBox == null )
         {
-            _dfListBox = new HashMap<String, List<String>>( );
+            _dfListBox = new HashMap<>( );
         }
 
         _dfListBox.put( strName + DYNAMIC_LIST_FIELD_SUFFIX, strValue );
@@ -283,7 +276,7 @@ public class SolrItem
     {
         if ( _dfString == null )
         {
-            _dfString = new HashMap<String, String>( );
+            _dfString = new HashMap<>( );
         }
 
         _dfString.put( strName + DYNAMIC_STRING_FIELD_SUFFIX, strValue );
@@ -311,12 +304,12 @@ public class SolrItem
         {
             if ( _dfGeoloc == null )
             {
-                _dfGeoloc = new HashMap<String, String>( );
+                _dfGeoloc = new HashMap<>( );
             }
 
             if ( _dfGeojson == null )
             {
-                _dfGeojson = new HashMap<String, String>( );
+                _dfGeojson = new HashMap<>( );
             }
 
             String strCoordinates = String.format( Locale.ENGLISH, "%.6f,%.6f", coordinates.get( 1 ), coordinates.get( 0 ) );
@@ -348,13 +341,11 @@ public class SolrItem
     public void addDynamicFieldGeoloc( String strName, String strAdress, double dLongitude, double dLatitude, String codeDocumentType )
     {
         GeolocItem geolocItem = new GeolocItem( );
-        HashMap<String, Object> properties = new HashMap<String, Object>( );
+        HashMap<String, Object> properties = new HashMap<>( );
         properties.put( GeolocItem.PATH_PROPERTIES_ADDRESS, strAdress );
 
-        HashMap<String, Object> geometry = new HashMap<String, Object>( );
-        geometry.put( GeolocItem.PATH_GEOMETRY_COORDINATES, Arrays.asList( new Double [ ] {
-                dLongitude, dLatitude
-        } ) );
+        HashMap<String, Object> geometry = new HashMap<>( );
+        geometry.put( GeolocItem.PATH_GEOMETRY_COORDINATES, Arrays.asList( dLongitude, dLatitude ) );
         geolocItem.setGeometry( geometry );
         geolocItem.setProperties( properties );
         addDynamicFieldGeoloc( strName, geolocItem, codeDocumentType );
@@ -401,29 +392,25 @@ public class SolrItem
             {
                 double [ ] parsedCoordinates = new double [ 2];
                 Iterator<JsonNode> it = objCoordinates.getElements( );
-                boolean bCoordinatesOk = true;
 
                 for ( int i = 0; i < parsedCoordinates.length; i++ )
                 {
                     if ( !it.hasNext( ) )
                     {
                         AppLogService.error( "SolrItem: coordinates array too short : " + strValue + " at element " + Integer.toString( i ) );
-                        bCoordinatesOk = false;
-
-                        break;
                     }
-
-                    JsonNode node = it.next( );
-
-                    if ( !node.isNumber( ) )
+                    else
                     {
-                        AppLogService.error( "SolrItem: coordinate not a number : " + strValue + " at element " + Integer.toString( i ) );
-                        bCoordinatesOk = false;
-
-                        break;
+                        JsonNode node = it.next( );
+                        if ( !node.isNumber( ) )
+                        {
+                            AppLogService.error( "SolrItem: coordinate not a number : " + strValue + " at element " + Integer.toString( i ) );
+                        }
+                        else
+                        {
+                            parsedCoordinates [i] = node.asDouble( );
+                        }
                     }
-
-                    parsedCoordinates [i] = node.asDouble( );
                 }
 
             }

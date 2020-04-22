@@ -33,13 +33,12 @@
  */
 package fr.paris.lutece.plugins.search.solr.business;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.RangeFacet;
 import org.apache.solr.client.solrj.response.SpellCheckResponse;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -49,19 +48,19 @@ import java.util.Map;
 public class SolrFacetedResult
 {
     /** Commentaire. **/
-    private List<FacetField> facetFieldsList;
+    private List<FacetField> _facetFieldsList;
 
     /** Commentaire. **/
-    private List<SolrSearchResult> searchResultsList;
+    private List<SolrSearchResult> _searchResultsList;
 
     /** Commentaire. **/
-    private List<RangeFacet> facetDateList;
+    private List<RangeFacet> _facetDateList;
 
     /** Commentaire. **/
-    private Map<String, ArrayList<FacetField>> facetIntersection;
+    private Map<String, List<FacetField>> _facetIntersection;
 
     /** spellcheck. **/
-    private SpellCheckResponse solrSpellCheckResponse;
+    private SpellCheckResponse _solrSpellCheckResponse;
 
     private int _nCount;
 
@@ -93,7 +92,7 @@ public class SolrFacetedResult
      */
     public final List<FacetField> getFacetFields( )
     {
-        return facetFieldsList;
+        return _facetFieldsList;
     }
 
     /**
@@ -104,7 +103,7 @@ public class SolrFacetedResult
      */
     public final void setFacetFields( List<FacetField> facetFieldsList )
     {
-        this.facetFieldsList = facetFieldsList;
+        this._facetFieldsList = facetFieldsList;
     }
 
     /**
@@ -114,7 +113,7 @@ public class SolrFacetedResult
      */
     public final List<SolrSearchResult> getSolrSearchResults( )
     {
-        return searchResultsList;
+        return _searchResultsList;
     }
 
     /**
@@ -125,7 +124,7 @@ public class SolrFacetedResult
      */
     public final void setSolrSearchResults( List<SolrSearchResult> searchResultsList )
     {
-        this.searchResultsList = searchResultsList;
+        this._searchResultsList = searchResultsList;
     }
 
     /**
@@ -135,31 +134,31 @@ public class SolrFacetedResult
      */
     public final List<RangeFacet> getFacetDateList( )
     {
-        return facetDateList;
+        return _facetDateList;
     }
 
     public final void setFacetDateList( List<RangeFacet> facetDateList )
     {
-        this.facetDateList = facetDateList;
+        this._facetDateList = facetDateList;
     }
 
-    public final Map<String, ArrayList<FacetField>> getFacetIntersection( )
+    public final Map<String, List<FacetField>> getFacetIntersection( )
     {
-        return facetIntersection;
+        return _facetIntersection;
     }
 
-    public final void setFacetIntersection( Map<String, ArrayList<FacetField>> facetIntersection )
+    public final void setFacetIntersection( Map<String, List<FacetField>> facetIntersection )
     {
-        this.facetIntersection = facetIntersection;
+        this._facetIntersection = facetIntersection;
     }
 
     public SpellCheckResponse getSolrSpellCheckResponse( )
     {
-        return this.solrSpellCheckResponse;
+        return this._solrSpellCheckResponse;
     }
 
     public void setSolrSpellCheckResponse( SpellCheckResponse solrSpellCheckResponse )
     {
-        this.solrSpellCheckResponse = solrSpellCheckResponse;
+        this._solrSpellCheckResponse = solrSpellCheckResponse;
     }
 }

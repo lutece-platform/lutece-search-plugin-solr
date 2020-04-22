@@ -33,23 +33,20 @@
  */
 package fr.paris.lutece.plugins.search.solr.web;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.plugins.search.solr.business.field.FieldHome;
 import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
 import fr.paris.lutece.plugins.search.solr.indexer.SolrIndexerService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppLogService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
 import fr.paris.lutece.util.html.HtmlTemplate;
-
-import java.io.UnsupportedEncodingException;
-
-import java.net.URLDecoder;
-
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  *
@@ -58,12 +55,14 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
 {
+    private static final long serialVersionUID = 1633639212933752088L;
     ////////////////////////////////////////////////////////////////////////////
     // Constantes
     public static final String SOLR_FIELDS_MANAGEMENT = "SOLR_FIELDS_MANAGEMENT";
     private static final String TEMPLATE_DISPLAY_SOLR_FIELDS = "admin/search/solr_manage_fields_display.html";
     private static final String TEMPLATE_SOLR_FIELDS_FORM = "admin/search/solr_manage_fields_form.html";
     private static final String MARK_FIELD = "field_list";
+    private static final String UTF_8 = "UTF-8";
 
     /**
      * Displays the indexing parameters
@@ -74,7 +73,7 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
      */
     public String getFieldList( HttpServletRequest request )
     {
-        HashMap<String, Object> model = new HashMap<String, Object>( );
+        HashMap<String, Object> model = new HashMap<>( );
         model.put( MARK_FIELD, SolrFieldManager.getFieldList( ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_DISPLAY_SOLR_FIELDS, getLocale( ), model );
@@ -84,7 +83,7 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
 
     public String getPage( HttpServletRequest request )
     {
-        StringBuffer htmlBuffer = new StringBuffer( );
+        StringBuilder htmlBuffer = new StringBuilder( );
         htmlBuffer.append( this.getFieldList( request ) );
 
         return getAdminPage( htmlBuffer.toString( ) );
@@ -92,7 +91,7 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
 
     public String getForm( HttpServletRequest request )
     {
-        HashMap<String, Object> model = new HashMap<String, Object>( );
+        HashMap<String, Object> model = new HashMap<>( );
 
         // UPDATE
         if ( request.getParameter( "update" ) != null )
@@ -170,8 +169,8 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
 
         try
         {
-            field.setLabel( URLDecoder.decode( request.getParameter( "label" ), "UTF-8" ) );
-            field.setDescription( URLDecoder.decode( request.getParameter( "description" ), "UTF-8" ) );
+            field.setLabel( URLDecoder.decode( request.getParameter( "label" ), UTF_8 ) );
+            field.setDescription( URLDecoder.decode( request.getParameter( "description" ), UTF_8 ) );
         }
         catch( UnsupportedEncodingException e )
         {
@@ -196,8 +195,8 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
 
         try
         {
-            field.setLabel( URLDecoder.decode( request.getParameter( "label" ), "UTF-8" ) );
-            field.setDescription( URLDecoder.decode( request.getParameter( "description" ), "UTF-8" ) );
+            field.setLabel( URLDecoder.decode( request.getParameter( "label" ), UTF_8 ) );
+            field.setDescription( URLDecoder.decode( request.getParameter( "description" ), UTF_8 ) );
         }
         catch( UnsupportedEncodingException e )
         {

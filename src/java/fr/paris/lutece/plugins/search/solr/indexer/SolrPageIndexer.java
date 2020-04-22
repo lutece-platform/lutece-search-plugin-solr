@@ -33,9 +33,22 @@
  */
 package fr.paris.lutece.plugins.search.solr.indexer;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.html.HtmlParser;
+import org.apache.tika.sax.BodyContentHandler;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
+import fr.paris.lutece.plugins.search.solr.util.LuteceSolrRuntimeException;
 import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
-import fr.paris.lutece.plugins.search.utils.SolrPageIndexerUtils;
 import fr.paris.lutece.portal.business.page.Page;
 import fr.paris.lutece.portal.business.page.PageHome;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
@@ -45,17 +58,6 @@ import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.url.UrlItem;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.html.HtmlParser;
-import org.apache.tika.sax.BodyContentHandler;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
 
 /**
  * The indexer service for Solr.
@@ -63,7 +65,7 @@ import org.xml.sax.SAXException;
  */
 public class SolrPageIndexer implements SolrIndexer
 {
-
+    public static final String RESSOURCE_PAGE = "PAGE_PAGE";
     public static final String NAME = "SolrPageIndexer";
     private static final String PARAMETER_PAGE_ID = "page_id";
     private static final String DESCRIPTION = "Solr page Indexer";
@@ -73,7 +75,7 @@ public class SolrPageIndexer implements SolrIndexer
     private static final String PROPERTY_INDEXER_ENABLE = "solr.indexer.page.enable";
     private static final String BEAN_PAGE_SERVICE = "pageService";
     private static final String SHORT_NAME = "page";
-    private static final List<String> LIST_RESSOURCES_NAME = new ArrayList<String>( );
+    private static final List<String> LIST_RESSOURCES_NAME = new ArrayList<>( );
     private static final String PAGE_INDEXATION_ERROR = "[SolrPageIndexer] An error occured during the indexation of the page number ";
 
     /**
@@ -81,7 +83,7 @@ public class SolrPageIndexer implements SolrIndexer
      */
     public SolrPageIndexer( )
     {
-        LIST_RESSOURCES_NAME.add( SolrPageIndexerUtils.RESSOURCE_PAGE );
+        LIST_RESSOURCES_NAME.add( RESSOURCE_PAGE );
     }
 
     /**
@@ -90,8 +92,8 @@ public class SolrPageIndexer implements SolrIndexer
     public List<String> indexDocuments( )
     {
         List<Page> listPages = PageHome.getAllPages( );
-        List<String> lstErrors = new ArrayList<String>( );
-        List<SolrItem> lstSolrItems = new ArrayList<SolrItem>( );
+        List<String> lstErrors = new ArrayList<>( );
+        List<SolrItem> lstSolrItems = new ArrayList<>( );
 
         for ( Page page : listPages )
         {
@@ -99,11 +101,7 @@ public class SolrPageIndexer implements SolrIndexer
             {
                 // Generates the item to index
                 SolrItem item = getItem( page, SolrIndexerService.getBaseUrl( ) );
-
-                if ( item != null )
-                {
-                    lstSolrItems.add( item );
-                }
+                lstSolrItems.add( item );
             }
             catch( Exception e )
             {
@@ -136,29 +134,24 @@ public class SolrPageIndexer implements SolrIndexer
      *            the page to index
      * @throws IOException
      *             The IO Exception
-     * @throws InterruptedException
-     *             The InterruptedException
      * @throws SiteMessageException
      *             occurs when a site message need to be displayed
      */
-    private SolrItem getItem( Page page, String strUrl ) throws IOException, InterruptedException, SiteMessageException
+    private SolrItem getItem( Page page, String strUrl ) throws IOException, SiteMessageException
     {
         // the item
         SolrItem item = new SolrItem( );
 
         // indexing page content
-        String strPageContent = ( (IPageService) SpringContextService.getBean( BEAN_PAGE_SERVICE ) ).getPageContent( page.getId( ), 0, null );
+        IPageService pageService = SpringContextService.getBean( BEAN_PAGE_SERVICE );
+        String strPageContent = pageService.getPageContent( page.getId( ), 0, null );
         ContentHandler handler = new BodyContentHandler( );
         Metadata metadata = new Metadata( );
         try
         {
             new HtmlParser( ).parse( new ByteArrayInputStream( strPageContent.getBytes( ) ), handler, metadata, new ParseContext( ) );
         }
-        catch( SAXException e )
-        {
-            throw new AppException( "Error during page parsing." );
-        }
-        catch( TikaException e )
+        catch( SAXException | TikaException e )
         {
             throw new AppException( "Error during page parsing." );
         }
@@ -177,7 +170,7 @@ public class SolrPageIndexer implements SolrIndexer
         item.setType( TYPE );
         item.setSite( SolrIndexerService.getWebAppName( ) );
 
-        List<String> cat = new ArrayList<String>( );
+        List<String> cat = new ArrayList<>( );
         cat.add( CATEGORIE );
         item.setCategorie( cat );
         item.setDate( page.getDateUpdate( ) );
@@ -185,7 +178,7 @@ public class SolrPageIndexer implements SolrIndexer
         UrlItem urlItem = new UrlItem( strUrl );
         urlItem.addParameter( PARAMETER_PAGE_ID, page.getId( ) );
         item.setUrl( urlItem.getUrl( ) );
-        item.setUid( getResourceUid( String.valueOf( page.getId( ) ), SolrPageIndexerUtils.RESSOURCE_PAGE ) );
+        item.setUid( getResourceUid( String.valueOf( page.getId( ) ), RESSOURCE_PAGE ) );
 
         return item;
     }
@@ -245,8 +238,7 @@ public class SolrPageIndexer implements SolrIndexer
     @Override
     public List<SolrItem> getDocuments( String strIdDocument )
     {
-        List<SolrItem> lstItems = new ArrayList<SolrItem>( );
-
+        List<SolrItem> lstItems = new ArrayList<>( );
         try
         {
             int nIdDocument = Integer.parseInt( strIdDocument );
@@ -255,7 +247,7 @@ public class SolrPageIndexer implements SolrIndexer
         }
         catch( Exception e )
         {
-            throw new RuntimeException( e );
+            throw new LuteceSolrRuntimeException( e.getMessage( ), e );
         }
 
         return lstItems;

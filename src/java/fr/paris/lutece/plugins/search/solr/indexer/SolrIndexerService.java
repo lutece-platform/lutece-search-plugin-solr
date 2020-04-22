@@ -33,6 +33,23 @@
  */
 package fr.paris.lutece.plugins.search.solr.indexer;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.store.Directory;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrInputDocument;
+
 import fr.paris.lutece.plugins.search.solr.business.SolrServerService;
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.plugins.search.solr.business.indexeraction.SolrIndexerAction;
@@ -48,19 +65,6 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.lang.StringUtils;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.store.Directory;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.util.ClientUtils;
-import org.apache.solr.common.SolrInputDocument;
 
 /**
  *
@@ -72,10 +76,12 @@ public final class SolrIndexerService
     private static final SolrClient SOLR_SERVER = SolrServerService.getInstance( ).getSolrServer( );
     private static final List<SolrIndexer> INDEXERS = initIndexersList( );
     private static final String PARAM_TYPE_PAGE = "PAGE";
-    private static StringBuffer _sbLogs;
+    private static StringBuilder _sbLogs;
     private static final String PROPERTY_SITE = "lutece.name";
     private static final String PROPERTY_PROD_URL = "lutece.prod.url";
     private static final String PROPERTY_BASE_URL = "lutece.base.url";
+    private static final String LOG_ERROR = " - ERROR : ";
+    private static final String LOG_CLOSE_STRONG = "</strong>\r\n";
 
     /**
      * Empty private constructor
@@ -100,13 +106,11 @@ public final class SolrIndexerService
      * @param solrItem
      *            The item
      * @param sbLogs
-     *            StringBuffer to write to
-     * @throws CorruptIndexException
-     *             corruptIndexException
+     *            StringBuilder to write to
      * @throws IOException
      *             i/o exception
      */
-    private static void writeNoCommit( SolrItem solrItem, StringBuffer sbLogs ) throws CorruptIndexException, IOException
+    private static void writeNoCommit( SolrItem solrItem, StringBuilder sbLogs ) throws IOException
     {
         try
         {
@@ -131,12 +135,10 @@ public final class SolrIndexerService
      * 
      * @param solrItem
      *            The item
-     * @throws CorruptIndexException
-     *             corruptIndexException
      * @throws IOException
      *             i/o exception
      */
-    public static void write( SolrItem solrItem ) throws CorruptIndexException, IOException
+    public static void write( SolrItem solrItem ) throws IOException
     {
         write( solrItem, _sbLogs );
     }
@@ -147,13 +149,11 @@ public final class SolrIndexerService
      * @param solrItem
      *            The item
      * @param sbLogs
-     *            StringBuffer to write to
-     * @throws CorruptIndexException
-     *             corruptIndexException
+     *            StringBuilder to write to
      * @throws IOException
      *             i/o exception
      */
-    public static void write( SolrItem solrItem, StringBuffer sbLogs ) throws CorruptIndexException, IOException
+    public static void write( SolrItem solrItem, StringBuilder sbLogs ) throws IOException
     {
         try
         {
@@ -171,12 +171,10 @@ public final class SolrIndexerService
      * 
      * @param solrItems
      *            The item
-     * @throws CorruptIndexException
-     *             corruptIndexException
      * @throws IOException
      *             i/o exception
      */
-    public static void write( Collection<SolrItem> solrItems ) throws CorruptIndexException, IOException
+    public static void write( Collection<SolrItem> solrItems ) throws IOException
     {
         write( solrItems, _sbLogs );
     }
@@ -187,13 +185,11 @@ public final class SolrIndexerService
      * @param solrItems
      *            The item
      * @param sbLogs
-     *            StringBuffer to write to
-     * @throws CorruptIndexException
-     *             corruptIndexException
+     *            StringBuilder to write to
      * @throws IOException
      *             i/o exception
      */
-    public static void write( Collection<SolrItem> solrItems, StringBuffer sbLogs ) throws CorruptIndexException, IOException
+    public static void write( Collection<SolrItem> solrItems, StringBuilder sbLogs ) throws IOException
     {
         try
         {
@@ -218,11 +214,8 @@ public final class SolrIndexerService
      */
     public static synchronized String processIndexing( boolean bCreate )
     {
-        // String buffer for building the response page;
-        _sbLogs = new StringBuffer( );
-
-        Plugin plugin = PluginService.getPlugin( SolrPlugin.PLUGIN_NAME );
-
+        // String buffer for building the response page
+        _sbLogs = new StringBuilder( );
         boolean bCreateIndex = bCreate;
         String strWebappNameEscaped = ClientUtils.escapeQueryChars( getWebAppName( ) );
 
@@ -239,146 +232,11 @@ public final class SolrIndexerService
 
             if ( bCreateIndex )
             {
-                _sbLogs.append( "\r\nIndexing all contents ...\r\n" );
-
-                // Remove all indexed values of this site
-                SOLR_SERVER.deleteByQuery(
-                        SearchItem.FIELD_UID + ":" + strWebappNameEscaped + SolrConstants.CONSTANT_UNDERSCORE + SolrConstants.CONSTANT_WILDCARD );
-
-                for ( SolrIndexer solrIndexer : INDEXERS )
-                {
-                    if ( solrIndexer.isEnable( ) )
-                    {
-                        _sbLogs.append( "\r\n<strong>Indexer : " );
-                        _sbLogs.append( solrIndexer.getName( ) );
-                        _sbLogs.append( " - " );
-                        _sbLogs.append( solrIndexer.getDescription( ) );
-                        _sbLogs.append( "</strong>\r\n" );
-
-                        // the indexer will call write(doc)
-                        List<String> lstErrors = solrIndexer.indexDocuments( );
-
-                        if ( lstErrors != null )
-                        {
-                            for ( String strError : lstErrors )
-                            {
-                                _sbLogs.append( "<strong>ERROR : " );
-                                _sbLogs.append( strError );
-                                _sbLogs.append( "</strong>\r\n" );
-                            }
-                        }
-                    }
-                }
-
-                // Remove all actions of the database
-                SolrIndexerActionHome.removeAll( plugin );
+                processFullIndexing( strWebappNameEscaped );
             }
             else
             {
-                _sbLogs.append( "\r\nIncremental Indexing ...\r\n" );
-
-                // incremental indexing
-                Collection<SolrIndexerAction> actions = SolrIndexerActionHome.getList( plugin );
-
-                for ( SolrIndexerAction action : actions )
-                {
-                    // catch any exception coming from an indexer to prevent global indexation to fail
-                    try
-                    {
-                        SolrIndexer indexer = findSolrIndexer( action.getTypeResource( ) );
-
-                        if ( indexer == null )
-                        {
-                            _sbLogs.append( " - ERROR : " );
-                            _sbLogs.append( " No indexer found for the resource name : " ).append( action.getTypeResource( ) );
-                            _sbLogs.append( "</strong>\r\n" );
-
-                            continue;
-                        }
-
-                        if ( action.getIdTask( ) == IndexerAction.TASK_DELETE )
-                        {
-                            if ( action.getIdPortlet( ) != IndexationService.ALL_DOCUMENT )
-                            {
-                                // delete only the index linked to this portlet
-                                SOLR_SERVER.deleteByQuery( SearchItem.FIELD_DOCUMENT_PORTLET_ID + ":" + action.getIdDocument( ) + "&"
-                                        + Integer.toString( action.getIdPortlet( ) ) + " AND " + SearchItem.FIELD_UID + ":" + strWebappNameEscaped
-                                        + SolrConstants.CONSTANT_UNDERSCORE + SolrConstants.CONSTANT_WILDCARD );
-                            }
-                            else
-                            {
-                                // delete all index linked to uid. We get the uid of the resource to prefix it like we do during the indexation
-                                SOLR_SERVER.deleteByQuery( SearchItem.FIELD_UID + ":" + strWebappNameEscaped + SolrConstants.CONSTANT_UNDERSCORE
-                                        + indexer.getResourceUid( action.getIdDocument( ), action.getTypeResource( ) ) );
-                            }
-
-                            _sbLogs.append( "Deleting " );
-                            _sbLogs.append( " #" );
-                            _sbLogs.append( action.getIdDocument( ) );
-                            _sbLogs.append( "\r\n" );
-                        }
-                        else
-                        {
-                            List<SolrItem> lstItems = indexer.getDocuments( action.getIdDocument( ) );
-
-                            if ( ( lstItems != null ) && !lstItems.isEmpty( ) )
-                            {
-                                for ( SolrItem item : lstItems )
-                                {
-                                    if ( ( action.getIdPortlet( ) == IndexationService.ALL_DOCUMENT ) || ( ( item.getDocPortletId( ) != null )
-                                            && item.getDocPortletId( ).equals( item.getUid( ) + "&" + action.getIdPortlet( ) ) ) )
-                                    {
-                                        if ( action.getIdTask( ) == IndexerAction.TASK_CREATE )
-                                        {
-                                            _sbLogs.append( "Adding " );
-                                        }
-                                        else
-                                            if ( action.getIdTask( ) == IndexerAction.TASK_MODIFY )
-                                            {
-                                                _sbLogs.append( "Updating " );
-                                            }
-
-                                        SOLR_SERVER.add( solrItem2SolrInputDocument( item ) );
-                                        SOLR_SERVER.commit( );
-
-                                        _sbLogs.append( item.getType( ) );
-                                        _sbLogs.append( " #" );
-                                        _sbLogs.append( item.getUid( ) );
-                                        _sbLogs.append( " - " );
-                                        _sbLogs.append( item.getTitle( ) );
-                                        _sbLogs.append( "\r\n" );
-                                    }
-                                }
-                            }
-                        }
-
-                        SolrIndexerActionHome.remove( action.getIdAction( ), plugin );
-                    }
-                    catch( Exception e )
-                    {
-                        _sbLogs.append( "\r\n<strong>Action from indexer : " );
-                        _sbLogs.append( action.getIndexerName( ) );
-                        _sbLogs.append( " Action ID : " ).append( action.getIdAction( ) ).append( " - Document ID : " ).append( action.getIdDocument( ) );
-                        _sbLogs.append( " - ERROR : " );
-                        _sbLogs.append( e.getMessage( ) )
-                                .append( ( e.getCause( ) != null ) ? ( " : " + e.getCause( ).getMessage( ) ) : SolrConstants.CONSTANT_EMPTY_STRING );
-                        _sbLogs.append( "</strong>\r\n" );
-                    }
-                }
-
-                // reindexing all pages.
-                SOLR_SERVER.deleteByQuery( SearchItem.FIELD_TYPE + ":" + PARAM_TYPE_PAGE + " AND " + SearchItem.FIELD_UID + ":" + strWebappNameEscaped
-                        + SolrConstants.CONSTANT_UNDERSCORE + SolrConstants.CONSTANT_WILDCARD );
-
-                for ( SolrIndexer indexer : INDEXERS )
-                {
-                    if ( indexer.isEnable( ) && SolrPageIndexer.NAME.equals( indexer.getName( ) ) )
-                    {
-                        indexer.indexDocuments( );
-
-                        break;
-                    }
-                }
+                processIncrementalIndexing( strWebappNameEscaped );
             }
 
             SOLR_SERVER.commit( );
@@ -400,6 +258,166 @@ public final class SolrIndexerService
         }
 
         return _sbLogs.toString( );
+    }
+
+    private static void processFullIndexing( String strWebappNameEscaped ) throws SolrServerException, IOException
+    {
+        Plugin plugin = PluginService.getPlugin( SolrPlugin.PLUGIN_NAME );
+
+        _sbLogs.append( "\r\nIndexing all contents ...\r\n" );
+
+        // Remove all indexed values of this site
+        SOLR_SERVER.deleteByQuery( SearchItem.FIELD_UID + ":" + strWebappNameEscaped + SolrConstants.CONSTANT_UNDERSCORE + SolrConstants.CONSTANT_WILDCARD );
+
+        for ( SolrIndexer solrIndexer : INDEXERS )
+        {
+            if ( solrIndexer.isEnable( ) )
+            {
+                _sbLogs.append( "\r\n<strong>Indexer : " );
+                _sbLogs.append( solrIndexer.getName( ) );
+                _sbLogs.append( " - " );
+                _sbLogs.append( solrIndexer.getDescription( ) );
+                _sbLogs.append( LOG_CLOSE_STRONG );
+
+                // the indexer will call write(doc)
+                List<String> lstErrors = solrIndexer.indexDocuments( );
+
+                if ( lstErrors != null )
+                {
+                    for ( String strError : lstErrors )
+                    {
+                        _sbLogs.append( "<strong>ERROR : " );
+                        _sbLogs.append( strError );
+                        _sbLogs.append( LOG_CLOSE_STRONG );
+                    }
+                }
+            }
+        }
+
+        // Remove all actions of the database
+        SolrIndexerActionHome.removeAll( plugin );
+    }
+
+    private static void processIncrementalIndexing( String strWebappNameEscaped ) throws SolrServerException, IOException
+    {
+        Plugin plugin = PluginService.getPlugin( SolrPlugin.PLUGIN_NAME );
+
+        _sbLogs.append( "\r\nIncremental Indexing ...\r\n" );
+
+        // incremental indexing
+        Collection<SolrIndexerAction> actions = SolrIndexerActionHome.getList( plugin );
+
+        for ( SolrIndexerAction action : actions )
+        {
+            processIndexingAction( action, strWebappNameEscaped );
+        }
+
+        // reindexing all pages.
+        SOLR_SERVER.deleteByQuery( SearchItem.FIELD_TYPE + ":" + PARAM_TYPE_PAGE + " AND " + SearchItem.FIELD_UID + ":" + strWebappNameEscaped
+                + SolrConstants.CONSTANT_UNDERSCORE + SolrConstants.CONSTANT_WILDCARD );
+
+        for ( SolrIndexer indexer : INDEXERS )
+        {
+            if ( indexer.isEnable( ) && SolrPageIndexer.NAME.equals( indexer.getName( ) ) )
+            {
+                indexer.indexDocuments( );
+
+                break;
+            }
+        }
+    }
+
+    private static void processIndexingAction( SolrIndexerAction action, String strWebappNameEscaped )
+    {
+        Plugin plugin = PluginService.getPlugin( SolrPlugin.PLUGIN_NAME );
+
+        // catch any exception coming from an indexer to prevent global indexation to fail
+        try
+        {
+            SolrIndexer indexer = findSolrIndexer( action.getTypeResource( ) );
+
+            if ( indexer == null )
+            {
+                _sbLogs.append( LOG_ERROR );
+                _sbLogs.append( " No indexer found for the resource name : " ).append( action.getTypeResource( ) );
+                _sbLogs.append( LOG_CLOSE_STRONG );
+
+                return;
+            }
+
+            if ( action.getIdTask( ) == IndexerAction.TASK_DELETE )
+            {
+                if ( action.getIdPortlet( ) != IndexationService.ALL_DOCUMENT )
+                {
+                    // delete only the index linked to this portlet
+                    SOLR_SERVER.deleteByQuery(
+                            SearchItem.FIELD_DOCUMENT_PORTLET_ID + ":" + action.getIdDocument( ) + "&" + Integer.toString( action.getIdPortlet( ) ) + " AND "
+                                    + SearchItem.FIELD_UID + ":" + strWebappNameEscaped + SolrConstants.CONSTANT_UNDERSCORE + SolrConstants.CONSTANT_WILDCARD );
+                }
+                else
+                {
+                    // delete all index linked to uid. We get the uid of the resource to prefix it like we do during the indexation
+                    SOLR_SERVER.deleteByQuery( SearchItem.FIELD_UID + ":" + strWebappNameEscaped + SolrConstants.CONSTANT_UNDERSCORE
+                            + indexer.getResourceUid( action.getIdDocument( ), action.getTypeResource( ) ) );
+                }
+
+                _sbLogs.append( "Deleting " );
+                _sbLogs.append( " #" );
+                _sbLogs.append( action.getIdDocument( ) );
+                _sbLogs.append( "\r\n" );
+            }
+            else
+            {
+                List<SolrItem> lstItems = indexer.getDocuments( action.getIdDocument( ) );
+
+                if ( CollectionUtils.isNotEmpty( lstItems ) )
+                {
+                    for ( SolrItem item : lstItems )
+                    {
+                        indexSolrItem( action, item );
+                    }
+                }
+            }
+
+            SolrIndexerActionHome.remove( action.getIdAction( ), plugin );
+        }
+        catch( Exception e )
+        {
+            _sbLogs.append( "\r\n<strong>Action from indexer : " );
+            _sbLogs.append( action.getIndexerName( ) );
+            _sbLogs.append( " Action ID : " ).append( action.getIdAction( ) ).append( " - Document ID : " ).append( action.getIdDocument( ) );
+            _sbLogs.append( LOG_ERROR );
+            _sbLogs.append( e.getMessage( ) )
+                    .append( ( e.getCause( ) != null ) ? ( " : " + e.getCause( ).getMessage( ) ) : SolrConstants.CONSTANT_EMPTY_STRING );
+            _sbLogs.append( LOG_CLOSE_STRONG );
+        }
+    }
+
+    private static void indexSolrItem( SolrIndexerAction action, SolrItem item ) throws SolrServerException, IOException
+    {
+        if ( ( action.getIdPortlet( ) == IndexationService.ALL_DOCUMENT )
+                || ( ( item.getDocPortletId( ) != null ) && item.getDocPortletId( ).equals( item.getUid( ) + "&" + action.getIdPortlet( ) ) ) )
+        {
+            if ( action.getIdTask( ) == IndexerAction.TASK_CREATE )
+            {
+                _sbLogs.append( "Adding " );
+            }
+            else
+                if ( action.getIdTask( ) == IndexerAction.TASK_MODIFY )
+                {
+                    _sbLogs.append( "Updating " );
+                }
+
+            SOLR_SERVER.add( solrItem2SolrInputDocument( item ) );
+            SOLR_SERVER.commit( );
+
+            _sbLogs.append( item.getType( ) );
+            _sbLogs.append( " #" );
+            _sbLogs.append( item.getUid( ) );
+            _sbLogs.append( " - " );
+            _sbLogs.append( item.getTitle( ) );
+            _sbLogs.append( "\r\n" );
+        }
     }
 
     /**
@@ -430,7 +448,7 @@ public final class SolrIndexerService
      */
     public static List<Field> getAdditionalFields( )
     {
-        List<Field> lstFields = new ArrayList<Field>( );
+        List<Field> lstFields = new ArrayList<>( );
 
         for ( SolrIndexer solrIndexer : INDEXERS )
         {
@@ -451,11 +469,11 @@ public final class SolrIndexerService
      * @param exception
      *            Exception to report
      * @param sbLogs
-     *            StringBuffer to write to
+     *            StringBuilder to write to
      */
-    private static void printIndexMessage( Exception exception, StringBuffer sbLogs )
+    private static void printIndexMessage( Exception exception, StringBuilder sbLogs )
     {
-        sbLogs.append( " - ERROR : " );
+        sbLogs.append( LOG_ERROR );
         sbLogs.append( exception.getMessage( ) );
 
         if ( exception.getCause( ) != null )
@@ -464,7 +482,7 @@ public final class SolrIndexerService
             sbLogs.append( exception.getCause( ).getMessage( ) );
         }
 
-        sbLogs.append( "</strong>\r\n" );
+        sbLogs.append( LOG_CLOSE_STRONG );
         AppLogService.error( exception.getMessage( ), exception );
     }
 
@@ -522,9 +540,9 @@ public final class SolrIndexerService
         // They must be declared into the schema.xml of the solr server
         Map<String, Object> mapDynamicFields = solrItem.getDynamicFields( );
 
-        for ( String strDynamicField : mapDynamicFields.keySet( ) )
+        for ( Entry<String, Object> dynamicField : mapDynamicFields.entrySet( ) )
         {
-            solrInputDocument.addField( strDynamicField, mapDynamicFields.get( strDynamicField ) );
+            solrInputDocument.addField( dynamicField.getKey( ), dynamicField.getValue( ) );
         }
 
         return solrInputDocument;
@@ -591,8 +609,8 @@ public final class SolrIndexerService
      */
     public static synchronized String processDel( )
     {
-        // String buffer for building the response page;
-        _sbLogs = new StringBuffer( );
+        // String buffer for building the response page
+        _sbLogs = new StringBuilder( );
         String strSite = AppPropertiesService.getProperty( PROPERTY_SITE );
 
         _sbLogs.append( "Delete site : " + strSite + "\r\n" );
@@ -613,7 +631,7 @@ public final class SolrIndexerService
         return _sbLogs.toString( );
     }
 
-    public static StringBuffer getSbLogs( )
+    public static StringBuilder getSbLogs( )
     {
         return _sbLogs;
     }

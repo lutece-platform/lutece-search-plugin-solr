@@ -50,7 +50,7 @@ public class SolrSearchAppConf
     private String _strFilterQuery = SolrConstants.CONSTANT_DEFAULT_FILTER_QUERY;
     private String _strTemplate = SolrConstants.CONSTANT_DEFAULT_TEMPLATE;
     private boolean _bExtraMappingQuery = SolrConstants.CONSTANT_DEFAULT_EXTRA_MAPPING_QUERY;
-    private List<String> _listAddonBeanNames = new ArrayList<String>( );
+    private List<String> _listAddonBeanNames = new ArrayList<>( );
 
     /**
      * Returns the code

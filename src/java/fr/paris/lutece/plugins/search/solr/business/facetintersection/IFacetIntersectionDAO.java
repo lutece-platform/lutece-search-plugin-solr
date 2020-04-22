@@ -31,7 +31,7 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.search.solr.business.facetIntersection;
+package fr.paris.lutece.plugins.search.solr.business.facetintersection;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 

@@ -131,7 +131,6 @@ public class SolrSearchItem
 
         if ( o != null )
         {
-            // System.out.println(o.getClass());
             _date = new Date( );
         }
     }

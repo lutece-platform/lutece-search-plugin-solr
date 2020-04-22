@@ -101,7 +101,8 @@ public final class SolrServerService
      */
     private SolrClient createSolrServer( String strServerUrl )
     {
-        HttpSolrClient solrServer = new HttpSolrClient( strServerUrl );
+        HttpSolrClient.Builder builder = new HttpSolrClient.Builder( ).withBaseSolrUrl( strServerUrl );
+        HttpSolrClient solrServer = builder.build( );
         if ( SOLR_SERVER_MAX_CONNECTION != NO_MAX_CONNECTION_SET )
         {
             solrServer.setMaxTotalConnections( SOLR_SERVER_MAX_CONNECTION );

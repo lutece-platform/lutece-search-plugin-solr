@@ -85,7 +85,7 @@ public final class SolrUtil
      */
     public static List<SearchResult> transformSolrDocumentList( SolrDocumentList documentList )
     {
-        Map<String, SearchResult> mapResults = new HashMap<String, SearchResult>( );
+        Map<String, SearchResult> mapResults = new HashMap<>( );
 
         for ( SolrDocument document : documentList )
         {
@@ -101,7 +101,7 @@ public final class SolrUtil
             mapResults.put( searchResult.getUrl( ), searchResult );
         }
 
-        return new ArrayList<SearchResult>( mapResults.values( ) );
+        return new ArrayList<>( mapResults.values( ) );
     }
 
     /**
@@ -115,7 +115,7 @@ public final class SolrUtil
      */
     public static List<SolrSearchResult> transformSolrItemsToSolrSearchResults( List<SolrItem> itemList, SolrHighlights highlights )
     {
-        List<SolrSearchResult> resultList = new ArrayList<SolrSearchResult>( itemList.size( ) );
+        List<SolrSearchResult> resultList = new ArrayList<>( itemList.size( ) );
 
         for ( SolrItem item : itemList )
         {
@@ -206,8 +206,6 @@ public final class SolrUtil
      */
     public static String getEncoding( )
     {
-        String strURIEncoding = AppPropertiesService.getProperty( PROPERTY_ENCODE_URI_ENCODING, DEFAULT_URI_ENCODING );
-
-        return strURIEncoding;
+        return AppPropertiesService.getProperty( PROPERTY_ENCODE_URI_ENCODING, DEFAULT_URI_ENCODING );
     }
 }

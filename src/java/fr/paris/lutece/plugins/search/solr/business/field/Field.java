@@ -47,26 +47,26 @@ public class Field
     private String _strName;
     private String _strLabel;
     private String _strDescription;
-    private boolean _IsFacet;
-    private boolean _EnableFacet;
-    private boolean _IsSort;
-    private boolean _EnableSort;
-    private boolean _DefaultSort;
-    private double _Weight;
+    private boolean _isFacet;
+    private boolean _enableFacet;
+    private boolean _isSort;
+    private boolean _enableSort;
+    private boolean _defaultSort;
+    private double _weight;
     private String _strOperator;
-    private int _FacetMincount;
+    private int _facetMincount;
 
     public Field( )
     {
         this._strName = "";
         this._strLabel = "";
         this._strDescription = "";
-        this._IsFacet = false;
-        this._EnableFacet = false;
-        this._IsSort = false;
-        this._EnableSort = false;
-        this._DefaultSort = false;
-        this._FacetMincount = 1;
+        this._isFacet = false;
+        this._enableFacet = false;
+        this._isSort = false;
+        this._enableSort = false;
+        this._defaultSort = false;
+        this._facetMincount = 1;
         this._strOperator = OPERATOR_TYPE_AND;
     }
 
@@ -166,18 +166,18 @@ public class Field
      */
     public boolean getIsFacet( )
     {
-        return _IsFacet;
+        return _isFacet;
     }
 
     /**
      * Sets the IsFacet
      * 
-     * @param IsFacet
+     * @param isFacet
      *            The IsFacet
      */
-    public void setIsFacet( boolean IsFacet )
+    public void setIsFacet( boolean isFacet )
     {
-        _IsFacet = IsFacet;
+        _isFacet = isFacet;
     }
 
     /**
@@ -187,18 +187,18 @@ public class Field
      */
     public boolean getEnableFacet( )
     {
-        return _EnableFacet;
+        return _enableFacet;
     }
 
     /**
      * Sets the EnableFacet
      * 
-     * @param EnableFacet
+     * @param enableFacet
      *            The EnableFacet
      */
-    public void setEnableFacet( boolean EnableFacet )
+    public void setEnableFacet( boolean enableFacet )
     {
-        _EnableFacet = EnableFacet;
+        _enableFacet = enableFacet;
     }
 
     /**
@@ -208,18 +208,18 @@ public class Field
      */
     public boolean getIsSort( )
     {
-        return _IsSort;
+        return _isSort;
     }
 
     /**
      * Sets the IsSort
      * 
-     * @param IsSort
+     * @param isSort
      *            The IsSort
      */
-    public void setIsSort( boolean IsSort )
+    public void setIsSort( boolean isSort )
     {
-        _IsSort = IsSort;
+        _isSort = isSort;
     }
 
     /**
@@ -229,18 +229,18 @@ public class Field
      */
     public boolean getEnableSort( )
     {
-        return _EnableSort;
+        return _enableSort;
     }
 
     /**
      * Sets the EnableSort
      * 
-     * @param EnableSort
+     * @param enableSort
      *            The EnableSort
      */
-    public void setEnableSort( boolean EnableSort )
+    public void setEnableSort( boolean enableSort )
     {
-        _EnableSort = EnableSort;
+        _enableSort = enableSort;
     }
 
     /**
@@ -250,18 +250,18 @@ public class Field
      */
     public boolean getDefaultSort( )
     {
-        return _DefaultSort;
+        return _defaultSort;
     }
 
     /**
      * Sets the DefaultSort
      * 
-     * @param DefaultSort
+     * @param defaultSort
      *            The DefaultSort
      */
-    public void setDefaultSort( boolean DefaultSort )
+    public void setDefaultSort( boolean defaultSort )
     {
-        _DefaultSort = DefaultSort;
+        _defaultSort = defaultSort;
     }
 
     /**
@@ -270,9 +270,9 @@ public class Field
      * @param Weight
      *            The Weight
      */
-    public void setWeight( double dWeight )
+    public void setWeight( double weight )
     {
-        _Weight = dWeight;
+        _weight = weight;
     }
 
     /**
@@ -282,7 +282,7 @@ public class Field
      */
     public double getWeight( )
     {
-        return _Weight;
+        return _weight;
     }
 
     /**
@@ -292,7 +292,7 @@ public class Field
      */
     public int getFacetMincount( )
     {
-        return _FacetMincount;
+        return _facetMincount;
     }
 
     /**
@@ -302,7 +302,7 @@ public class Field
      */
     public void setFacetMincount( int facetMincount )
     {
-        this._FacetMincount = facetMincount;
+        this._facetMincount = facetMincount;
     }
 
     /**
@@ -324,7 +324,7 @@ public class Field
     {
         strOperator = !( OPERATOR_TYPE_SWITCH.equalsIgnoreCase( strOperator ) || OPERATOR_TYPE_OR.equalsIgnoreCase( strOperator ) ) ? OPERATOR_TYPE_AND
                 : strOperator;
-        this._FacetMincount = OPERATOR_TYPE_AND.equalsIgnoreCase( strOperator ) ? 1 : 0;
+        this._facetMincount = OPERATOR_TYPE_AND.equalsIgnoreCase( strOperator ) ? 1 : 0;
         this._strOperator = strOperator;
     }
 }

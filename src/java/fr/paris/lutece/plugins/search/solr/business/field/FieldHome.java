@@ -46,8 +46,8 @@ import java.util.List;
 public final class FieldHome
 {
     // Static variable pointed at the DAO instance
-    private static IFieldDAO _dao = (IFieldDAO) SpringContextService.getPluginBean( "solr", "fieldDAO" );
-    private static Plugin plugin = PluginService.getPlugin( SolrPlugin.PLUGIN_NAME );
+    private static IFieldDAO _dao = SpringContextService.getBean( "solrFieldDAO" );
+    private static Plugin _plugin = PluginService.getPlugin( SolrPlugin.PLUGIN_NAME );
 
     /**
      * Private constructor - this class need not be instantiated
@@ -65,7 +65,7 @@ public final class FieldHome
      */
     public static Field create( Field field )
     {
-        _dao.insert( field, plugin );
+        _dao.insert( field, _plugin );
 
         return field;
     }
@@ -79,7 +79,7 @@ public final class FieldHome
      */
     public static Field update( Field field )
     {
-        _dao.store( field, plugin );
+        _dao.store( field, _plugin );
 
         return field;
     }
@@ -92,7 +92,7 @@ public final class FieldHome
      */
     public static void remove( int nFieldId )
     {
-        _dao.delete( nFieldId, plugin );
+        _dao.delete( nFieldId, _plugin );
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -107,7 +107,7 @@ public final class FieldHome
      */
     public static Field findByPrimaryKey( int nKey )
     {
-        return _dao.load( nKey, plugin );
+        return _dao.load( nKey, _plugin );
     }
 
     /**
@@ -117,6 +117,6 @@ public final class FieldHome
      */
     public static List<Field> getFieldsList( )
     {
-        return _dao.selectFieldsList( plugin );
+        return _dao.selectFieldsList( _plugin );
     }
 }

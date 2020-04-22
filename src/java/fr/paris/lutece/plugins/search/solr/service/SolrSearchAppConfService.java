@@ -56,6 +56,10 @@ public class SolrSearchAppConfService
     private static final String DSKEY_MAPPING = ".mapping";
     private static final String DSKEY_ADDON_BEANS = ".addonBeans.";
 
+    private SolrSearchAppConfService( )
+    {
+    }
+
     public static SolrSearchAppConf loadConfiguration( String code )
     {
         String strSafeCode = ( code == null ) ? EMPTY_CODE : code;

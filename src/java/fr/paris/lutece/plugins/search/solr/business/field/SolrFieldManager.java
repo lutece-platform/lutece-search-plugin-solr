@@ -33,8 +33,8 @@
  */
 package fr.paris.lutece.plugins.search.solr.business.field;
 
-import fr.paris.lutece.plugins.search.solr.business.facetIntersection.FacetIntersection;
-import fr.paris.lutece.plugins.search.solr.business.facetIntersection.FacetIntersectionHome;
+import fr.paris.lutece.plugins.search.solr.business.facetintersection.FacetIntersection;
+import fr.paris.lutece.plugins.search.solr.business.facetintersection.FacetIntersectionHome;
 import fr.paris.lutece.plugins.search.solr.util.SolrUtil;
 
 import java.util.ArrayList;
@@ -45,60 +45,60 @@ import java.util.Map;
 public class SolrFieldManager
 {
     // Static
-    private static List<Field> fieldList = loadFieldList( );
-    private static Map<String, Field> facetList = loadFacetList( );
-    private static List<Field> sortList = loadSortList( );
-    private static List<FacetIntersection> intersectionList = loadIntersectionList( );
+    private static List<Field> _fieldList = loadFieldList( );
+    private static Map<String, Field> _facetList = loadFacetList( );
+    private static List<Field> _sortList = loadSortList( );
+    private static List<FacetIntersection> _intersectionList = loadIntersectionList( );
 
     // attributes
-    private List<FacetHistorique> currentFacet;
+    private List<FacetHistorique> _currentFacet;
 
     public SolrFieldManager( )
     {
-        this.currentFacet = new ArrayList<FacetHistorique>( );
+        this._currentFacet = new ArrayList<>( );
     }
 
     public void addFacet( String key )
     {
         FacetHistorique facet = new FacetHistorique( key, "" );
 
-        for ( FacetHistorique f : this.currentFacet )
+        for ( FacetHistorique f : this._currentFacet )
         {
-            if ( f.name.equals( key ) )
+            if ( f._name.equals( key ) )
             {
                 return;
             }
         }
-
-        for ( FacetHistorique f : this.currentFacet )
+        StringBuilder facetQuery = new StringBuilder( );
+        for ( FacetHistorique f : this._currentFacet )
         {
             // encode key
             String strEncodedKey = SolrUtil.encodeUrl( key );
-            f.query += ( "&fq=" + strEncodedKey );
+            f._query += ( "&fq=" + strEncodedKey );
 
-            String strEncodedName = SolrUtil.encodeUrl( f.name );
-            facet.query += ( "&fq=" + strEncodedName );
+            String strEncodedName = SolrUtil.encodeUrl( f._name );
+            facetQuery.append( "&fq=" ).append( strEncodedName );
         }
-
-        this.currentFacet.add( facet );
+        facet._query = facetQuery.toString( );
+        this._currentFacet.add( facet );
     }
 
     public List<FacetHistorique> getCurrentFacet( )
     {
-        return currentFacet;
+        return _currentFacet;
     }
 
     // STATIC FUNCTIONS
     public static void reloadField( )
     {
-        fieldList = loadFieldList( );
-        facetList = loadFacetList( );
-        sortList = loadSortList( );
+        _fieldList = loadFieldList( );
+        _facetList = loadFacetList( );
+        _sortList = loadSortList( );
     }
 
     public static void reloadIntersection( )
     {
-        intersectionList = loadIntersectionList( );
+        _intersectionList = loadIntersectionList( );
     }
 
     /**
@@ -113,7 +113,7 @@ public class SolrFieldManager
 
     private static Map<String, Field> loadFacetList( )
     {
-        Map<String, Field> result = new HashMap<String, Field>( );
+        Map<String, Field> result = new HashMap<>( );
 
         for ( Field field : getFieldList( ) )
         {
@@ -125,7 +125,7 @@ public class SolrFieldManager
 
     private static List<Field> loadSortList( )
     {
-        List<Field> result = new ArrayList<Field>( );
+        List<Field> result = new ArrayList<>( );
 
         for ( Field field : getFieldList( ) )
         {
@@ -140,30 +140,28 @@ public class SolrFieldManager
 
     private static List<FacetIntersection> loadIntersectionList( )
     {
-        List<FacetIntersection> list = FacetIntersectionHome.getFacetIntersectionsList( );
-
-        return list;
+        return FacetIntersectionHome.getFacetIntersectionsList( );
     }
 
     // Getters & setters
     public static List<Field> getFieldList( )
     {
-        return fieldList;
+        return _fieldList;
     }
 
     public static Map<String, Field> getFacetList( )
     {
-        return facetList;
+        return _facetList;
     }
 
     public static List<Field> getSortList( )
     {
-        return sortList;
+        return _sortList;
     }
 
     public static List<FacetIntersection> getIntersectionlist( )
     {
-        return intersectionList;
+        return _intersectionList;
     }
 
     /**
@@ -199,25 +197,25 @@ public class SolrFieldManager
         }
     }
 
-    public class FacetHistorique
+    public static class FacetHistorique
     {
-        public String name;
-        public String query;
+        private String _name;
+        private String _query;
 
         public FacetHistorique( String name, String query )
         {
-            this.name = name;
-            this.query = query;
+            this._name = name;
+            this._query = query;
         }
 
         public String getName( )
         {
-            return name;
+            return _name;
         }
 
         public String getQuery( )
         {
-            return query;
+            return _query;
         }
     }
 

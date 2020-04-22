@@ -45,7 +45,7 @@ import java.util.List;
 public final class SolrIndexerActionHome
 {
     // Static variable pointed at the DAO instance
-    private static ISolrIndexerActionDAO _dao = (ISolrIndexerActionDAO) SpringContextService.getBean( "solrIndexerActionDAO" );
+    private static ISolrIndexerActionDAO _dao = SpringContextService.getBean( "solrIndexerActionDAO" );
 
     /**
      * Private constructor - this class need not be instantiated

@@ -31,7 +31,7 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.search.solr.business.facetIntersection;
+package fr.paris.lutece.plugins.search.solr.business.facetintersection;
 
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.plugins.search.solr.service.SolrPlugin;
@@ -47,8 +47,8 @@ import java.util.List;
 public final class FacetIntersectionHome
 {
     // Static variable pointed at the DAO instance
-    private static IFacetIntersectionDAO _dao = (IFacetIntersectionDAO) SpringContextService.getPluginBean( "solr", "facetIntersectionDAO" );
-    private static Plugin plugin = PluginService.getPlugin( SolrPlugin.PLUGIN_NAME );
+    private static IFacetIntersectionDAO _dao = SpringContextService.getBean( "facetIntersectionDAO" );
+    private static Plugin _plugin = PluginService.getPlugin( SolrPlugin.PLUGIN_NAME );
 
     /**
      * Private constructor - this class need not be instantiated
@@ -66,7 +66,7 @@ public final class FacetIntersectionHome
      */
     public static FacetIntersection create( FacetIntersection facetIntersection )
     {
-        _dao.insert( facetIntersection, plugin );
+        _dao.insert( facetIntersection, _plugin );
 
         return facetIntersection;
     }
@@ -82,7 +82,7 @@ public final class FacetIntersectionHome
         FacetIntersection fi = new FacetIntersection( );
         fi.setField1( f1 );
         fi.setField2( f2 );
-        _dao.insert( fi, plugin );
+        _dao.insert( fi, _plugin );
 
         return fi;
     }
@@ -97,7 +97,7 @@ public final class FacetIntersectionHome
      */
     public static void remove( int nFacetIntersectionId, int nFacetIntersectionId2 )
     {
-        _dao.delete( nFacetIntersectionId, nFacetIntersectionId2, plugin );
+        _dao.delete( nFacetIntersectionId, nFacetIntersectionId2, _plugin );
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -110,6 +110,6 @@ public final class FacetIntersectionHome
      */
     public static List<FacetIntersection> getFacetIntersectionsList( )
     {
-        return _dao.selectFacetIntersectionsList( plugin );
+        return _dao.selectFacetIntersectionsList( _plugin );
     }
 }

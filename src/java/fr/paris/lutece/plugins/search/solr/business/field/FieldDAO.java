@@ -61,20 +61,15 @@ public final class FieldDAO implements IFieldDAO
      */
     public int newPrimaryKey( Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEW_PK, plugin );
-        daoUtil.executeQuery( );
-
-        int nKey;
-
-        if ( !daoUtil.next( ) )
+        int nKey = 1;
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEW_PK, plugin ) )
         {
-            // if the table is empty
-            nKey = 1;
+            daoUtil.executeQuery( );
+            if ( daoUtil.next( ) )
+            {
+                nKey = daoUtil.getInt( 1 ) + 1;
+            }
         }
-
-        nKey = daoUtil.getInt( 1 ) + 1;
-        daoUtil.free( );
-
         return nKey;
     }
 
@@ -88,25 +83,25 @@ public final class FieldDAO implements IFieldDAO
      */
     public void insert( Field field, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin ) )
+        {
+            field.setIdField( newPrimaryKey( plugin ) );
 
-        field.setIdField( newPrimaryKey( plugin ) );
-
-        int i = 1;
-        daoUtil.setInt( i++, field.getIdField( ) );
-        daoUtil.setString( i++, field.getName( ) );
-        daoUtil.setString( i++, field.getLabel( ) );
-        daoUtil.setString( i++, field.getDescription( ) );
-        daoUtil.setBoolean( i++, field.getIsFacet( ) );
-        daoUtil.setBoolean( i++, field.getEnableFacet( ) );
-        daoUtil.setBoolean( i++, field.getIsSort( ) );
-        daoUtil.setBoolean( i++, field.getEnableSort( ) );
-        daoUtil.setBoolean( i++, field.getDefaultSort( ) );
-        daoUtil.setDouble( i++, field.getWeight( ) );
-        daoUtil.setInt( i++, field.getFacetMincount( ) );
-        daoUtil.setString( i++, field.getOperator( ) );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+            int i = 0;
+            daoUtil.setInt( ++i, field.getIdField( ) );
+            daoUtil.setString( ++i, field.getName( ) );
+            daoUtil.setString( ++i, field.getLabel( ) );
+            daoUtil.setString( ++i, field.getDescription( ) );
+            daoUtil.setBoolean( ++i, field.getIsFacet( ) );
+            daoUtil.setBoolean( ++i, field.getEnableFacet( ) );
+            daoUtil.setBoolean( ++i, field.getIsSort( ) );
+            daoUtil.setBoolean( ++i, field.getEnableSort( ) );
+            daoUtil.setBoolean( ++i, field.getDefaultSort( ) );
+            daoUtil.setDouble( ++i, field.getWeight( ) );
+            daoUtil.setInt( ++i, field.getFacetMincount( ) );
+            daoUtil.setString( ++i, field.getOperator( ) );
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -120,33 +115,33 @@ public final class FieldDAO implements IFieldDAO
      */
     public Field load( int nId, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin );
-        daoUtil.setInt( 1, nId );
-        daoUtil.executeQuery( );
-
         Field field = null;
-
-        if ( daoUtil.next( ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
         {
-            field = new Field( );
+            daoUtil.setInt( 1, nId );
+            daoUtil.executeQuery( );
 
-            int i = 1;
-            field.setIdField( daoUtil.getInt( i++ ) );
-            field.setName( daoUtil.getString( i++ ) );
-            field.setLabel( daoUtil.getString( i++ ) );
-            field.setDescription( daoUtil.getString( i++ ) );
-            field.setIsFacet( daoUtil.getBoolean( i++ ) );
-            field.setEnableFacet( daoUtil.getBoolean( i++ ) );
-            field.setIsSort( daoUtil.getBoolean( i++ ) );
-            field.setEnableSort( daoUtil.getBoolean( i++ ) );
-            field.setDefaultSort( daoUtil.getBoolean( i++ ) );
-            field.setWeight( daoUtil.getDouble( i++ ) );
-            field.setFacetMincount( daoUtil.getInt( i++ ) );
-            field.setOperator( daoUtil.getString( i ) );
+            if ( daoUtil.next( ) )
+            {
+                field = new Field( );
+
+                int i = 1;
+                field.setIdField( daoUtil.getInt( i++ ) );
+                field.setName( daoUtil.getString( i++ ) );
+                field.setLabel( daoUtil.getString( i++ ) );
+                field.setDescription( daoUtil.getString( i++ ) );
+                field.setIsFacet( daoUtil.getBoolean( i++ ) );
+                field.setEnableFacet( daoUtil.getBoolean( i++ ) );
+                field.setIsSort( daoUtil.getBoolean( i++ ) );
+                field.setEnableSort( daoUtil.getBoolean( i++ ) );
+                field.setDefaultSort( daoUtil.getBoolean( i++ ) );
+                field.setWeight( daoUtil.getDouble( i++ ) );
+                field.setFacetMincount( daoUtil.getInt( i++ ) );
+                field.setOperator( daoUtil.getString( i ) );
+
+            }
 
         }
-
-        daoUtil.free( );
 
         return field;
     }
@@ -161,10 +156,11 @@ public final class FieldDAO implements IFieldDAO
      */
     public void delete( int nFieldId, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );
-        daoUtil.setInt( 1, nFieldId );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
+        {
+            daoUtil.setInt( 1, nFieldId );
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -177,25 +173,25 @@ public final class FieldDAO implements IFieldDAO
      */
     public void store( Field field, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
+        {
+            int i = 0;
+            daoUtil.setInt( ++i, field.getIdField( ) );
+            daoUtil.setString( ++i, field.getName( ) );
+            daoUtil.setString( ++i, field.getLabel( ) );
+            daoUtil.setString( ++i, field.getDescription( ) );
+            daoUtil.setBoolean( ++i, field.getIsFacet( ) );
+            daoUtil.setBoolean( ++i, field.getEnableFacet( ) );
+            daoUtil.setBoolean( ++i, field.getIsSort( ) );
+            daoUtil.setBoolean( ++i, field.getEnableSort( ) );
+            daoUtil.setBoolean( ++i, field.getDefaultSort( ) );
+            daoUtil.setDouble( ++i, field.getWeight( ) );
+            daoUtil.setInt( ++i, field.getFacetMincount( ) );
+            daoUtil.setString( ++i, field.getOperator( ) );
+            daoUtil.setInt( ++i, field.getIdField( ) );
 
-        int i = 1;
-        daoUtil.setInt( i++, field.getIdField( ) );
-        daoUtil.setString( i++, field.getName( ) );
-        daoUtil.setString( i++, field.getLabel( ) );
-        daoUtil.setString( i++, field.getDescription( ) );
-        daoUtil.setBoolean( i++, field.getIsFacet( ) );
-        daoUtil.setBoolean( i++, field.getEnableFacet( ) );
-        daoUtil.setBoolean( i++, field.getIsSort( ) );
-        daoUtil.setBoolean( i++, field.getEnableSort( ) );
-        daoUtil.setBoolean( i++, field.getDefaultSort( ) );
-        daoUtil.setDouble( i++, field.getWeight( ) );
-        daoUtil.setInt( i++, field.getFacetMincount( ) );
-        daoUtil.setString( i++, field.getOperator( ) );
-        daoUtil.setInt( i++, field.getIdField( ) );
-
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -207,32 +203,30 @@ public final class FieldDAO implements IFieldDAO
      */
     public List<Field> selectFieldsList( Plugin plugin )
     {
-        List<Field> fieldList = new ArrayList<Field>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        List<Field> fieldList = new ArrayList<>( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, plugin ) )
         {
-            Field field = new Field( );
+            daoUtil.executeQuery( );
+            while ( daoUtil.next( ) )
+            {
+                Field field = new Field( );
 
-            int i = 1;
-            field.setIdField( daoUtil.getInt( i++ ) );
-            field.setName( daoUtil.getString( i++ ) );
-            field.setLabel( daoUtil.getString( i++ ) );
-            field.setDescription( daoUtil.getString( i++ ) );
-            field.setIsFacet( daoUtil.getBoolean( i++ ) );
-            field.setEnableFacet( daoUtil.getBoolean( i++ ) );
-            field.setIsSort( daoUtil.getBoolean( i++ ) );
-            field.setEnableSort( daoUtil.getBoolean( i++ ) );
-            field.setDefaultSort( daoUtil.getBoolean( i++ ) );
-            field.setWeight( daoUtil.getDouble( i++ ) );
-            field.setFacetMincount( daoUtil.getInt( i++ ) );
-            field.setOperator( daoUtil.getString( i ) );
-            fieldList.add( field );
+                int i = 0;
+                field.setIdField( daoUtil.getInt( ++i ) );
+                field.setName( daoUtil.getString( ++i ) );
+                field.setLabel( daoUtil.getString( ++i ) );
+                field.setDescription( daoUtil.getString( ++i ) );
+                field.setIsFacet( daoUtil.getBoolean( ++i ) );
+                field.setEnableFacet( daoUtil.getBoolean( ++i ) );
+                field.setIsSort( daoUtil.getBoolean( ++i ) );
+                field.setEnableSort( daoUtil.getBoolean( ++i ) );
+                field.setDefaultSort( daoUtil.getBoolean( ++i ) );
+                field.setWeight( daoUtil.getDouble( ++i ) );
+                field.setFacetMincount( daoUtil.getInt( ++i ) );
+                field.setOperator( daoUtil.getString( i ) );
+                fieldList.add( field );
+            }
         }
-
-        daoUtil.free( );
-
         return fieldList;
     }
 }

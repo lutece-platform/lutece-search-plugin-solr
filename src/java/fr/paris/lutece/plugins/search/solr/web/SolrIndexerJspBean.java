@@ -51,6 +51,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class SolrIndexerJspBean extends PluginAdminPageJspBean
 {
+    private static final long serialVersionUID = -817567539235503458L;
     ////////////////////////////////////////////////////////////////////////////
     // Constantes
     public static final String RIGHT_INDEXER = "SOLR_INDEX_MANAGEMENT";
@@ -62,6 +63,8 @@ public class SolrIndexerJspBean extends PluginAdminPageJspBean
     private static final String MARK_INDEXERS_LIST = "indexers_list";
 
     private static final String JSP_VIEW_INDEXATION = "ViewSearchIndexation.jsp";
+    private static final String INDEX_INCR = "incremental";
+    private static final String INDEX_TOTAL = "total";
 
     private static Thread _thread;
     private static String _threadLogs;
@@ -132,58 +135,60 @@ public class SolrIndexerJspBean extends PluginAdminPageJspBean
      */
     public static synchronized String doIndexing( HttpServletRequest request )
     {
-        if ( _thread == null )
+        if ( _thread != null )
         {
-            if ( request.getParameter( "incremental" ) != null )
+            return JSP_VIEW_INDEXATION;
+        }
+        if ( request.getParameter( INDEX_INCR ) != null )
+        {
+            _command = INDEX_INCR;
+        }
+        else
+            if ( request.getParameter( INDEX_TOTAL ) != null )
             {
-                _command = "incremental";
+                _command = INDEX_TOTAL;
             }
             else
-                if ( request.getParameter( "total" ) != null )
+                if ( request.getParameter( "del" ) != null )
                 {
-                    _command = "total";
+                    _command = "del";
                 }
-                else
-                    if ( request.getParameter( "del" ) != null )
-                    {
-                        _command = "del";
-                    }
-            _thread = new Thread( )
+        _thread = new Thread( )
+        {
+            @Override
+            public void run( )
             {
-                @Override
-                public void run( )
+                try
                 {
-                    try
+                    if ( INDEX_INCR.equals( _command ) )
                     {
-                        if ( "incremental".equals( _command ) )
+                        _threadLogs = SolrIndexerService.processIndexing( false );
+                    }
+                    else
+                        if ( INDEX_TOTAL.equals( _command ) )
                         {
-                            _threadLogs = SolrIndexerService.processIndexing( false );
+                            _threadLogs = SolrIndexerService.processIndexing( true );
                         }
                         else
-                            if ( "total".equals( _command ) )
+                            if ( "del".equals( _command ) )
                             {
-                                _threadLogs = SolrIndexerService.processIndexing( true );
+                                _threadLogs = SolrIndexerService.processDel( );
                             }
-                            else
-                                if ( "del".equals( _command ) )
-                                {
-                                    _threadLogs = SolrIndexerService.processDel( );
-                                }
-                    }
-                    catch( Exception e )
-                    {
-                        _threadLogs = e.toString( );
-                        AppLogService.error( "Error during solr indexation", e );
-                    }
-                    finally
-                    {
-                        _thread = null;
-                    }
                 }
-            };
-            _thread.start( );
-        }
+                catch( Exception e )
+                {
+                    _threadLogs = e.toString( );
+                    AppLogService.error( "Error during solr indexation", e );
+                }
+                finally
+                {
+                    _thread = null;
+                }
+            }
+        };
+        _thread.start( );
 
         return JSP_VIEW_INDEXATION;
     }
+    
 }
