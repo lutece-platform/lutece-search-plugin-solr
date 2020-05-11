@@ -82,6 +82,8 @@ public final class SolrIndexerService
     private static final String PROPERTY_BASE_URL = "lutece.base.url";
     private static final String LOG_ERROR = " - ERROR : ";
     private static final String LOG_CLOSE_STRONG = "</strong>\r\n";
+    private static final String PROPERTY_COMMIT_SIZE = "solr.indexer.commit.size";
+    
 
     /**
      * Empty private constructor
@@ -193,9 +195,16 @@ public final class SolrIndexerService
     {
         try
         {
+            int commitSize = Integer.parseInt( AppPropertiesService.getProperty( PROPERTY_COMMIT_SIZE ) );
+            int count = 0;
             for ( SolrItem solrItem : solrItems )
             {
+                count++;
                 writeNoCommit( solrItem, sbLogs );
+                if ( count % commitSize == 0)
+                {
+                    SOLR_SERVER.commit( );
+                }
             }
             SOLR_SERVER.commit( );
         }
@@ -534,6 +543,7 @@ public final class SolrIndexerService
         solrInputDocument.addField( SolrItem.FIELD_HIERATCHY_DATE, solrItem.getHieDate( ) );
         solrInputDocument.addField( SolrItem.FIELD_CATEGORIE, solrItem.getCategorie( ) );
         solrInputDocument.addField( SolrItem.FIELD_CONTENT, solrItem.getContent( ) );
+        solrInputDocument.addField( SolrItem.FIELD_FILE_CONTENT, solrItem.getFileContent( ) );
         solrInputDocument.addField( SearchItem.FIELD_DOCUMENT_PORTLET_ID, solrItem.getDocPortletId( ) );
 
         // Add the dynamic fields

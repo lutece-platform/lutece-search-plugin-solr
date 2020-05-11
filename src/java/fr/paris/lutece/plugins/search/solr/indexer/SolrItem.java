@@ -61,6 +61,7 @@ public class SolrItem
     public static final String FIELD_CONTENT = "content";
     public static final String FIELD_SITE = "site";
     public static final String FIELD_XML_CONTENT = "xml_content";
+    public static final String FIELD_FILE_CONTENT = "file_content";
     public static final String FIELD_CATEGORIE = "categorie";
     public static final String FIELD_HIERATCHY_DATE = "hiedate";
     public static final String FIELD_METADATA = "metadata";
@@ -104,6 +105,8 @@ public class SolrItem
     private String _strMetadata;
     @Field( SearchItem.FIELD_DOCUMENT_PORTLET_ID )
     private String _strDocPortletId;
+    @Field( FIELD_FILE_CONTENT )
+    private String _strFileContent;
 
     // DynamicField
     @Field( "*" + DYNAMIC_LIST_FIELD_SUFFIX )
@@ -692,4 +695,21 @@ public class SolrItem
     {
         _strDocPortletId = strDocPortletId;
     }
+
+    /**
+     * @return the strFileContent
+     */
+    public String getFileContent( )
+    {
+        return _strFileContent;
+    }
+
+    /**
+     * @param strFileContent the strFileContent to set
+     */
+    public void setFileContent( String strFileContent )
+    {
+        _strFileContent = strFileContent;
+    }
+    
 }

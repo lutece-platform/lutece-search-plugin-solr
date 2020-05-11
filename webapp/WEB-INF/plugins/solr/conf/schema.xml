@@ -61,6 +61,8 @@
             indexed="true" />
         <field name="role" type="string" indexed="true"
             stored="true" />
+        <field name="file_content" type="text" indexed="true"
+            stored="true" />
         <field name="xml_content" type="text" indexed="true"
             stored="true" />
         <field name="categorie" type="string" indexed="true"
@@ -100,6 +102,7 @@
         <copyField source="categorie" dest="text" />
         <copyField source="summary" dest="text" />
         <copyField source="content" dest="text" />
+        <copyField source="file_content" dest="text" />
         <copyField source="metadata" dest="text" />
     </fields>
     <uniqueKey>uid</uniqueKey>

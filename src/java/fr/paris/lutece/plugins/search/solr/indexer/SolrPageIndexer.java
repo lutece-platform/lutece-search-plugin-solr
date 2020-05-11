@@ -33,22 +33,16 @@
  */
 package fr.paris.lutece.plugins.search.solr.indexer;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.html.HtmlParser;
-import org.apache.tika.sax.BodyContentHandler;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
 
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
+import fr.paris.lutece.plugins.search.solr.util.LuteceSolrException;
 import fr.paris.lutece.plugins.search.solr.util.LuteceSolrRuntimeException;
 import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
+import fr.paris.lutece.plugins.search.solr.util.TikaIndexerUtil;
 import fr.paris.lutece.portal.business.page.Page;
 import fr.paris.lutece.portal.business.page.PageHome;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
@@ -132,12 +126,10 @@ public class SolrPageIndexer implements SolrIndexer
      *            The base URL for documents
      * @param page
      *            the page to index
-     * @throws IOException
-     *             The IO Exception
      * @throws SiteMessageException
      *             occurs when a site message need to be displayed
      */
-    private SolrItem getItem( Page page, String strUrl ) throws IOException, SiteMessageException
+    private SolrItem getItem( Page page, String strUrl ) throws SiteMessageException
     {
         // the item
         SolrItem item = new SolrItem( );
@@ -145,20 +137,18 @@ public class SolrPageIndexer implements SolrIndexer
         // indexing page content
         IPageService pageService = SpringContextService.getBean( BEAN_PAGE_SERVICE );
         String strPageContent = pageService.getPageContent( page.getId( ), 0, null );
-        ContentHandler handler = new BodyContentHandler( );
-        Metadata metadata = new Metadata( );
         try
         {
-            new HtmlParser( ).parse( new ByteArrayInputStream( strPageContent.getBytes( ) ), handler, metadata, new ParseContext( ) );
+            ContentHandler handler = TikaIndexerUtil.parseHtml( strPageContent );
+            // the content of the article is recovered in the parser because this one
+            // had replaced the encoded caracters (as &eacute;) by the corresponding special caracter (as ?)
+            item.setContent( handler.toString( ) );
         }
-        catch( SAXException | TikaException e )
+        catch( LuteceSolrException e )
         {
-            throw new AppException( "Error during page parsing." );
+            throw new AppException( "Error during page parsing.",e );
         }
 
-        // the content of the article is recovered in the parser because this one
-        // had replaced the encoded caracters (as &eacute;) by the corresponding special caracter (as ?)
-        item.setContent( handler.toString( ) );
         item.setTitle( page.getName( ) );
         item.setRole( page.getRole( ) );
 
