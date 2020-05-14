@@ -43,8 +43,6 @@ import java.util.Map.Entry;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.store.Directory;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -99,7 +97,7 @@ public final class SolrIndexerService
      */
     public static List<SolrIndexer> getIndexers( )
     {
-        return INDEXERS;
+        return new ArrayList<>( INDEXERS );
     }
 
     /**
@@ -230,13 +228,6 @@ public final class SolrIndexerService
 
         try
         {
-            Directory dir = IndexationService.getDirectoryIndex( );
-
-            if ( !DirectoryReader.indexExists( dir ) )
-            { // init index
-                bCreateIndex = true;
-            }
-
             Date start = new Date( );
 
             if ( bCreateIndex )
