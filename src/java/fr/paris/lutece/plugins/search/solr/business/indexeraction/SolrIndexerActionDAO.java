@@ -158,7 +158,7 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
             daoUtil.setString( ++i, indexerAction.getTypeResource( ) );
             daoUtil.setInt( ++i, indexerAction.getIdPortlet( ) );
             daoUtil.setInt( ++i, indexerAction.getIdAction( ) );
-            
+
             daoUtil.executeUpdate( );
         }
     }

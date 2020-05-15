@@ -190,5 +190,5 @@ public class SolrIndexerJspBean extends PluginAdminPageJspBean
 
         return JSP_VIEW_INDEXATION;
     }
-    
+
 }

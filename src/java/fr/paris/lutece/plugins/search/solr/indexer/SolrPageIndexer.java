@@ -146,7 +146,7 @@ public class SolrPageIndexer implements SolrIndexer
         }
         catch( LuteceSolrException e )
         {
-            throw new AppException( "Error during page parsing.",e );
+            throw new AppException( "Error during page parsing.", e );
         }
 
         item.setTitle( page.getName( ) );

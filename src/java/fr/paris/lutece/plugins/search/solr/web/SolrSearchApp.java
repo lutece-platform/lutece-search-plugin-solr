@@ -289,7 +289,7 @@ public class SolrSearchApp implements XPageApplication
         if ( StringUtils.isNotBlank( conf.getFilterQuery( ) ) )
         {
             int nNewLength = ( facetQuery == null ) ? 1 : ( facetQuery.length + 1 );
-            String[ ] newFacetQuery = Arrays.copyOf( facetQuery, nNewLength );
+            String [ ] newFacetQuery = Arrays.copyOf( facetQuery, nNewLength );
 
             newFacetQuery [newFacetQuery.length - 1] = conf.getFilterQuery( );
             facetQuery = newFacetQuery;
@@ -314,8 +314,8 @@ public class SolrSearchApp implements XPageApplication
 
             String strOnlyFacets = AppPropertiesService.getProperty( PROPERTY_ONLY_FACTES );
 
-            if ( StringUtils.isNotBlank( strError ) || ( ArrayUtils.isEmpty( facetQuery ) && StringUtils.isNotBlank( strOnlyFacets )
-                    && SolrConstants.CONSTANT_TRUE.equals( strOnlyFacets ) ) )
+            if ( StringUtils.isNotBlank( strError )
+                    || ( ArrayUtils.isEmpty( facetQuery ) && StringUtils.isNotBlank( strOnlyFacets ) && SolrConstants.CONSTANT_TRUE.equals( strOnlyFacets ) ) )
             {
                 // no request and no facet selected : we show the facets but no result
                 nLimit = 0;

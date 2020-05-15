@@ -81,7 +81,6 @@ public final class SolrIndexerService
     private static final String LOG_ERROR = " - ERROR : ";
     private static final String LOG_CLOSE_STRONG = "</strong>\r\n";
     private static final String PROPERTY_COMMIT_SIZE = "solr.indexer.commit.size";
-    
 
     /**
      * Empty private constructor
@@ -199,7 +198,7 @@ public final class SolrIndexerService
             {
                 count++;
                 writeNoCommit( solrItem, sbLogs );
-                if ( count % commitSize == 0)
+                if ( count % commitSize == 0 )
                 {
                     SOLR_SERVER.commit( );
                 }

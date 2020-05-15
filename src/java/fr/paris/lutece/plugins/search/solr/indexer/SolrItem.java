@@ -705,11 +705,12 @@ public class SolrItem
     }
 
     /**
-     * @param strFileContent the strFileContent to set
+     * @param strFileContent
+     *            the strFileContent to set
      */
     public void setFileContent( String strFileContent )
     {
         _strFileContent = strFileContent;
     }
-    
+
 }

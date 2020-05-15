@@ -61,11 +61,11 @@ public final class TikaIndexerUtil
     // 1Mo
     private static final int DEFAULT_DOCUMENT_SIZE = 1048576;
     private static final String CONFIG = AppPathService.getAbsolutePathFromRelativePath( "/WEB-INF/conf/tika.xml" );
-    
+
     private TikaIndexerUtil( )
     {
     }
-    
+
     /**
      * Parse the xml content
      * 
@@ -100,7 +100,7 @@ public final class TikaIndexerUtil
     {
         try
         {
-            ContentHandler handler = new BodyContentHandler(  );
+            ContentHandler handler = new BodyContentHandler( );
             AutoDetectParser parser = new AutoDetectParser( new TikaConfig( CONFIG ) );
             parser.parse( stream, handler, metadata, parseContext );
             return handler;
@@ -167,7 +167,7 @@ public final class TikaIndexerUtil
                 ContentHandler handler = parse( bais );
                 content.append( handler.toString( ) );
             }
-            catch (IOException e)
+            catch( IOException e )
             {
                 throw new LuteceSolrException( "Error while parsing file for item " + item.getUid( ), e );
             }

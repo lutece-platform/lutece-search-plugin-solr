@@ -482,17 +482,14 @@ public class SolrSearchEngine implements SearchEngine
                 }
                 else
                 {
-                    sbFacetString
-                        .append( " " )
-                        .append( strOperator )
-                        .append( " " )
-                        .append( strTmpSearch.trim( ) );
+                    sbFacetString.append( " " ).append( strOperator ).append( " " ).append( strTmpSearch.trim( ) );
                 }
             }
-            else if ( SOLR_SPELLFIELD_SWITCH.equalsIgnoreCase( strOperator ) )
-            {
-                sbFacetString = new StringBuilder( strTmpSearch.trim( ) );
-            }
+            else
+                if ( SOLR_SPELLFIELD_SWITCH.equalsIgnoreCase( strOperator ) )
+                {
+                    sbFacetString = new StringBuilder( strTmpSearch.trim( ) );
+                }
         }
         return strStart.concat( sbFacetString.toString( ) ).concat( strEnd );
     }
@@ -586,7 +583,7 @@ public class SolrSearchEngine implements SearchEngine
         String strFields = "*" + SolrItem.DYNAMIC_GEOJSON_FIELD_SUFFIX + "," + SearchItem.FIELD_UID;
         SolrQuery query = new SolrQuery( strQuery );
         query.setParam( "fl", strFields );
-        
+
         for ( Field field : SolrFieldManager.getFacetList( ).values( ) )
         {
             // Add facet Field
@@ -617,7 +614,7 @@ public class SolrSearchEngine implements SearchEngine
                 if ( CollectionUtils.isNotEmpty( strValues ) )
                 {
                     strFacetString = extractQuery( strValues, tmpFieldValue.getOperator( ) );
-                    if ( isFieldDate( tmpFieldValue.getName( ) )  )
+                    if ( isFieldDate( tmpFieldValue.getName( ) ) )
                     {
                         strFacetString = strFacetString.replaceAll( "\"", "" );
                     }
@@ -792,7 +789,7 @@ public class SolrSearchEngine implements SearchEngine
 
         return _instance;
     }
-    
+
     private boolean isFieldDate( String fieldName )
     {
         return fieldName.equalsIgnoreCase( "date" ) || fieldName.toLowerCase( ).endsWith( "_date" );
