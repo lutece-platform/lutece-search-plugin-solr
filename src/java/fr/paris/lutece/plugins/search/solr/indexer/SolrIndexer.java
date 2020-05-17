@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,6 @@ import fr.paris.lutece.plugins.search.solr.business.field.Field;
 
 import java.util.List;
 
-
 /**
  *
  * SolrIndexer
@@ -46,58 +45,71 @@ import java.util.List;
 public interface SolrIndexer
 {
     /**
-    * Index all solr documents from the plugin, replace  List<SolrItem> getDocuments(  ) method
-    * @return A list of error messages or null if there is no error
-    */
-    List<String> indexDocuments(  );
+     * Index all solr documents from the plugin, replace List<SolrItem> getDocuments( ) method
+     * 
+     * @return A list of error messages or null if there is no error
+     */
+    List<String> indexDocuments( );
 
     /**
      * Returns the name of the indexer.
+     * 
      * @return the name of the indexer
      */
-    String getName(  );
+    String getName( );
 
     /**
      * Returns the version.
+     * 
      * @return the version.
      */
-    String getVersion(  );
+    String getVersion( );
 
     /**
      * Returns the description.
+     * 
      * @return the description.
      */
-    String getDescription(  );
+    String getDescription( );
 
     /**
      * Tells whether the service is enable or not
+     * 
      * @return true if enable, otherwise false
      */
-    boolean isEnable(  );
+    boolean isEnable( );
 
     /**
-     * Returns the list of dynamic fields. The name of the fields must end with a {@link SolrItem} suffix (SolrItem.DYNAMIC_URL_FIELD_SUFFIX, SolrItem.DYNAMIC_TEXT_FIELD_SUFFIX ...)
+     * Returns the list of dynamic fields. The name of the fields must end with a {@link SolrItem} suffix (SolrItem.DYNAMIC_URL_FIELD_SUFFIX,
+     * SolrItem.DYNAMIC_TEXT_FIELD_SUFFIX ...)
+     * 
      * @return the list of additional indexed fields or null if there are no additional fields
      */
-    List<Field> getAdditionalFields(  );
+    List<Field> getAdditionalFields( );
 
     /**
      * Returns a list of SolR documents to add to the index
-     * @param strIdDocument the identifier of the document to convert into a {@link SolrItem} object
+     * 
+     * @param strIdDocument
+     *            the identifier of the document to convert into a {@link SolrItem} object
      * @return A list of documents corresponding to the resource identifier. If nothing has been found, returns null
      */
     List<SolrItem> getDocuments( String strIdDocument );
 
     /**
      * Returns the name of the indexed resources. To prevent conflicts, the names must begin with PluginName_ where PluginName is the name of the plugin.
+     * 
      * @return The list of names of the indexed resources or null
      */
-    List<String> getResourcesName(  );
+    List<String> getResourcesName( );
 
     /**
      * Return the uid of a resource
-     * @param strResourceId the identifier of the resource
-     * @param strResourceType the type of the resource
+     * 
+     * @param strResourceId
+     *            the identifier of the resource
+     * @param strResourceType
+     *            the type of the resource
      * @return the uid of a resource or null if the resource is unknow
      */
     String getResourceUid( String strResourceId, String strResourceType );

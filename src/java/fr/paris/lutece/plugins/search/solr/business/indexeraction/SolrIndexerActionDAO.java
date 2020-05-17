@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,6 @@ import fr.paris.lutece.util.sql.DAOUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * This class provides Data Access methods for Indexer Action objects
  */
@@ -50,15 +49,14 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
     public static final String CONSTANT_WHERE = " WHERE ";
     public static final String CONSTANT_AND = " AND ";
     private static final String SQL_QUERY_NEW_PK = "SELECT max( id_action ) FROM solr_indexer_action";
-    private static final String SQL_QUERY_FIND_BY_PRIMARY_KEY = "SELECT id_action,id_document,id_task,type_ressource, id_portlet" +
-        " FROM solr_indexer_action WHERE id_action = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO solr_indexer_action( id_action,id_document,id_task ,type_ressource,id_portlet)" +
-        " VALUES(?,?,?,?,?)";
+    private static final String SQL_QUERY_FIND_BY_PRIMARY_KEY = "SELECT id_action,id_document,id_task,type_ressource, id_portlet"
+            + " FROM solr_indexer_action WHERE id_action = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO solr_indexer_action( id_action,id_document,id_task ,type_ressource,id_portlet)"
+            + " VALUES(?,?,?,?,?)";
     private static final String SQL_QUERY_DELETE = "DELETE FROM solr_indexer_action WHERE id_action = ? ";
     private static final String SQL_QUERY_TRUNCATE = "DELETE FROM solr_indexer_action  ";
     private static final String SQL_QUERY_UPDATE = "UPDATE solr_indexer_action SET id_action=?,id_document=?,id_task=?,type_ressource=?,id_portlet=? WHERE id_action = ? ";
-    private static final String SQL_QUERY_SELECT = "SELECT id_action,id_document,id_task,type_ressource,id_portlet" +
-        " FROM solr_indexer_action  ";
+    private static final String SQL_QUERY_SELECT = "SELECT id_action,id_document,id_task,type_ressource,id_portlet" + " FROM solr_indexer_action  ";
     private static final String SQL_FILTER_ID_TASK = " id_task = ? ";
 
     /**
@@ -66,20 +64,15 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
      */
     public int newPrimaryKey( Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEW_PK, plugin );
-        daoUtil.executeQuery(  );
-
-        int nKey;
-
-        if ( !daoUtil.next(  ) )
+        int nKey = 1;
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEW_PK, plugin ) )
         {
-            // if the table is empty
-            nKey = 1;
+            daoUtil.executeQuery( );
+            if ( daoUtil.next( ) )
+            {
+                nKey = daoUtil.getInt( 1 ) + 1;
+            }
         }
-
-        nKey = daoUtil.getInt( 1 ) + 1;
-        daoUtil.free(  );
-
         return nKey;
     }
 
@@ -88,17 +81,18 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
      */
     public synchronized void insert( SolrIndexerAction indexerAction, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin );
-        daoUtil.setString( 2, indexerAction.getIdDocument(  ) );
-        daoUtil.setInt( 3, indexerAction.getIdTask(  ) );
-        daoUtil.setString( 4, indexerAction.getTypeResource(  ) );
-        daoUtil.setInt( 5, indexerAction.getIdPortlet(  ) );
-        indexerAction.setIdAction( newPrimaryKey( plugin ) );
-        daoUtil.setInt( 1, indexerAction.getIdAction(  ) );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin ) )
+        {
+            int i = 0;
+            indexerAction.setIdAction( newPrimaryKey( plugin ) );
+            daoUtil.setInt( ++i, indexerAction.getIdAction( ) );
+            daoUtil.setString( ++i, indexerAction.getIdDocument( ) );
+            daoUtil.setInt( ++i, indexerAction.getIdTask( ) );
+            daoUtil.setString( ++i, indexerAction.getTypeResource( ) );
+            daoUtil.setInt( ++i, indexerAction.getIdPortlet( ) );
 
-        daoUtil.executeUpdate(  );
-
-        daoUtil.free(  );
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -108,22 +102,22 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
     {
         SolrIndexerAction indexerAction = null;
 
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_BY_PRIMARY_KEY, plugin );
-        daoUtil.setInt( 1, nId );
-        daoUtil.executeQuery(  );
-
-        if ( daoUtil.next(  ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_BY_PRIMARY_KEY, plugin ) )
         {
-            indexerAction = new SolrIndexerAction(  );
-            indexerAction.setIdAction( daoUtil.getInt( 1 ) );
-            indexerAction.setIdDocument( daoUtil.getString( 2 ) );
-            indexerAction.setIdTask( daoUtil.getInt( 3 ) );
-            indexerAction.setTypeResource( daoUtil.getString( 4 ) );
-            indexerAction.setIdPortlet( daoUtil.getInt( 5 ) );
+            daoUtil.setInt( 1, nId );
+            daoUtil.executeQuery( );
+
+            if ( daoUtil.next( ) )
+            {
+                int i = 0;
+                indexerAction = new SolrIndexerAction( );
+                indexerAction.setIdAction( daoUtil.getInt( ++i ) );
+                indexerAction.setIdDocument( daoUtil.getString( ++i ) );
+                indexerAction.setIdTask( daoUtil.getInt( ++i ) );
+                indexerAction.setTypeResource( daoUtil.getString( ++i ) );
+                indexerAction.setIdPortlet( daoUtil.getInt( ++i ) );
+            }
         }
-
-        daoUtil.free(  );
-
         return indexerAction;
     }
 
@@ -132,10 +126,11 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
      */
     public void delete( int nId, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );
-        daoUtil.setInt( 1, nId );
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin ) )
+        {
+            daoUtil.setInt( 1, nId );
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -143,9 +138,10 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
      */
     public void deleteAll( Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_TRUNCATE, plugin );
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_TRUNCATE, plugin ) )
+        {
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -153,15 +149,18 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
      */
     public void store( SolrIndexerAction indexerAction, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin );
-        daoUtil.setInt( 1, indexerAction.getIdAction(  ) );
-        daoUtil.setString( 2, indexerAction.getIdDocument(  ) );
-        daoUtil.setInt( 3, indexerAction.getIdTask(  ) );
-        daoUtil.setString( 4, indexerAction.getTypeResource(  ) );
-        daoUtil.setInt( 5, indexerAction.getIdPortlet(  ) );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
+        {
+            int i = 0;
+            daoUtil.setInt( ++i, indexerAction.getIdAction( ) );
+            daoUtil.setString( ++i, indexerAction.getIdDocument( ) );
+            daoUtil.setInt( ++i, indexerAction.getIdTask( ) );
+            daoUtil.setString( ++i, indexerAction.getTypeResource( ) );
+            daoUtil.setInt( ++i, indexerAction.getIdPortlet( ) );
+            daoUtil.setInt( ++i, indexerAction.getIdAction( ) );
 
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -169,42 +168,39 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
      */
     public List<SolrIndexerAction> selectList( IndexerActionFilter filter, Plugin plugin )
     {
-        List<SolrIndexerAction> indexerActionList = new ArrayList<SolrIndexerAction>(  );
-        SolrIndexerAction indexerAction = null;
-        List<String> listStrFilter = new ArrayList<String>(  );
+        List<SolrIndexerAction> indexerActionList = new ArrayList<>( );
+        List<String> listStrFilter = new ArrayList<>( );
 
-        if ( filter.containsIdTask(  ) )
+        if ( filter.containsIdTask( ) )
         {
             listStrFilter.add( SQL_FILTER_ID_TASK );
         }
 
         String strSQL = buildRequestWithFilter( SQL_QUERY_SELECT, listStrFilter, null );
 
-        DAOUtil daoUtil = new DAOUtil( strSQL, plugin );
-
-        int nIndex = 1;
-
-        if ( filter.containsIdTask(  ) )
+        try ( DAOUtil daoUtil = new DAOUtil( strSQL, plugin ) )
         {
-            daoUtil.setInt( nIndex, filter.getIdTask(  ) );
-            nIndex++;
+            int nIndex = 1;
+
+            if ( filter.containsIdTask( ) )
+            {
+                daoUtil.setInt( nIndex++, filter.getIdTask( ) );
+            }
+
+            daoUtil.executeQuery( );
+
+            while ( daoUtil.next( ) )
+            {
+                int i = 0;
+                SolrIndexerAction indexerAction = new SolrIndexerAction( );
+                indexerAction.setIdAction( daoUtil.getInt( ++i ) );
+                indexerAction.setIdDocument( daoUtil.getString( ++i ) );
+                indexerAction.setIdTask( daoUtil.getInt( ++i ) );
+                indexerAction.setTypeResource( daoUtil.getString( ++i ) );
+                indexerAction.setIdPortlet( daoUtil.getInt( ++i ) );
+                indexerActionList.add( indexerAction );
+            }
         }
-
-        daoUtil.executeQuery(  );
-
-        while ( daoUtil.next(  ) )
-        {
-            indexerAction = new SolrIndexerAction(  );
-            indexerAction.setIdAction( daoUtil.getInt( 1 ) );
-            indexerAction.setIdDocument( daoUtil.getString( 2 ) );
-            indexerAction.setIdTask( daoUtil.getInt( 3 ) );
-            indexerAction.setTypeResource( daoUtil.getString( 4 ) );
-            indexerAction.setIdPortlet( daoUtil.getInt( 5 ) );
-            indexerActionList.add( indexerAction );
-        }
-
-        daoUtil.free(  );
-
         return indexerActionList;
     }
 
@@ -213,39 +209,39 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
      */
     public List<SolrIndexerAction> selectList( Plugin plugin )
     {
-        List<SolrIndexerAction> indexerActionList = new ArrayList<SolrIndexerAction>(  );
-        SolrIndexerAction indexerAction = null;
-
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin );
-
-        daoUtil.executeQuery(  );
-
-        while ( daoUtil.next(  ) )
+        List<SolrIndexerAction> indexerActionList = new ArrayList<>( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
         {
-            indexerAction = new SolrIndexerAction(  );
-            indexerAction.setIdAction( daoUtil.getInt( 1 ) );
-            indexerAction.setIdDocument( daoUtil.getString( 2 ) );
-            indexerAction.setIdTask( daoUtil.getInt( 3 ) );
-            indexerAction.setTypeResource( daoUtil.getString( 4 ) );
-            indexerAction.setIdPortlet( daoUtil.getInt( 5 ) );
-            indexerActionList.add( indexerAction );
+            daoUtil.executeQuery( );
+            while ( daoUtil.next( ) )
+            {
+                int i = 0;
+                SolrIndexerAction indexerAction = new SolrIndexerAction( );
+                indexerAction.setIdAction( daoUtil.getInt( ++i ) );
+                indexerAction.setIdDocument( daoUtil.getString( ++i ) );
+                indexerAction.setIdTask( daoUtil.getInt( ++i ) );
+                indexerAction.setTypeResource( daoUtil.getString( ++i ) );
+                indexerAction.setIdPortlet( daoUtil.getInt( ++i ) );
+                indexerActionList.add( indexerAction );
+            }
         }
-
-        daoUtil.free(  );
-
         return indexerActionList;
     }
 
     /**
      * Builds a query with filters placed in parameters
-     * @param strSelect the select of the  query
-     * @param listStrFilter the list of filter to add in the query
-     * @param strOrder the order by of the query
+     * 
+     * @param strSelect
+     *            the select of the query
+     * @param listStrFilter
+     *            the list of filter to add in the query
+     * @param strOrder
+     *            the order by of the query
      * @return a query
      */
     public static String buildRequestWithFilter( String strSelect, List<String> listStrFilter, String strOrder )
     {
-        StringBuffer strBuffer = new StringBuffer(  );
+        StringBuilder strBuffer = new StringBuilder( );
         strBuffer.append( strSelect );
 
         int nCount = 0;
@@ -259,7 +255,7 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
 
             strBuffer.append( strFilter );
 
-            if ( nCount != listStrFilter.size(  ) )
+            if ( nCount != listStrFilter.size( ) )
             {
                 strBuffer.append( CONSTANT_AND );
             }
@@ -270,6 +266,6 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
             strBuffer.append( strOrder );
         }
 
-        return strBuffer.toString(  );
+        return strBuffer.toString( );
     }
 }

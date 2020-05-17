@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,30 +37,38 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 
 import java.util.List;
 
-
 /**
-* IFieldDAO Interface
-*/
+ * IFieldDAO Interface
+ */
 public interface IFieldDAO
 {
     /**
      * Insert a new record in the table.
-     * @param field instance of the Field object to inssert
-     * @param plugin the Plugin
+     * 
+     * @param field
+     *            instance of the Field object to inssert
+     * @param plugin
+     *            the Plugin
      */
     void insert( Field field, Plugin plugin );
 
     /**
-    * Update the record in the table
-    * @param field the reference of the Field
-    * @param plugin the Plugin
-    */
+     * Update the record in the table
+     * 
+     * @param field
+     *            the reference of the Field
+     * @param plugin
+     *            the Plugin
+     */
     void store( Field field, Plugin plugin );
 
     /**
      * Delete a record from the table
-     * @param nIdField int identifier of the Field to delete
-     * @param plugin the Plugin
+     * 
+     * @param nIdField
+     *            int identifier of the Field to delete
+     * @param plugin
+     *            the Plugin
      */
     void delete( int nIdField, Plugin plugin );
 
@@ -69,16 +77,21 @@ public interface IFieldDAO
 
     /**
      * Load the data from the table
-     * @param strId The identifier of the field
-     * @param plugin the Plugin
+     * 
+     * @param strId
+     *            The identifier of the field
+     * @param plugin
+     *            the Plugin
      * @return The instance of the field
      */
     Field load( int nKey, Plugin plugin );
 
     /**
-    * Load the data of all the field objects and returns them as a List
-    * @param plugin the Plugin
-    * @return The List which contains the data of all the field objects
-    */
+     * Load the data of all the field objects and returns them as a List
+     * 
+     * @param plugin
+     *            the Plugin
+     * @return The List which contains the data of all the field objects
+     */
     List<Field> selectFieldsList( Plugin plugin );
 }

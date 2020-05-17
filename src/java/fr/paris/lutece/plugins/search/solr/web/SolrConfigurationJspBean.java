@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@
  */
 package fr.paris.lutece.plugins.search.solr.web;
 
-import fr.paris.lutece.plugins.search.solr.business.facetIntersection.FacetIntersectionHome;
+import fr.paris.lutece.plugins.search.solr.business.facetintersection.FacetIntersectionHome;
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.plugins.search.solr.business.field.FieldHome;
 import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
@@ -50,7 +50,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 
-
 /**
  *
  * SolrIndexerJspBean
@@ -58,6 +57,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class SolrConfigurationJspBean extends PluginAdminPageJspBean
 {
+    private static final long serialVersionUID = 8010702541285203732L;
     ////////////////////////////////////////////////////////////////////////////
     // Constantes
     public static final String RIGHT_CONFIGURATION = "SOLR_CONFIGURATION_MANAGEMENT";
@@ -72,68 +72,59 @@ public class SolrConfigurationJspBean extends PluginAdminPageJspBean
     /**
      * Displays the indexing parameters
      *
-     * @param request the http request
+     * @param request
+     *            the http request
      * @return the html code which displays the parameters page
      */
-    public String getFacet( HttpServletRequest request )
+    private String getFacet( )
     {
-        HashMap<String, Object> model = new HashMap<String, Object>(  );
-        model.put( MARK_FIELD, SolrFieldManager.getFieldList(  ) );
+        HashMap<String, Object> model = new HashMap<>( );
+        model.put( MARK_FIELD, SolrFieldManager.getFieldList( ) );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MANAGE_FACET_CONFIGURATION, getLocale(  ),
-                model );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MANAGE_FACET_CONFIGURATION, getLocale( ), model );
 
-        return template.getHtml(  );
+        return template.getHtml( );
     }
 
-    public String getSort( HttpServletRequest request )
+    private String getSort( )
     {
-        HashMap<String, Object> model = new HashMap<String, Object>(  );
-        model.put( MARK_FIELD, SolrFieldManager.getFieldList(  ) );
+        HashMap<String, Object> model = new HashMap<>( );
+        model.put( MARK_FIELD, SolrFieldManager.getFieldList( ) );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MANAGE_SORT_CONFIGURATION, getLocale(  ), model );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MANAGE_SORT_CONFIGURATION, getLocale( ), model );
 
-        return template.getHtml(  );
+        return template.getHtml( );
     }
 
-    public String getIntersection( HttpServletRequest request )
+    private String getIntersection( )
     {
-        HashMap<String, Object> model = new HashMap<String, Object>(  );
-        model.put( MARK_FIELD, SolrFieldManager.getFacetList(  ).values(  ) );
+        HashMap<String, Object> model = new HashMap<>( );
+        model.put( MARK_FIELD, SolrFieldManager.getFacetList( ).values( ) );
 
-        //load facet intersection
-        model.put( MARK_INTERSECTION, FacetIntersectionHome.getFacetIntersectionsList(  ) );
+        // load facet intersection
+        model.put( MARK_INTERSECTION, FacetIntersectionHome.getFacetIntersectionsList( ) );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MANAGE_INTERSECTION_CONFIGURATION,
-                getLocale(  ), model );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MANAGE_INTERSECTION_CONFIGURATION, getLocale( ), model );
 
-        return template.getHtml(  );
+        return template.getHtml( );
     }
 
     public String getPage( HttpServletRequest request )
     {
-        StringBuffer htmlBuffer = new StringBuffer(  );
-        htmlBuffer.append( this.getFacet( request ) );
-        htmlBuffer.append( this.getSort( request ) );
-        htmlBuffer.append( this.getIntersection( request ) );
+        StringBuilder htmlBuffer = new StringBuilder( );
+        htmlBuffer.append( getFacet( ) );
+        htmlBuffer.append( getSort( ) );
+        htmlBuffer.append( getIntersection( ) );
 
-        return getAdminPage( htmlBuffer.toString(  ) );
+        return getAdminPage( htmlBuffer.toString( ) );
     }
 
-    //Traitement
+    // Traitement
     public String doFacet( HttpServletRequest request )
     {
-        for ( Field field : SolrFieldManager.getFieldList(  ) )
+        for ( Field field : SolrFieldManager.getFieldList( ) )
         {
-            if ( request.getParameter( Integer.toString( field.getIdField(  ) ) ) != null )
-            {
-                field.setEnableFacet( true );
-            }
-            else
-            {
-                field.setEnableFacet( false );
-            }
-
+            field.setEnableFacet( request.getParameter( Integer.toString( field.getIdField( ) ) ) != null );
             FieldHome.update( field );
         }
 
@@ -142,27 +133,13 @@ public class SolrConfigurationJspBean extends PluginAdminPageJspBean
 
     public String doSort( HttpServletRequest request )
     {
-    	String strDefaultSort = request.getParameter( PARAMETER_DEFAULT_SORT );
-        for ( Field field : SolrFieldManager.getFieldList(  ) )
+        String strDefaultSort = request.getParameter( PARAMETER_DEFAULT_SORT );
+        for ( Field field : SolrFieldManager.getFieldList( ) )
         {
-            if ( request.getParameter( Integer.toString( field.getIdField(  ) ) ) != null )
+            field.setEnableSort( request.getParameter( Integer.toString( field.getIdField( ) ) ) != null );
+            if ( StringUtils.isNotBlank( strDefaultSort ) && StringUtils.isNumeric( strDefaultSort ) )
             {
-                field.setEnableSort( true );
-            }
-            else
-            {
-                field.setEnableSort( false );
-            }
-            if ( StringUtils.isNotBlank( strDefaultSort ) && StringUtils.isNumeric( strDefaultSort ) )             		
-            {
-            	if ( Integer.parseInt(strDefaultSort) == field.getIdField(  ) ) 
-            	{
-            		field.setDefaultSort( true );
-            	}
-            	else
-            	{
-            		field.setDefaultSort( false );
-            	}            	
+                field.setDefaultSort( Integer.parseInt( strDefaultSort ) == field.getIdField( ) );
             }
 
             FieldHome.update( field );
@@ -173,24 +150,22 @@ public class SolrConfigurationJspBean extends PluginAdminPageJspBean
 
     public String doIntersect( HttpServletRequest request )
     {
-        //CREATE
+        // CREATE
         if ( request.getParameter( "add" ) != null )
         {
-            FacetIntersectionHome.create( Integer.parseInt( request.getParameter( "field1" ) ),
-                Integer.parseInt( request.getParameter( "field2" ) ) );
+            FacetIntersectionHome.create( Integer.parseInt( request.getParameter( "field1" ) ), Integer.parseInt( request.getParameter( "field2" ) ) );
         }
 
-        //DELETE
-        else if ( request.getParameter( "delete" ) != null )
-        {
-            FacetIntersectionHome.remove( Integer.parseInt( request.getParameter( "field1" ) ),
-                Integer.parseInt( request.getParameter( "field2" ) ) );
-        }
+        // DELETE
+        else
+            if ( request.getParameter( "delete" ) != null )
+            {
+                FacetIntersectionHome.remove( Integer.parseInt( request.getParameter( "field1" ) ), Integer.parseInt( request.getParameter( "field2" ) ) );
+            }
 
-        SolrFieldManager.reloadIntersection(  );
+        SolrFieldManager.reloadIntersection( );
 
-        return AppPathService.getBaseUrl( request ) +
-        "jsp/admin/search/solr/ManageSearchConfiguration.jsp?plugin_name=solr";
+        return AppPathService.getBaseUrl( request ) + "jsp/admin/search/solr/ManageSearchConfiguration.jsp?plugin_name=solr";
     }
 
     private String validMessage( HttpServletRequest request )

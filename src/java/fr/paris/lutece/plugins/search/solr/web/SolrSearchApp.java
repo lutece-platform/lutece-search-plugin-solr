@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,21 @@
  */
 package fr.paris.lutece.plugins.search.solr.web;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.solr.client.solrj.response.SpellCheckResponse;
+
 import fr.paris.lutece.plugins.leaflet.business.GeolocItem;
 import fr.paris.lutece.plugins.leaflet.service.IconService;
 import fr.paris.lutece.plugins.search.solr.business.SolrFacetedResult;
@@ -57,27 +72,12 @@ import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.xpages.XPage;
 import fr.paris.lutece.portal.web.xpages.XPageApplication;
+import fr.paris.lutece.util.html.AbstractPaginator;
 import fr.paris.lutece.util.html.DelegatePaginator;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.html.IPaginator;
-import fr.paris.lutece.util.html.Paginator;
 import fr.paris.lutece.util.string.StringUtil;
 import fr.paris.lutece.util.url.UrlItem;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.response.SpellCheckResponse;
 
 /**
  * This page shows some features of Solr like Highlights or Facets.
@@ -86,6 +86,7 @@ import org.apache.solr.client.solrj.response.SpellCheckResponse;
 public class SolrSearchApp implements XPageApplication
 {
 
+    private static final long serialVersionUID = -2504409688612219166L;
     private static final String FULL_URL = "fullUrl";
     private static final String SOLR_FACET_DATE_GAP = "facetDateGap";
     private static final String ALL_SEARCH_QUERY = "*:*";
@@ -98,8 +99,7 @@ public class SolrSearchApp implements XPageApplication
     private static final String PROPERTY_PAGE_TITLE = "portal.search.search_results.pageTitle";
     private static final String PROPERTY_ONLY_FACTES = "solr.onlyFacets";
     private static final String PROPERTY_SOLR_RESPONSE_MAX = "solr.reponse.max";
-    private static final int SOLR_RESPONSE_MAX = Integer.parseInt(AppPropertiesService.getProperty(
-            PROPERTY_SOLR_RESPONSE_MAX, "50"));
+    private static final int SOLR_RESPONSE_MAX = Integer.parseInt( AppPropertiesService.getProperty( PROPERTY_SOLR_RESPONSE_MAX, "50" ) );
     private static final String MESSAGE_INVALID_SEARCH_TERMS = "portal.search.message.invalidSearchTerms";
     private static final int DEFAULT_RESULTS_PER_PAGE = 10;
     private static final String DEFAULT_PAGE_INDEX = "1";
@@ -108,7 +108,6 @@ public class SolrSearchApp implements XPageApplication
     private static final String PARAMETER_QUERY = "query";
     private static final String PARAMETER_CONF = "conf";
     private static final String PARAMETER_FACET_QUERY = "fq";
-    private static final String PARAMETER_PREVIOUS_SEARCH = "previous_search";
 
     private static final String PARAMETER_FACET_LABEL = "facetlabel";
     private static final String PARAMETER_FACET_NAME = "facetname";
@@ -140,367 +139,349 @@ public class SolrSearchApp implements XPageApplication
     private static final String MARK_POINTS_TYPE = "type";
     private static final String PROPERTY_ENCODE_URI = "search.encode.uri";
     private static final boolean DEFAULT_ENCODE_URI = false;
-    private static final boolean SOLR_SPELLCHECK = AppPropertiesService.getPropertyBoolean("solr.spellchecker", false);
+    private static final boolean SOLR_SPELLCHECK = AppPropertiesService.getPropertyBoolean( "solr.spellchecker", false );
 
     /**
      * Returns search results
      *
-     * @param request The HTTP request.
-     * @param nMode The current mode.
-     * @param plugin The plugin
+     * @param request
+     *            The HTTP request.
+     * @param nMode
+     *            The current mode.
+     * @param plugin
+     *            The plugin
      * @return The HTML code of the page.
-     * @throws SiteMessageException exception
+     * @throws SiteMessageException
+     *             exception
      */
     @Override
-    public XPage getPage(HttpServletRequest request, int nMode, Plugin plugin)
-            throws SiteMessageException
+    public XPage getPage( HttpServletRequest request, int nMode, Plugin plugin ) throws SiteMessageException
     {
-        XPage page = new XPage();
+        XPage page = new XPage( );
 
         String strConfCode = request.getParameter( PARAMETER_CONF );
         SolrSearchAppConf conf = SolrSearchAppConfService.loadConfiguration( strConfCode );
         if ( conf == null )
         {
-            //Use default conf if the requested one doesn't exist
+            // Use default conf if the requested one doesn't exist
             conf = SolrSearchAppConfService.loadConfiguration( null );
         }
 
-        Map<String, Object> model = getSearchResultModel(request, conf);
-        for ( String beanName: conf.getAddonBeanNames() ) {
+        Map<String, Object> model = getSearchResultModel( request, conf );
+        for ( String beanName : conf.getAddonBeanNames( ) )
+        {
             ISolrSearchAppAddOn solrSearchAppAddon = SpringContextService.getBean( beanName );
             solrSearchAppAddon.buildPageAddOn( model, request );
         }
 
-        HtmlTemplate template = AppTemplateService.getTemplate(conf.getTemplate(), request.getLocale(), model);
+        HtmlTemplate template = AppTemplateService.getTemplate( conf.getTemplate( ), request.getLocale( ), model );
 
-        page.setPathLabel(I18nService.getLocalizedString(PROPERTY_PATH_LABEL, request.getLocale()));
-        page.setTitle(I18nService.getLocalizedString(PROPERTY_PAGE_TITLE, request.getLocale()));
-        page.setContent(template.getHtml());
+        page.setPathLabel( I18nService.getLocalizedString( PROPERTY_PATH_LABEL, request.getLocale( ) ) );
+        page.setTitle( I18nService.getLocalizedString( PROPERTY_PAGE_TITLE, request.getLocale( ) ) );
+        page.setContent( template.getHtml( ) );
 
         return page;
     }
+
     /**
      * @param facetQuery
      * @return
      */
     private static String getFacetNameFromIHM( String facetQuery )
     {
-    	String strFacet = null;
-    	String myValues[] = facetQuery.split(":",2);
-        if (myValues != null && myValues.length == 2)
-        	strFacet = myValues[0];
+        String strFacet = null;
+        String [ ] myValues = facetQuery.split( ":", 2 );
+        if ( myValues != null && myValues.length == 2 )
+        {
+            strFacet = myValues [0];
+        }
         return strFacet;
     }
-    
+
     /**
      * @param facetQuery
      * @return
      */
     private static String getFacetValueFromIHM( String facetQuery )
     {
-    	String strFacet = null;
-    	String myValues[] = facetQuery.split(":",2);
-        if (myValues != null && myValues.length == 2)
-        	strFacet = myValues[1];
+        String strFacet = null;
+        String [ ] myValues = facetQuery.split( ":", 2 );
+        if ( myValues != null && myValues.length == 2 )
+        {
+            strFacet = myValues [1];
+        }
         return strFacet;
     }
+
     /**
-     * Performs a search and fills the model (useful when a page needs to remind
-     * search parameters/results) with the default conf
+     * Performs a search and fills the model (useful when a page needs to remind search parameters/results) with the default conf
      *
-     * @param request the request
+     * @param request
+     *            the request
      * @return the model
-     * @throws SiteMessageException if an error occurs
+     * @throws SiteMessageException
+     *             if an error occurs
      */
-    public static Map<String, Object> getSearchResultModel(HttpServletRequest request)
-            throws SiteMessageException
+    public static Map<String, Object> getSearchResultModel( HttpServletRequest request ) throws SiteMessageException
     {
-        return getSearchResultModel(request, null);
+        return getSearchResultModel( request, null );
     }
 
     /**
-     * Performs a search and fills the model (useful when a page needs to remind
-     * search parameters/results)
+     * Performs a search and fills the model (useful when a page needs to remind search parameters/results)
      *
-     * @param request the request
-     * @param conf the configuration
+     * @param request
+     *            the request
+     * @param conf
+     *            the configuration
      * @return the model
-     * @throws SiteMessageException if an error occurs
+     * @throws SiteMessageException
+     *             if an error occurs
      */
-    public static Map<String, Object> getSearchResultModel(HttpServletRequest request, SolrSearchAppConf conf)
-            throws SiteMessageException
+    public static Map<String, Object> getSearchResultModel( HttpServletRequest request, SolrSearchAppConf conf ) throws SiteMessageException
     {
-        String strQuery = request.getParameter(PARAMETER_QUERY);
-        String[] facetQuery = request.getParameterValues(PARAMETER_FACET_QUERY);
-        String sort = request.getParameter(PARAMETER_SORT_NAME);
-        String order = request.getParameter(PARAMETER_SORT_ORDER);
-        String strCurrentPageIndex = request.getParameter(PARAMETER_PAGE_INDEX);
+        String strQuery = request.getParameter( PARAMETER_QUERY );
+        String [ ] facetQuery = request.getParameterValues( PARAMETER_FACET_QUERY );
+        String sort = request.getParameter( PARAMETER_SORT_NAME );
+        String order = request.getParameter( PARAMETER_SORT_ORDER );
+        String strCurrentPageIndex = request.getParameter( PARAMETER_PAGE_INDEX );
 
-        String fname = StringUtils.isBlank(request.getParameter(PARAMETER_FACET_NAME)) ? null : request.getParameter(PARAMETER_FACET_LABEL).trim();
-        String flabel = StringUtils.isBlank(request.getParameter(PARAMETER_FACET_LABEL)) ? null : request.getParameter(PARAMETER_FACET_LABEL).trim();
+        String fname = StringUtils.isBlank( request.getParameter( PARAMETER_FACET_NAME ) ) ? null : request.getParameter( PARAMETER_FACET_LABEL ).trim( );
+        String flabel = StringUtils.isBlank( request.getParameter( PARAMETER_FACET_LABEL ) ) ? null : request.getParameter( PARAMETER_FACET_LABEL ).trim( );
         String strConfCode = request.getParameter( PARAMETER_CONF );
 
-        Locale locale = request.getLocale();
+        Locale locale = request.getLocale( );
 
         if ( conf == null )
         {
-            //Use default conf if not provided
+            // Use default conf if not provided
             conf = SolrSearchAppConfService.loadConfiguration( null );
         }
 
-        StringBuilder sbFacetQueryUrl = new StringBuilder();
-        SolrFieldManager sfm = new SolrFieldManager();
+        StringBuilder sbFacetQueryUrl = new StringBuilder( );
+        SolrFieldManager sfm = new SolrFieldManager( );
 
-        List<String> lstSingleFacetQueries = new ArrayList<String>();
-        Hashtable<String,Boolean> switchType = getSwitched ();
-        ArrayList<String> facetQueryTmp = new ArrayList<String>();
-         if (facetQuery != null)
+        List<String> lstSingleFacetQueries = new ArrayList<>( );
+        Map<String, Boolean> switchType = getSwitched( );
+        ArrayList<String> facetQueryTmp = new ArrayList<>( );
+        if ( facetQuery != null )
         {
-        	 for (String fq : facetQuery)
-        	 {
-	        	 if (sbFacetQueryUrl.indexOf(fq) == -1)
-	             {	
-	        		 String strFqNameIHM = getFacetNameFromIHM ( fq );
-	                 String strFqValueIHM = getFacetValueFromIHM ( fq );
-	                 if ( fname == null || !switchType.containsKey( fname ) ||
-	                	   (strFqNameIHM != null && strFqValueIHM != null && 
-	                	    strFqValueIHM.equalsIgnoreCase(flabel) && 
-	                	    strFqNameIHM.equalsIgnoreCase( fname ) ))
-	                {
-	                	sbFacetQueryUrl.append("&fq=" + fq);
-	                	sfm.addFacet(fq);
-	                	facetQueryTmp.add(fq);
-	                	lstSingleFacetQueries.add(fq);
-	                }
-		        }
+            for ( String fq : facetQuery )
+            {
+                if ( sbFacetQueryUrl.indexOf( fq ) == -1 )
+                {
+                    String strFqNameIHM = getFacetNameFromIHM( fq );
+                    String strFqValueIHM = getFacetValueFromIHM( fq );
+                    if ( fname == null || !switchType.containsKey( fname ) || ( strFqNameIHM != null && strFqValueIHM != null
+                            && strFqValueIHM.equalsIgnoreCase( flabel ) && strFqNameIHM.equalsIgnoreCase( fname ) ) )
+                    {
+                        sbFacetQueryUrl.append( "&fq=" + fq );
+                        sfm.addFacet( fq );
+                        facetQueryTmp.add( fq );
+                        lstSingleFacetQueries.add( fq );
+                    }
+                }
             }
-//             for (String fq : facetQuery)
-//            {
-//                if (sbFacetQueryUrl.indexOf(fq) == -1)
-//                {	
-//                	//	sbFacetQueryUrl.append("&fq=" + fq);
-//	                    sfm.addFacet(fq);
-//	                    lstSingleFacetQueries.add(fq);
-//                }
-//            }
         }
-         facetQuery = new String[facetQueryTmp.size()];
-         facetQuery =  facetQueryTmp.toArray(facetQuery);
+        facetQuery = new String [ facetQueryTmp.size( )];
+        facetQuery = facetQueryTmp.toArray( facetQuery );
 
-        if ( StringUtils.isNotBlank( conf.getFilterQuery(  ) ) )
+        if ( StringUtils.isNotBlank( conf.getFilterQuery( ) ) )
         {
             int nNewLength = ( facetQuery == null ) ? 1 : ( facetQuery.length + 1 );
-            String[] newFacetQuery = new String[nNewLength];
+            String [ ] newFacetQuery = Arrays.copyOf( facetQuery, nNewLength );
 
-            for ( int i = 0; i < ( nNewLength - 1 ); i++ )
-            {
-                newFacetQuery[i] = facetQuery[i];
-            }
-
-            newFacetQuery[newFacetQuery.length - 1] = conf.getFilterQuery(  );
+            newFacetQuery [newFacetQuery.length - 1] = conf.getFilterQuery( );
             facetQuery = newFacetQuery;
         }
 
-        boolean bEncodeUri = Boolean.parseBoolean(AppPropertiesService.getProperty(PROPERTY_ENCODE_URI,
-                Boolean.toString(DEFAULT_ENCODE_URI)));
+        boolean bEncodeUri = Boolean.parseBoolean( AppPropertiesService.getProperty( PROPERTY_ENCODE_URI, Boolean.toString( DEFAULT_ENCODE_URI ) ) );
 
-        String strSearchPageUrl = AppPropertiesService.getProperty(PROPERTY_SEARCH_PAGE_URL);
+        String strSearchPageUrl = AppPropertiesService.getProperty( PROPERTY_SEARCH_PAGE_URL );
         String strError = SolrConstants.CONSTANT_EMPTY_STRING;
 
         int nLimit = SOLR_RESPONSE_MAX;
 
         // Check XSS characters
-        if ((strQuery != null) && (StringUtil.containsXssCharacters(strQuery)))
+        if ( ( strQuery != null ) && ( StringUtil.containsXssCharacters( strQuery ) ) )
         {
-            strError = I18nService.getLocalizedString(MESSAGE_INVALID_SEARCH_TERMS, locale);
+            strError = I18nService.getLocalizedString( MESSAGE_INVALID_SEARCH_TERMS, locale );
         }
 
-        if (StringUtils.isNotBlank(strError) || StringUtils.isBlank(strQuery))
+        if ( StringUtils.isNotBlank( strError ) || StringUtils.isBlank( strQuery ) )
         {
             strQuery = ALL_SEARCH_QUERY;
 
-            String strOnlyFacets = AppPropertiesService.getProperty(PROPERTY_ONLY_FACTES);
+            String strOnlyFacets = AppPropertiesService.getProperty( PROPERTY_ONLY_FACTES );
 
-            if (StringUtils.isNotBlank(strError)
-                    || (((facetQuery == null) || (facetQuery.length <= 0))
-                    && StringUtils.isNotBlank(strOnlyFacets) && SolrConstants.CONSTANT_TRUE.equals(strOnlyFacets)))
+            if ( StringUtils.isNotBlank( strError )
+                    || ( ArrayUtils.isEmpty( facetQuery ) && StringUtils.isNotBlank( strOnlyFacets ) && SolrConstants.CONSTANT_TRUE.equals( strOnlyFacets ) ) )
             {
-                //no request and no facet selected : we show the facets but no result
+                // no request and no facet selected : we show the facets but no result
                 nLimit = 0;
             }
         }
 
         // paginator & session related elements
-        int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt(PROPERTY_RESULTS_PER_PAGE, DEFAULT_RESULTS_PER_PAGE);
-        String strCurrentItemsPerPage = request.getParameter(PARAMETER_NB_ITEMS_PER_PAGE);
-        int nCurrentItemsPerPage = strCurrentItemsPerPage != null ? Integer.parseInt(strCurrentItemsPerPage) : 0;
-        int nItemsPerPage = Paginator.getItemsPerPage(request, Paginator.PARAMETER_ITEMS_PER_PAGE, nCurrentItemsPerPage,
-                nDefaultItemsPerPage);
+        int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_RESULTS_PER_PAGE, DEFAULT_RESULTS_PER_PAGE );
+        String strCurrentItemsPerPage = request.getParameter( PARAMETER_NB_ITEMS_PER_PAGE );
+        int nCurrentItemsPerPage = strCurrentItemsPerPage != null ? Integer.parseInt( strCurrentItemsPerPage ) : 0;
+        int nItemsPerPage = AbstractPaginator.getItemsPerPage( request, AbstractPaginator.PARAMETER_ITEMS_PER_PAGE, nCurrentItemsPerPage,
+                nDefaultItemsPerPage );
 
-        strCurrentPageIndex = (strCurrentPageIndex != null) ? strCurrentPageIndex : DEFAULT_PAGE_INDEX;
+        strCurrentPageIndex = ( strCurrentPageIndex != null ) ? strCurrentPageIndex : DEFAULT_PAGE_INDEX;
 
-        SolrSearchEngine engine = SolrSearchEngine.getInstance();
+        SolrSearchEngine engine = SolrSearchEngine.getInstance( );
 
-        SolrFacetedResult facetedResult = engine.getFacetedSearchResults(strQuery, facetQuery, sort, order, nLimit, Integer.parseInt(strCurrentPageIndex), nItemsPerPage, SOLR_SPELLCHECK);
-        List<SolrSearchResult> listResults = facetedResult.getSolrSearchResults();
+        SolrFacetedResult facetedResult = engine.getFacetedSearchResults( strQuery, facetQuery, sort, order, nLimit, Integer.parseInt( strCurrentPageIndex ),
+                nItemsPerPage, SOLR_SPELLCHECK );
+        List<SolrSearchResult> listResults = facetedResult.getSolrSearchResults( );
 
         List<HashMap<String, Object>> points = null;
-        if ( conf.getExtraMappingQuery(  ) )
+        if ( conf.getExtraMappingQuery( ) )
         {
             List<SolrSearchResult> listResultsGeoloc = engine.getGeolocSearchResults( strQuery, facetQuery, nLimit );
-            points = getGeolocModel(listResultsGeoloc);
+            points = getGeolocModel( listResultsGeoloc );
         }
 
         // The page should not be added to the cache
-        // Notify results infos to QueryEventListeners 
-        notifyQueryListeners(strQuery, listResults.size(), request);
+        // Notify results infos to QueryEventListeners
+        notifyQueryListeners( strQuery, listResults.size( ), request );
 
-        UrlItem url = new UrlItem(strSearchPageUrl);
+        UrlItem url = new UrlItem( strSearchPageUrl );
         String strQueryForPaginator = strQuery;
 
-        if (bEncodeUri)
+        if ( bEncodeUri )
         {
-            strQueryForPaginator = SolrUtil.encodeUrl(request, strQuery);
+            strQueryForPaginator = SolrUtil.encodeUrl( request, strQuery );
         }
 
-        url.addParameter(PARAMETER_QUERY, strQueryForPaginator);
-        url.addParameter(PARAMETER_NB_ITEMS_PER_PAGE, nItemsPerPage);
+        url.addParameter( PARAMETER_QUERY, strQueryForPaginator );
+        url.addParameter( PARAMETER_NB_ITEMS_PER_PAGE, nItemsPerPage );
 
         if ( strConfCode != null )
         {
             url.addParameter( PARAMETER_CONF, strConfCode );
         }
 
-        for (String strFacetName : lstSingleFacetQueries)
+        for ( String strFacetName : lstSingleFacetQueries )
         {
-            url.addParameter(PARAMETER_FACET_QUERY, SolrUtil.encodeUrl(strFacetName));
+            url.addParameter( PARAMETER_FACET_QUERY, SolrUtil.encodeUrl( strFacetName ) );
         }
 
         // nb items per page
-        IPaginator<SolrSearchResult> paginator = new DelegatePaginator<SolrSearchResult>(listResults, nItemsPerPage,
-                url.getUrl(), PARAMETER_PAGE_INDEX, strCurrentPageIndex, facetedResult.getCount());
+        IPaginator<SolrSearchResult> paginator = new DelegatePaginator<>( listResults, nItemsPerPage, url.getUrl( ), PARAMETER_PAGE_INDEX, strCurrentPageIndex,
+                facetedResult.getCount( ) );
 
-        Map<String, Object> model = new HashMap<String, Object>();
-        model.put(MARK_RESULTS_LIST, paginator.getPageItems());
+        Map<String, Object> model = new HashMap<>( );
+        model.put( MARK_RESULTS_LIST, paginator.getPageItems( ) );
         // put the query only if it's not *.*
-        model.put(MARK_QUERY, ALL_SEARCH_QUERY.equals(strQuery) ? SolrConstants.CONSTANT_EMPTY_STRING : strQuery);
-        model.put(MARK_FACET_QUERY, sbFacetQueryUrl.toString());
-        model.put(MARK_PAGINATOR, paginator);
-        model.put(MARK_NB_ITEMS_PER_PAGE, nItemsPerPage);
-        model.put(MARK_ERROR, strError);
-        model.put(MARK_FACETS, facetedResult.getFacetFields());
-        model.put(MARK_SOLR_FIELDS, SolrFieldManager.getFacetList());
-        model.put(MARK_FACETS_DATE, facetedResult.getFacetDateList());
-        model.put(MARK_HISTORIQUE, sfm.getCurrentFacet());
-        model.put(MARK_FACETS_LIST, lstSingleFacetQueries);
+        model.put( MARK_QUERY, ALL_SEARCH_QUERY.equals( strQuery ) ? SolrConstants.CONSTANT_EMPTY_STRING : strQuery );
+        model.put( MARK_FACET_QUERY, sbFacetQueryUrl.toString( ) );
+        model.put( MARK_PAGINATOR, paginator );
+        model.put( MARK_NB_ITEMS_PER_PAGE, nItemsPerPage );
+        model.put( MARK_ERROR, strError );
+        model.put( MARK_FACETS, facetedResult.getFacetFields( ) );
+        model.put( MARK_SOLR_FIELDS, SolrFieldManager.getFacetList( ) );
+        model.put( MARK_FACETS_DATE, facetedResult.getFacetDateList( ) );
+        model.put( MARK_HISTORIQUE, sfm.getCurrentFacet( ) );
+        model.put( MARK_FACETS_LIST, lstSingleFacetQueries );
         model.put( MARK_CONF_QUERY, strConfCode );
         model.put( MARK_CONF, conf );
         model.put( MARK_POINTS, points );
 
-        if (SOLR_SPELLCHECK && (strQuery != null) && (strQuery.compareToIgnoreCase(ALL_SEARCH_QUERY) != 0))
+        if ( SOLR_SPELLCHECK && ( strQuery != null ) && ( strQuery.compareToIgnoreCase( ALL_SEARCH_QUERY ) != 0 ) )
         {
-            SpellCheckResponse checkResponse = engine.getSpellChecker(strQuery);
+            SpellCheckResponse checkResponse = engine.getSpellChecker( strQuery );
 
-            if (checkResponse != null)
+            if ( checkResponse != null )
             {
-            	model.put(MARK_SUGGESTION, checkResponse.getCollatedResults());
-                //model.put(MARK_SUGGESTION, facetedResult.getSolrSpellCheckResponse().getCollatedResults());
+                model.put( MARK_SUGGESTION, checkResponse.getCollatedResults( ) );
             }
         }
 
-        model.put(MARK_SORT_NAME, sort);
-        model.put(MARK_SORT_ORDER, order);
-        model.put(MARK_SORT_LIST, SolrFieldManager.getSortList());
-        model.put(MARK_FACET_TREE, facetedResult.getFacetIntersection());
-        model.put(MARK_ENCODING, SolrUtil.getEncoding());
+        model.put( MARK_SORT_NAME, sort );
+        model.put( MARK_SORT_ORDER, order );
+        model.put( MARK_SORT_LIST, SolrFieldManager.getSortList( ) );
+        model.put( MARK_FACET_TREE, facetedResult.getFacetIntersection( ) );
+        model.put( MARK_ENCODING, SolrUtil.getEncoding( ) );
 
-        String strRequestUrl = request.getRequestURL().toString();
-        model.put(FULL_URL, strRequestUrl);
-        model.put(SOLR_FACET_DATE_GAP, SolrSearchEngine.SOLR_FACET_DATE_GAP);
+        String strRequestUrl = request.getRequestURL( ).toString( );
+        model.put( FULL_URL, strRequestUrl );
+        model.put( SOLR_FACET_DATE_GAP, SolrSearchEngine.SOLR_FACET_DATE_GAP );
 
         return model;
     }
 
-    private static Hashtable<String, Boolean> getSwitched ()
+    private static Map<String, Boolean> getSwitched( )
     {
-    	Hashtable <String,Boolean>tabFromSwitch = new Hashtable<String,Boolean>();
-    	for (Field tmpField : SolrFieldManager.getFacetList(  ).values(  ))
-    	{
-    		if ( tmpField.getEnableFacet(  ) && 
-    			"SWITCH".equalsIgnoreCase(tmpField.getOperator()))
-    		{
-    			tabFromSwitch.put(tmpField.getName(),Boolean.FALSE);
-    		}
-    	}
-    	return tabFromSwitch;
-    }
-    
-    private static void isSwitched( String strFacetQuery, Hashtable<String, Boolean> tabType)
-    {
-          if (strFacetQuery != null && tabType!=null &&
-        	tabType.containsKey( strFacetQuery ) &&
-        	tabType.get( strFacetQuery ) == Boolean.FALSE)
+        Map<String, Boolean> tabFromSwitch = new HashMap<>( );
+        for ( Field tmpField : SolrFieldManager.getFacetList( ).values( ) )
         {
-        	tabType.remove(strFacetQuery);
-        	tabType.put(strFacetQuery, Boolean.TRUE);
+            if ( tmpField.getEnableFacet( ) && "SWITCH".equalsIgnoreCase( tmpField.getOperator( ) ) )
+            {
+                tabFromSwitch.put( tmpField.getName( ), Boolean.FALSE );
+            }
         }
+        return tabFromSwitch;
     }
+
     /**
      * Returns a model with points data from a geoloc search
-     * @param listResultsGeoloc the result of a search
+     * 
+     * @param listResultsGeoloc
+     *            the result of a search
      * @return the model
      */
-    private static List<HashMap<String, Object>> getGeolocModel( List<SolrSearchResult> listResultsGeoloc ) {
-        List<HashMap<String, Object>> points = new ArrayList<HashMap<String, Object>>( listResultsGeoloc.size(  ) );
-        HashMap<String, String> iconKeysCache = new HashMap<String, String>(  );
+    private static List<HashMap<String, Object>> getGeolocModel( List<SolrSearchResult> listResultsGeoloc )
+    {
+        List<HashMap<String, Object>> points = new ArrayList<>( listResultsGeoloc.size( ) );
+        Map<String, String> iconKeysCache = new HashMap<>( );
 
         for ( SolrSearchResult result : listResultsGeoloc )
         {
-            Map<String, Object> dynamicFields = result.getDynamicFields(  );
+            Map<String, Object> dynamicFields = result.getDynamicFields( );
 
-            for ( String key : dynamicFields.keySet(  ) )
+            for ( Entry<String, Object> entry : dynamicFields.entrySet( ) )
             {
-                if ( key.endsWith( SolrItem.DYNAMIC_GEOJSON_FIELD_SUFFIX ) )
+                if ( !entry.getKey( ).endsWith( SolrItem.DYNAMIC_GEOJSON_FIELD_SUFFIX ) )
                 {
-                    HashMap<String, Object> h = new HashMap<String, Object>(  );
-                    String strJson = (String) dynamicFields.get( key );
-                    GeolocItem geolocItem = null;
+                    continue;
+                }
+                HashMap<String, Object> h = new HashMap<>( );
+                String strJson = (String) entry.getValue( );
+                GeolocItem geolocItem = null;
 
-                    try
+                try
+                {
+                    geolocItem = GeolocItem.fromJSON( strJson );
+                }
+                catch( IOException e )
+                {
+                    AppLogService.error( "SolrSearchApp: error parsing geoloc JSON: " + strJson + ", exception " + e );
+                }
+
+                if ( geolocItem != null )
+                {
+                    String strType = result.getId( ).substring( result.getId( ).lastIndexOf( '_' ) + 1 );
+                    String strIcon;
+
+                    if ( iconKeysCache.containsKey( geolocItem.getIcon( ) ) )
                     {
-                        geolocItem = GeolocItem.fromJSON( strJson );
+                        strIcon = iconKeysCache.get( geolocItem.getIcon( ) );
                     }
-                    catch ( IOException e )
+                    else
                     {
-                        AppLogService.error( "SolrSearchApp: error parsing geoloc JSON: " + strJson +
-                            ", exception " + e );
+                        strIcon = IconService.getIcon( strType, geolocItem.getIcon( ) );
+                        iconKeysCache.put( geolocItem.getIcon( ), strIcon );
                     }
 
-                    if ( geolocItem != null )
-                    {
-                        String strType = result.getId(  ).substring( result.getId(  ).lastIndexOf( "_" ) + 1 );
-                        String strIcon;
-
-                        if ( iconKeysCache.containsKey( geolocItem.getIcon(  ) ) )
-                        {
-                            strIcon = iconKeysCache.get( geolocItem.getIcon(  ) );
-                        }
-                        else
-                        {
-                            strIcon = IconService.getIcon( strType, geolocItem.getIcon(  ) );
-                            iconKeysCache.put( geolocItem.getIcon(  ), strIcon );
-                        }
-
-                        geolocItem.setIcon( strIcon );
-                        h.put( MARK_POINTS_GEOJSON, geolocItem.toJSON(  ) );
-                        h.put( MARK_POINTS_ID,
-                            result.getId(  )
-                                  .substring( result.getId(  ).indexOf( "_" ) + 1,
-                                result.getId(  ).lastIndexOf( "_" ) ) );
-                        h.put( MARK_POINTS_FIELDCODE, key.substring( 0, key.lastIndexOf( "_" ) ) );
-                        h.put( MARK_POINTS_TYPE, strType );
-                        points.add( h );
-                    }
+                    geolocItem.setIcon( strIcon );
+                    h.put( MARK_POINTS_GEOJSON, geolocItem.toJSON( ) );
+                    h.put( MARK_POINTS_ID, result.getId( ).substring( result.getId( ).indexOf( '_' ) + 1, result.getId( ).lastIndexOf( '_' ) ) );
+                    h.put( MARK_POINTS_FIELDCODE, entry.getKey( ).substring( 0, entry.getKey( ).lastIndexOf( '_' ) ) );
+                    h.put( MARK_POINTS_TYPE, strType );
+                    points.add( h );
                 }
             }
         }
@@ -510,30 +491,19 @@ public class SolrSearchApp implements XPageApplication
     /**
      * Notify all query Listeners
      *
-     * @param strQuery The query
-     * @param nResultsCount The results count
-     * @param request The request
+     * @param strQuery
+     *            The query
+     * @param nResultsCount
+     *            The results count
+     * @param request
+     *            The request
      */
-    private static void notifyQueryListeners(String strQuery, int nResultsCount, HttpServletRequest request)
+    private static void notifyQueryListeners( String strQuery, int nResultsCount, HttpServletRequest request )
     {
-        QueryEvent event = new QueryEvent();
-        event.setQuery(strQuery);
-        event.setResultsCount(nResultsCount);
-        event.setRequest(request);
-        QueryListenersService.getInstance().notifyListeners(event);
-    }
-
-    /**
-     * Return the model used during the last search
-     *
-     * @param request The HTTP request.
-     * @return the model used during the last search
-     * @deprecated model is not stored in session anymore
-     */
-    @Deprecated
-    public static Map<String, Object> getLastSearchModel(HttpServletRequest request)
-    {
-        AppLogService.error("calling deprecated code : SolrSearchApp.getLastSearchModel( HttpServletRequest request )");
-        return (Map<String, Object>) request.getSession().getAttribute(PARAMETER_PREVIOUS_SEARCH);
+        QueryEvent event = new QueryEvent( );
+        event.setQuery( strQuery );
+        event.setResultsCount( nResultsCount );
+        event.setRequest( request );
+        QueryListenersService.getInstance( ).notifyListeners( event );
     }
 }

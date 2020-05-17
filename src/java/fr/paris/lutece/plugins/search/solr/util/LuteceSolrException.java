@@ -31,27 +31,17 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.search.solr.service;
-
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
+package fr.paris.lutece.plugins.search.solr.util;
 
 /**
- *
- * Interface ISolrSearchAppAddOn : add data to SolrSearchApp's model
- *
+ * Runtime Exception for plugin Solr lutece.
  */
-public interface ISolrSearchAppAddOn
+public class LuteceSolrException extends Exception
 {
+    private static final long serialVersionUID = 9082843125984049066L;
 
-    /**
-     * Add datas to the model used by SolrSearchApp template
-     *
-     * @param model
-     *            The model use by document template
-     * @param request
-     *            The HTTP Request
-     */
-    void buildPageAddOn( Map<String, Object> model, HttpServletRequest request );
+    public LuteceSolrException( String strMessage, Exception e )
+    {
+        super( strMessage, e );
+    }
 }

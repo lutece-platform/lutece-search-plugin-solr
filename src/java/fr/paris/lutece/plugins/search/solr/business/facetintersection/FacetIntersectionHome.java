@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.search.solr.business.facetIntersection;
+package fr.paris.lutece.plugins.search.solr.business.facetintersection;
 
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.plugins.search.solr.service.SolrPlugin;
@@ -41,60 +41,63 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 import java.util.List;
 
-
 /**
  * This class provides instances management methods (create, find, ...) for FacetIntersection objects
  */
 public final class FacetIntersectionHome
 {
     // Static variable pointed at the DAO instance
-    private static IFacetIntersectionDAO _dao = (IFacetIntersectionDAO) SpringContextService.getPluginBean( "solr",
-            "facetIntersectionDAO" );
-    private static Plugin plugin = PluginService.getPlugin( SolrPlugin.PLUGIN_NAME );
+    private static IFacetIntersectionDAO _dao = SpringContextService.getBean( "facetIntersectionDAO" );
+    private static Plugin _plugin = PluginService.getPlugin( SolrPlugin.PLUGIN_NAME );
 
     /**
      * Private constructor - this class need not be instantiated
      */
-    private FacetIntersectionHome(  )
+    private FacetIntersectionHome( )
     {
     }
 
     /**
      * Create an instance of the facetIntersection class
-     * @param facetIntersection The instance of the FacetIntersection which contains the informations to store
-     * @return The  instance of facetIntersection which has been created with its primary key.
+     * 
+     * @param facetIntersection
+     *            The instance of the FacetIntersection which contains the informations to store
+     * @return The instance of facetIntersection which has been created with its primary key.
      */
     public static FacetIntersection create( FacetIntersection facetIntersection )
     {
-        _dao.insert( facetIntersection, plugin );
+        _dao.insert( facetIntersection, _plugin );
 
         return facetIntersection;
     }
 
     public static FacetIntersection create( int idField1, int idField2 )
     {
-        Field f1 = new Field(  );
+        Field f1 = new Field( );
         f1.setIdField( idField1 );
 
-        Field f2 = new Field(  );
+        Field f2 = new Field( );
         f2.setIdField( idField2 );
 
-        FacetIntersection fi = new FacetIntersection(  );
+        FacetIntersection fi = new FacetIntersection( );
         fi.setField1( f1 );
         fi.setField2( f2 );
-        _dao.insert( fi, plugin );
+        _dao.insert( fi, _plugin );
 
         return fi;
     }
 
     /**
      * Remove the facetIntersection whose identifier is specified in parameter
-     * @param nFacetIntersectionId The facetIntersection Id
-     * @param nFacetIntersectionId2 The other facetIntersection Id
+     * 
+     * @param nFacetIntersectionId
+     *            The facetIntersection Id
+     * @param nFacetIntersectionId2
+     *            The other facetIntersection Id
      */
     public static void remove( int nFacetIntersectionId, int nFacetIntersectionId2 )
     {
-        _dao.delete( nFacetIntersectionId, nFacetIntersectionId2, plugin );
+        _dao.delete( nFacetIntersectionId, nFacetIntersectionId2, _plugin );
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -102,10 +105,11 @@ public final class FacetIntersectionHome
 
     /**
      * Load the data of all the facetIntersection objects and returns them in form of a list
+     * 
      * @return the list which contains the data of all the facetIntersection objects
      */
-    public static List<FacetIntersection> getFacetIntersectionsList(  )
+    public static List<FacetIntersection> getFacetIntersectionsList( )
     {
-        return _dao.selectFacetIntersectionsList( plugin );
+        return _dao.selectFacetIntersectionsList( _plugin );
     }
 }

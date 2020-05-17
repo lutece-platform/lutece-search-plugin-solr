@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,8 +33,8 @@
  */
 package fr.paris.lutece.plugins.search.solr.business.field;
 
-import fr.paris.lutece.plugins.search.solr.business.facetIntersection.FacetIntersection;
-import fr.paris.lutece.plugins.search.solr.business.facetIntersection.FacetIntersectionHome;
+import fr.paris.lutece.plugins.search.solr.business.facetintersection.FacetIntersection;
+import fr.paris.lutece.plugins.search.solr.business.facetintersection.FacetIntersectionHome;
 import fr.paris.lutece.plugins.search.solr.util.SolrUtil;
 
 import java.util.ArrayList;
@@ -42,94 +42,94 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class SolrFieldManager
 {
-    //Static
-    private static List<Field> fieldList = loadFieldList(  );
-    private static Map<String, Field> facetList = loadFacetList(  );
-    private static List<Field> sortList = loadSortList(  );
-    private static List<FacetIntersection> intersectionList = loadIntersectionList(  );
+    // Static
+    private static List<Field> _fieldList = loadFieldList( );
+    private static Map<String, Field> _facetList = loadFacetList( );
+    private static List<Field> _sortList = loadSortList( );
+    private static List<FacetIntersection> _intersectionList = loadIntersectionList( );
 
-    //attributes
-    private List<FacetHistorique> currentFacet;
+    // attributes
+    private List<FacetHistorique> _currentFacet;
 
-    public SolrFieldManager(  )
+    public SolrFieldManager( )
     {
-        this.currentFacet = new ArrayList<FacetHistorique>(  );
+        this._currentFacet = new ArrayList<>( );
     }
 
     public void addFacet( String key )
     {
         FacetHistorique facet = new FacetHistorique( key, "" );
 
-        for ( FacetHistorique f : this.currentFacet )
+        for ( FacetHistorique f : this._currentFacet )
         {
-            if ( f.name.equals( key ) )
+            if ( f._name.equals( key ) )
             {
                 return;
             }
         }
-
-        for ( FacetHistorique f : this.currentFacet )
+        StringBuilder facetQuery = new StringBuilder( );
+        for ( FacetHistorique f : this._currentFacet )
         {
             // encode key
             String strEncodedKey = SolrUtil.encodeUrl( key );
-            f.query += ( "&fq=" + strEncodedKey );
+            f._query += ( "&fq=" + strEncodedKey );
 
-            String strEncodedName = SolrUtil.encodeUrl( f.name );
-            facet.query += ( "&fq=" + strEncodedName );
+            String strEncodedName = SolrUtil.encodeUrl( f._name );
+            facetQuery.append( "&fq=" ).append( strEncodedName );
         }
-
-        this.currentFacet.add( facet );
+        facet._query = facetQuery.toString( );
+        this._currentFacet.add( facet );
     }
 
-    public List<FacetHistorique> getCurrentFacet(  )
+    public List<FacetHistorique> getCurrentFacet( )
     {
-        return currentFacet;
+        return _currentFacet;
     }
 
-    //STATIC FUNCTIONS
-    public static void reloadField(  )
+    // STATIC FUNCTIONS
+    public static void reloadField( )
     {
-        fieldList = loadFieldList(  );
-        facetList = loadFacetList(  );
-        sortList = loadSortList(  );
+        _fieldList = loadFieldList( );
+        _facetList = loadFacetList( );
+        _sortList = loadSortList( );
     }
 
-    public static void reloadIntersection(  )
+    public static void reloadIntersection( )
     {
-        intersectionList = loadIntersectionList(  );
+        _intersectionList = loadIntersectionList( );
     }
 
     /**
      * Load the solr fields in database
+     * 
      * @return
      */
-    private static List<Field> loadFieldList(  )
+    private static List<Field> loadFieldList( )
     {
-        return FieldHome.getFieldsList(  );
+        return FieldHome.getFieldsList( );
     }
 
-    private static Map<String, Field> loadFacetList(  )
+    private static Map<String, Field> loadFacetList( )
     {
-        Map<String, Field> result = new HashMap<String, Field>(  );
+        Map<String, Field> result = new HashMap<>( );
 
-        for ( Field field : getFieldList(  ) )
+        for ( Field field : getFieldList( ) )
         {
-            result.put( field.getSolrName(  ), field );
+            result.put( field.getSolrName( ), field );
         }
 
         return result;
     }
 
-    private static List<Field> loadSortList(  )
+    private static List<Field> loadSortList( )
     {
-        List<Field> result = new ArrayList<Field>(  );
+        List<Field> result = new ArrayList<>( );
 
-        for ( Field field : getFieldList(  ) )
+        for ( Field field : getFieldList( ) )
         {
-            if ( field.getIsSort(  ) )
+            if ( field.getIsSort( ) )
             {
                 result.add( field );
             }
@@ -138,41 +138,41 @@ public class SolrFieldManager
         return result;
     }
 
-    private static List<FacetIntersection> loadIntersectionList(  )
+    private static List<FacetIntersection> loadIntersectionList( )
     {
-        List<FacetIntersection> list = FacetIntersectionHome.getFacetIntersectionsList(  );
-
-        return list;
+        return FacetIntersectionHome.getFacetIntersectionsList( );
     }
 
-    //Getters & setters
-    public static List<Field> getFieldList(  )
+    // Getters & setters
+    public static List<Field> getFieldList( )
     {
-        return fieldList;
+        return _fieldList;
     }
 
-    public static Map<String, Field> getFacetList(  )
+    public static Map<String, Field> getFacetList( )
     {
-        return facetList;
+        return _facetList;
     }
 
-    public static List<Field> getSortList(  )
+    public static List<Field> getSortList( )
     {
-        return sortList;
+        return _sortList;
     }
 
-    public static List<FacetIntersection> getIntersectionlist(  )
+    public static List<FacetIntersection> getIntersectionlist( )
     {
-        return intersectionList;
+        return _intersectionList;
     }
 
     /**
      * Adds all fields of the given parameter list if they are not already in databse. Two fields with the same name are equals
-     * @param lstFields the fields list to add
+     * 
+     * @param lstFields
+     *            the fields list to add
      */
     public static void updateFields( List<Field> lstFields )
     {
-        List<Field> lstAllFields = FieldHome.getFieldsList(  );
+        List<Field> lstAllFields = FieldHome.getFieldsList( );
 
         for ( Field field : lstFields )
         {
@@ -181,7 +181,7 @@ public class SolrFieldManager
             // Search the field with its name
             for ( Field actualField : lstAllFields )
             {
-                if ( ( actualField.getName(  ) != null ) && actualField.getName(  ).equals( field.getName(  ) ) )
+                if ( ( actualField.getName( ) != null ) && actualField.getName( ).equals( field.getName( ) ) )
                 {
                     // A field with the same name already exists => we don't insert it
                     bInsert = false;
@@ -197,25 +197,25 @@ public class SolrFieldManager
         }
     }
 
-    public class FacetHistorique
+    public static class FacetHistorique
     {
-        public String name;
-        public String query;
+        private String _name;
+        private String _query;
 
         public FacetHistorique( String name, String query )
         {
-            this.name = name;
-            this.query = query;
+            this._name = name;
+            this._query = query;
         }
 
-        public String getName(  )
+        public String getName( )
         {
-            return name;
+            return _name;
         }
 
-        public String getQuery(  )
+        public String getQuery( )
         {
-            return query;
+            return _query;
         }
     }
 

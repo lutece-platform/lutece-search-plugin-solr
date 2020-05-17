@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,22 +33,19 @@
  */
 package fr.paris.lutece.plugins.search.solr.web;
 
-import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
-
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.SpellCheckResponse.Collation;
-import org.apache.solr.client.solrj.response.SpellCheckResponse.Suggestion;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.SpellCheckResponse.Collation;
+
+import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
 
 /**
  *
@@ -59,14 +56,11 @@ public class SolrSuggestServlet extends HttpServlet
 {
     private static final long serialVersionUID = -3273825949482572338L;
 
-    public void init(  )
-    {
-    }
-
     /**
      * Displays the indexing parameters
      *
-     * @param request the http request
+     * @param request
+     *            the http request
      * @return the html code which displays the parameters page
      */
     public String getSuggest( HttpServletRequest request )
@@ -74,77 +68,60 @@ public class SolrSuggestServlet extends HttpServlet
         String callback = request.getParameter( "callback" );
         String terms = request.getParameter( "q" );
 
-        SolrSearchEngine engine = SolrSearchEngine.getInstance(  );
-        StringBuffer result = new StringBuffer(  );
+        SolrSearchEngine engine = SolrSearchEngine.getInstance( );
+        StringBuilder result = new StringBuilder( );
         result.append( callback );
 
         result.append( "({\"response\":{\"docs\":[" );
 
         QueryResponse response = engine.getJsonpSuggest( terms, callback );
         Collation solr = null;
-        //String fieldName = null;
-        //int i= 1;
-
-        //Iterate on all document
-        for ( Iterator<Collation> ite = response.getSpellCheckResponse().getCollatedResults().iterator(); ite.hasNext(  ); )
+        // Iterate on all document
+        for ( Iterator<Collation> ite = response.getSpellCheckResponse( ).getCollatedResults( ).iterator( ); ite.hasNext( ); )
         {
-        	if (ite.hasNext(  ))
-        	{
-	        	solr = ite.next(  );
-	           
-	            String collation=solr.getCollationQueryString();
-	            
-	
-	            //iterate on each field
-	            //for ( String suggest : suggestions )
-	            //{
-	            	result.append( "{" );
-	                result.append( "\"" ).append( "title" ).append( "\":\"" ).append( collation )
-	                      .append( "\"" );
-	
-	
-		            if ( ite.hasNext(  ) )
-		            {
-		                result.append( "}," );
-		            }
-		            else
-		            {
-		                result.append( "}" );
-		            }
-        	}
-	           // i++;
-            //}
+            if ( ite.hasNext( ) )
+            {
+                solr = ite.next( );
+
+                String collation = solr.getCollationQueryString( );
+
+                // iterate on each field
+                result.append( "{" );
+                result.append( "\"" ).append( "title" ).append( "\":\"" ).append( collation ).append( "\"" );
+
+                if ( ite.hasNext( ) )
+                {
+                    result.append( "}," );
+                }
+                else
+                {
+                    result.append( "}" );
+                }
+            }
         }
 
-        //Close result
+        // Close result
         result.append( "]}})" );
 
-        return result.toString(  );
+        return result.toString( );
     }
 
-    public void doGet( HttpServletRequest req, HttpServletResponse resp )
-        throws ServletException, IOException
+    @Override
+    public void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException
     {
-        resp.reset(  );
-        resp.resetBuffer(  );
+        resp.reset( );
+        resp.resetBuffer( );
         resp.setContentType( "application/x-javascript; charset=utf-8" );
 
-        PrintWriter out = resp.getWriter(  );
+        PrintWriter out = resp.getWriter( );
         out.print( this.getSuggest( req ) );
-        out.flush(  );
-        out.close(  );
+        out.flush( );
+        out.close( );
     }
 
-    public void doPost( HttpServletRequest req, HttpServletResponse resp )
-        throws ServletException, IOException
+    @Override
+    public void doPost( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException
     {
-        resp.reset(  );
-        resp.resetBuffer(  );
-        resp.setContentType( "application/x-javascript; charset=utf-8" );
-
-        PrintWriter out = resp.getWriter(  );
-        out.print( this.getSuggest( req ) );
-        out.flush(  );
-        out.close(  );
+        doGet( req, resp );
     }
 }

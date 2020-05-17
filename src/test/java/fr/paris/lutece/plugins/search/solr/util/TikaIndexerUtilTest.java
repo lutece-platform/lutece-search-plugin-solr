@@ -31,27 +31,35 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.search.solr.service;
+package fr.paris.lutece.plugins.search.solr.util;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import org.xml.sax.ContentHandler;
 
-/**
- *
- * Interface ISolrSearchAppAddOn : add data to SolrSearchApp's model
- *
- */
-public interface ISolrSearchAppAddOn
+import fr.paris.lutece.plugins.search.solr.indexer.SolrItem;
+import fr.paris.lutece.test.LuteceTestCase;
+
+public class TikaIndexerUtilTest extends LuteceTestCase
 {
 
-    /**
-     * Add datas to the model used by SolrSearchApp template
-     *
-     * @param model
-     *            The model use by document template
-     * @param request
-     *            The HTTP Request
-     */
-    void buildPageAddOn( Map<String, Object> model, HttpServletRequest request );
+    public void testParseHtml( ) throws LuteceSolrException
+    {
+        String content = "<div><p>Hello World !</p></div>";
+        ContentHandler handler = TikaIndexerUtil.parseHtml( content );
+        assertEquals( "Hello World !", handler.toString( ).trim( ) );
+    }
+
+    public void testAddFileContentToSolrItem( ) throws LuteceSolrException
+    {
+        SolrItem item = new SolrItem( );
+        List<byte [ ]> contentList = new ArrayList<>( );
+        contentList.add( "<div><p>Hello World !</p></div>".getBytes( ) );
+        contentList.add( "<div><p>Goodbye</p></div>".getBytes( ) );
+        TikaIndexerUtil.addFileContentToSolrItem( item, contentList );
+
+        assertTrue( item.getFileContent( ).trim( ).startsWith( "Hello World !" ) );
+        assertTrue( item.getFileContent( ).trim( ).endsWith( "Goodbye" ) );
+    }
 }

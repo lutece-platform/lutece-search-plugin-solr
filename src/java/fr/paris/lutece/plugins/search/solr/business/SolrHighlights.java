@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,6 @@ package fr.paris.lutece.plugins.search.solr.business;
 import java.util.List;
 import java.util.Map;
 
-
 /**
  *
  * A SolrHighlight is a sample sentence which highlights searched words.
@@ -48,7 +47,9 @@ public class SolrHighlights
 
     /**
      * Creates a new SolrHighlights
-     * @param map the highlight map from SolrServer.
+     * 
+     * @param map
+     *            the highlight map from SolrServer.
      */
     public SolrHighlights( Map<String, Map<String, List<String>>> map )
     {
@@ -57,16 +58,19 @@ public class SolrHighlights
 
     /**
      * Gets the map.
+     * 
      * @return the map
      */
-    public Map<String, Map<String, List<String>>> getMap(  )
+    public Map<String, Map<String, List<String>>> getMap( )
     {
         return _map;
     }
 
     /**
      * Sets the map.
-     * @param map the map.
+     * 
+     * @param map
+     *            the map.
      */
     public void setMap( Map<String, Map<String, List<String>>> map )
     {
@@ -75,7 +79,9 @@ public class SolrHighlights
 
     /**
      * Returns a SolrHighlight matching the searched strId.
-     * @param strId the searched id
+     * 
+     * @param strId
+     *            the searched id
      * @return the SolrHighlight that matches the searched id, otherwise null.
      */
     public SolrHighlight getHighlights( String strId )

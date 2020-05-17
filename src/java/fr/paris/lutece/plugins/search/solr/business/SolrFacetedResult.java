@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,123 +33,132 @@
  */
 package fr.paris.lutece.plugins.search.solr.business;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.RangeFacet;
 import org.apache.solr.client.solrj.response.SpellCheckResponse;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-
 /**
  *
- * SolrFacetedResult represents a list of SolrSearchResult
- * with a list of FacetField.
+ * SolrFacetedResult represents a list of SolrSearchResult with a list of FacetField.
  *
  */
 public class SolrFacetedResult
 {
-    /**Commentaire. **/
-    private List<FacetField> facetFieldsList;
+    /** Commentaire. **/
+    private List<FacetField> _facetFieldsList;
 
-    /**Commentaire. **/
-    private List<SolrSearchResult> searchResultsList;
+    /** Commentaire. **/
+    private List<SolrSearchResult> _searchResultsList;
 
-    /**Commentaire. **/
-    private List<RangeFacet> facetDateList;
+    /** Commentaire. **/
+    private List<RangeFacet> _facetDateList;
 
-    /**Commentaire. **/
-    private Map<String, ArrayList<FacetField>> facetIntersection;
-    
-    /**spellcheck. **/
-    private SpellCheckResponse solrSpellCheckResponse;
-    
+    /** Commentaire. **/
+    private Map<String, List<FacetField>> _facetIntersection;
+
+    /** spellcheck. **/
+    private SpellCheckResponse _solrSpellCheckResponse;
+
     private int _nCount;
-    
+
     /**
      * Items count
+     * 
      * @return items count
      */
     public int getCount( )
     {
-    	return _nCount;
+        return _nCount;
     }
-    
+
     /**
      * Items count
-     * @param nCount items count
+     * 
+     * @param nCount
+     *            items count
      */
     public void setCount( int nCount )
     {
-    	_nCount = nCount;
+        _nCount = nCount;
     }
 
     /**
      * Return the FacetField List.
+     * 
      * @return the FacetField List
      */
-    public final List<FacetField> getFacetFields(  )
+    public final List<FacetField> getFacetFields( )
     {
-        return facetFieldsList;
+        return _facetFieldsList;
     }
 
     /**
      * Set the FacetField List.
-     * @param facetFieldsList the new FacetField List
+     * 
+     * @param facetFieldsList
+     *            the new FacetField List
      */
     public final void setFacetFields( List<FacetField> facetFieldsList )
     {
-        this.facetFieldsList = facetFieldsList;
+        this._facetFieldsList = facetFieldsList;
     }
 
     /**
      * Return the SolrSearchResult List.
+     * 
      * @return the SolrSearchResult List.
      */
-    public final List<SolrSearchResult> getSolrSearchResults(  )
+    public final List<SolrSearchResult> getSolrSearchResults( )
     {
-        return searchResultsList;
+        return _searchResultsList;
     }
 
     /**
      * Set the SolrSearchResult List.
-     * @param searchResultsList the new SolrSearchResult List.
+     * 
+     * @param searchResultsList
+     *            the new SolrSearchResult List.
      */
     public final void setSolrSearchResults( List<SolrSearchResult> searchResultsList )
     {
-        this.searchResultsList = searchResultsList;
+        this._searchResultsList = searchResultsList;
     }
 
     /**
      * Retourne la liste de field de type date.
+     * 
      * @return Une liste de field
      */
-    public final List<RangeFacet> getFacetDateList(  )
+    public final List<RangeFacet> getFacetDateList( )
     {
-        return facetDateList;
+        return _facetDateList;
     }
 
     public final void setFacetDateList( List<RangeFacet> facetDateList )
     {
-        this.facetDateList = facetDateList;
+        this._facetDateList = facetDateList;
     }
 
-    public final Map<String, ArrayList<FacetField>> getFacetIntersection(  )
+    public final Map<String, List<FacetField>> getFacetIntersection( )
     {
-        return facetIntersection;
+        return _facetIntersection;
     }
 
-    public final void setFacetIntersection( Map<String, ArrayList<FacetField>> facetIntersection )
+    public final void setFacetIntersection( Map<String, List<FacetField>> facetIntersection )
     {
-        this.facetIntersection = facetIntersection;
+        this._facetIntersection = facetIntersection;
     }
 
-	public SpellCheckResponse getSolrSpellCheckResponse() {
-		return this.solrSpellCheckResponse;
-	}
+    public SpellCheckResponse getSolrSpellCheckResponse( )
+    {
+        return this._solrSpellCheckResponse;
+    }
 
-	public void setSolrSpellCheckResponse(SpellCheckResponse solrSpellCheckResponse) {
-		this.solrSpellCheckResponse = solrSpellCheckResponse;
-	}
+    public void setSolrSpellCheckResponse( SpellCheckResponse solrSpellCheckResponse )
+    {
+        this._solrSpellCheckResponse = solrSpellCheckResponse;
+    }
 }

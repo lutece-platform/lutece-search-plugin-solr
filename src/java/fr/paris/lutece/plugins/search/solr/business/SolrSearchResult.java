@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,6 @@ import fr.paris.lutece.portal.service.search.SearchResult;
 import java.util.List;
 import java.util.Map;
 
-
 /**
  *
  * SolrSearchResult is more complete than a SearchResult with the highlights and the site name.
@@ -57,16 +56,19 @@ public class SolrSearchResult extends SearchResult
 
     /**
      * Return the highlight
+     * 
      * @return the highlight
      */
-    public SolrHighlight getHighlight(  )
+    public SolrHighlight getHighlight( )
     {
         return _highlight;
     }
 
     /**
      * Set the highlight
-     * @param highlight the highlight
+     * 
+     * @param highlight
+     *            the highlight
      */
     public void setHighlight( SolrHighlight highlight )
     {
@@ -75,16 +77,19 @@ public class SolrSearchResult extends SearchResult
 
     /**
      * Return the site name
+     * 
      * @return the site name
      */
-    public String getSite(  )
+    public String getSite( )
     {
         return _strSite;
     }
 
     /**
      * Set the the site name
-     * @param strSite the site name
+     * 
+     * @param strSite
+     *            the site name
      */
     public void setSite( String strSite )
     {
@@ -93,16 +98,19 @@ public class SolrSearchResult extends SearchResult
 
     /**
      * Return the categories
+     * 
      * @return the list of categories
      */
-    public List<String> getCategorie(  )
+    public List<String> getCategorie( )
     {
         return _lstCategories;
     }
 
     /**
      * Set the categories
-     * @param lstCategories the list of categories
+     * 
+     * @param lstCategories
+     *            the list of categories
      */
     public void setCategorie( List<String> lstCategories )
     {
@@ -111,16 +119,19 @@ public class SolrSearchResult extends SearchResult
 
     /**
      * Return the metadata
+     * 
      * @return the metadata
      */
-    public String getMetadata(  )
+    public String getMetadata( )
     {
         return _strMetadata;
     }
 
     /**
      * Set the metadata
-     * @param strMetadata the metadata
+     * 
+     * @param strMetadata
+     *            the metadata
      */
     public void setMetadata( String strMetadata )
     {
@@ -129,16 +140,20 @@ public class SolrSearchResult extends SearchResult
 
     /**
      * Return all the dynamics fields
-     * @return A map which contains all the dynamics fields. The name of a dynamic field is like NAME_XXX where NAME is the name of the field and XXX a SolrItem dynamic type
+     * 
+     * @return A map which contains all the dynamics fields. The name of a dynamic field is like NAME_XXX where NAME is the name of the field and XXX a SolrItem
+     *         dynamic type
      */
-    public Map<String, Object> getDynamicFields(  )
+    public Map<String, Object> getDynamicFields( )
     {
         return _dynamicFields;
     }
 
     /**
      * Set the dynamics fields
-     * @param dynamicFields the dynamics fields
+     * 
+     * @param dynamicFields
+     *            the dynamics fields
      */
     public void setDynamicFields( Map<String, Object> dynamicFields )
     {
@@ -147,16 +162,19 @@ public class SolrSearchResult extends SearchResult
 
     /**
      * Return the portlet identifier
+     * 
      * @return the portlet identifier
      */
-    public String getDocPortletId(  )
+    public String getDocPortletId( )
     {
         return _strDocPortletId;
     }
 
     /**
      * Set the portlet identifier
-     * @param strDocPortletId the portlet identifier
+     * 
+     * @param strDocPortletId
+     *            the portlet identifier
      */
     public void setDocPortletId( String strDocPortletId )
     {
@@ -165,16 +183,19 @@ public class SolrSearchResult extends SearchResult
 
     /**
      * Return the hierarchical date
+     * 
      * @return the hierarchical date
      */
-    public String getHieDate(  )
+    public String getHieDate( )
     {
         return _strHieDate;
     }
 
     /**
      * Set the hierarchical date
-     * @param strHieDate the hierarchical date
+     * 
+     * @param strHieDate
+     *            the hierarchical date
      */
     public void setHieDate( String strHieDate )
     {
@@ -183,16 +204,19 @@ public class SolrSearchResult extends SearchResult
 
     /**
      * Return the XML content
+     * 
      * @return the XML content
      */
-    public String getXmlContent(  )
+    public String getXmlContent( )
     {
         return _strXmlContent;
     }
 
     /**
      * Set the XML content
-     * @param strXmlContent the XML content
+     * 
+     * @param strXmlContent
+     *            the XML content
      */
     public void setXmlContent( String strXmlContent )
     {

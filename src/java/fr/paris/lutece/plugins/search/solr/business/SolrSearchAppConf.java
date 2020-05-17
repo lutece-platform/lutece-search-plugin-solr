@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2015, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,6 @@ import java.util.List;
 import fr.paris.lutece.plugins.search.solr.service.SolrSearchAppConfService;
 import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
 
-
 /**
  *
  * SolrSearchAppConf
@@ -51,20 +50,23 @@ public class SolrSearchAppConf
     private String _strFilterQuery = SolrConstants.CONSTANT_DEFAULT_FILTER_QUERY;
     private String _strTemplate = SolrConstants.CONSTANT_DEFAULT_TEMPLATE;
     private boolean _bExtraMappingQuery = SolrConstants.CONSTANT_DEFAULT_EXTRA_MAPPING_QUERY;
-    private List<String> _listAddonBeanNames = new ArrayList<String>(  );
+    private List<String> _listAddonBeanNames = new ArrayList<>( );
 
     /**
      * Returns the code
+     * 
      * @return the code
      */
-    public String getCode(  )
+    public String getCode( )
     {
         return _strCode;
     }
 
     /**
      * Sets the code
-     * @param code the code
+     * 
+     * @param code
+     *            the code
      */
     public void setCode( String code )
     {
@@ -73,16 +75,19 @@ public class SolrSearchAppConf
 
     /**
      * Returns the template
+     * 
      * @return the template
      */
-    public String getTemplate(  )
+    public String getTemplate( )
     {
         return _strTemplate;
     }
 
     /**
      * Sets the template
-     * @param template the template
+     * 
+     * @param template
+     *            the template
      */
     public void setTemplate( String template )
     {
@@ -91,16 +96,19 @@ public class SolrSearchAppConf
 
     /**
      * Returns the filter query
+     * 
      * @return the filter query
      */
-    public String getFilterQuery(  )
+    public String getFilterQuery( )
     {
         return _strFilterQuery;
     }
 
     /**
      * Sets the filter query
-     * @param filter query the code
+     * 
+     * @param filter
+     *            query the code
      */
     public void setFilterQuery( String strFilterQuery )
     {
@@ -109,16 +117,19 @@ public class SolrSearchAppConf
 
     /**
      * Returns the boolean indicating if we need an extra query for mapping
+     * 
      * @return the boolean indicating if we need an extra query for mapping
      */
-    public boolean getExtraMappingQuery(  )
+    public boolean getExtraMappingQuery( )
     {
         return _bExtraMappingQuery;
     }
 
     /**
      * Sets the boolean indicating if we need an extra query for mapping
-     * @param bExtraMappingQuery the boolean indicating if we need an extra query for mapping
+     * 
+     * @param bExtraMappingQuery
+     *            the boolean indicating if we need an extra query for mapping
      */
     public void setExtraMappingQuery( boolean bExtraMappingQuery )
     {
@@ -128,14 +139,17 @@ public class SolrSearchAppConf
     /**
      * @return the AddonBeanNames
      */
-    public List<String> getAddonBeanNames() {
+    public List<String> getAddonBeanNames( )
+    {
         return _listAddonBeanNames;
     }
 
     /**
-     * @param listAddonBeanNames the AddonBeanNames to set
+     * @param listAddonBeanNames
+     *            the AddonBeanNames to set
      */
-    public void setAddonBeanNames(List<String> listAddonBeanNames) {
+    public void setAddonBeanNames( List<String> listAddonBeanNames )
+    {
         this._listAddonBeanNames = listAddonBeanNames;
     }
 }

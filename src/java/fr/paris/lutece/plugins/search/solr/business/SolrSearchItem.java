@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,6 @@ import org.apache.solr.common.SolrDocument;
 
 import java.util.Date;
 
-
 /**
  *
  * A SearchItem
@@ -59,13 +58,15 @@ public class SolrSearchItem
     /**
      * Empty constructor
      */
-    public SolrSearchItem(  )
+    public SolrSearchItem( )
     {
     }
 
     /**
      * Creates and fills a SolrSearchItem form a SolrDocument
-     * @param document the document
+     * 
+     * @param document
+     *            the document
      */
     public SolrSearchItem( SolrDocument document )
     {
@@ -79,7 +80,7 @@ public class SolrSearchItem
         }
         else
         {
-            _strId = o.toString(  );
+            _strId = o.toString( );
         }
 
         o = document.getFieldValue( SearchItem.FIELD_SUMMARY );
@@ -90,7 +91,7 @@ public class SolrSearchItem
         }
         else
         {
-            _strSummary = o.toString(  );
+            _strSummary = o.toString( );
         }
 
         o = document.getFieldValue( SearchItem.FIELD_TITLE );
@@ -101,7 +102,7 @@ public class SolrSearchItem
         }
         else
         {
-            _strTitle = o.toString(  );
+            _strTitle = o.toString( );
         }
 
         o = document.getFieldValue( SearchItem.FIELD_TYPE );
@@ -112,7 +113,7 @@ public class SolrSearchItem
         }
         else
         {
-            _strType = o.toString(  );
+            _strType = o.toString( );
         }
 
         o = document.getFieldValue( SearchItem.FIELD_URL );
@@ -123,30 +124,32 @@ public class SolrSearchItem
         }
         else
         {
-            _strUrl = o.toString(  );
+            _strUrl = o.toString( );
         }
 
         o = document.getFieldValue( SearchItem.FIELD_DATE );
 
         if ( o != null )
         {
-            //System.out.println(o.getClass());
-            _date = new Date(  );
+            _date = new Date( );
         }
     }
 
     /**
      * Return the id
+     * 
      * @return the id
      */
-    public String getId(  )
+    public String getId( )
     {
         return _strId;
     }
 
     /**
      * Sets the id
-     * @param strId the id
+     * 
+     * @param strId
+     *            the id
      */
     public void setId( String strId )
     {
@@ -155,16 +158,19 @@ public class SolrSearchItem
 
     /**
      * Return the type
+     * 
      * @return the type
      */
-    public String getType(  )
+    public String getType( )
     {
         return _strType;
     }
 
     /**
      * Set the type
-     * @param strType the type
+     * 
+     * @param strType
+     *            the type
      */
     public void setType( String strType )
     {
@@ -173,16 +179,19 @@ public class SolrSearchItem
 
     /**
      * Return the title
+     * 
      * @return the title
      */
-    public String getTitle(  )
+    public String getTitle( )
     {
         return _strTitle;
     }
 
     /**
      * Set the title
-     * @param strTitle the title
+     * 
+     * @param strTitle
+     *            the title
      */
     public void setTitle( String strTitle )
     {
@@ -191,16 +200,19 @@ public class SolrSearchItem
 
     /**
      * Return the summary
+     * 
      * @return the summary
      */
-    public String getSummary(  )
+    public String getSummary( )
     {
         return _strSummary;
     }
 
     /**
      * Set the summary
-     * @param strSummary the summary
+     * 
+     * @param strSummary
+     *            the summary
      */
     public void setSummary( String strSummary )
     {
@@ -209,16 +221,19 @@ public class SolrSearchItem
 
     /**
      * Return the url
+     * 
      * @return the url
      */
-    public String getUrl(  )
+    public String getUrl( )
     {
         return _strUrl;
     }
 
     /***
      * Set the url
-     * @param strUrl the url
+     * 
+     * @param strUrl
+     *            the url
      */
     public void setUrl( String strUrl )
     {
@@ -227,16 +242,19 @@ public class SolrSearchItem
 
     /**
      * Return the date
+     * 
      * @return the date
      */
-    public Date getDate(  )
+    public Date getDate( )
     {
         return _date;
     }
 
     /**
      * Set the date
-     * @param date the date.
+     * 
+     * @param date
+     *            the date.
      */
     public void setDate( Date date )
     {
@@ -245,16 +263,19 @@ public class SolrSearchItem
 
     /**
      * Return the role
+     * 
      * @return the role
      */
-    public String getRole(  )
+    public String getRole( )
     {
         return _strRole;
     }
 
     /**
      * Set the role
-     * @param strRole the role
+     * 
+     * @param strRole
+     *            the role
      */
     public void setRole( String strRole )
     {
@@ -263,16 +284,19 @@ public class SolrSearchItem
 
     /**
      * Return the site name.
+     * 
      * @return the site name.
      */
-    public String getSite(  )
+    public String getSite( )
     {
         return _strSite;
     }
 
     /**
      * Sets the site name.
-     * @param strSite the new site name.
+     * 
+     * @param strSite
+     *            the new site name.
      */
     public void setSite( String strSite )
     {

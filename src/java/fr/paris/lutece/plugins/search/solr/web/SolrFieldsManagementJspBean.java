@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,24 +33,20 @@
  */
 package fr.paris.lutece.plugins.search.solr.web;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.plugins.search.solr.business.field.FieldHome;
 import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
 import fr.paris.lutece.plugins.search.solr.indexer.SolrIndexerService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppLogService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
 import fr.paris.lutece.util.html.HtmlTemplate;
-
-import java.io.UnsupportedEncodingException;
-
-import java.net.URLDecoder;
-
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-
 
 /**
  *
@@ -59,93 +55,100 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
 {
+    private static final long serialVersionUID = 1633639212933752088L;
     ////////////////////////////////////////////////////////////////////////////
     // Constantes
     public static final String SOLR_FIELDS_MANAGEMENT = "SOLR_FIELDS_MANAGEMENT";
     private static final String TEMPLATE_DISPLAY_SOLR_FIELDS = "admin/search/solr_manage_fields_display.html";
     private static final String TEMPLATE_SOLR_FIELDS_FORM = "admin/search/solr_manage_fields_form.html";
     private static final String MARK_FIELD = "field_list";
+    private static final String UTF_8 = "UTF-8";
 
     /**
      * Displays the indexing parameters
      *
-     * @param request the http request
+     * @param request
+     *            the http request
      * @return the html code which displays the parameters page
      */
     public String getFieldList( HttpServletRequest request )
     {
-        HashMap<String, Object> model = new HashMap<String, Object>(  );
-        model.put( MARK_FIELD, SolrFieldManager.getFieldList(  ) );
+        HashMap<String, Object> model = new HashMap<>( );
+        model.put( MARK_FIELD, SolrFieldManager.getFieldList( ) );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_DISPLAY_SOLR_FIELDS, getLocale(  ), model );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_DISPLAY_SOLR_FIELDS, getLocale( ), model );
 
-        return template.getHtml(  );
+        return template.getHtml( );
     }
 
     public String getPage( HttpServletRequest request )
     {
-        StringBuffer htmlBuffer = new StringBuffer(  );
+        StringBuilder htmlBuffer = new StringBuilder( );
         htmlBuffer.append( this.getFieldList( request ) );
 
-        return getAdminPage( htmlBuffer.toString(  ) );
+        return getAdminPage( htmlBuffer.toString( ) );
     }
 
     public String getForm( HttpServletRequest request )
     {
-        HashMap<String, Object> model = new HashMap<String, Object>(  );
+        HashMap<String, Object> model = new HashMap<>( );
 
-        //UPDATE
+        // UPDATE
         if ( request.getParameter( "update" ) != null )
         {
             model.put( "create", false );
 
-            //load Field
+            // load Field
             Field updateField = FieldHome.findByPrimaryKey( Integer.parseInt( request.getParameter( "id" ) ) );
             model.put( "field", updateField );
         }
-        else if ( request.getParameter( "create" ) != null )
-        {
-            //CREATE
-            Field createField = new Field(  );
-            model.put( "create", true );
-            model.put( "field", createField );
-        }
+        else
+            if ( request.getParameter( "create" ) != null )
+            {
+                // CREATE
+                Field createField = new Field( );
+                model.put( "create", true );
+                model.put( "field", createField );
+            }
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_SOLR_FIELDS_FORM, getLocale(  ), model );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_SOLR_FIELDS_FORM, getLocale( ), model );
 
-        return getAdminPage( template.getHtml(  ) );
+        return getAdminPage( template.getHtml( ) );
     }
 
-    //Traitement
+    // Traitement
     public String doFields( HttpServletRequest request )
     {
         if ( request.getParameter( "delete" ) != null )
         {
             return this.doDeleteField( request );
         }
-        else if ( request.getParameter( "update" ) != null )
-        {
-            return this.doUpdateField( request );
-        }
-        else if ( request.getParameter( "create" ) != null )
-        {
-            return this.doCreateField( request );
-        }
-        else if ( request.getParameter( "refresh" ) != null )
-        {
-            return this.doRefreshFields( request );
-        }
         else
-        {
-            return null;
-        }
+            if ( request.getParameter( "update" ) != null )
+            {
+                return this.doUpdateField( request );
+            }
+            else
+                if ( request.getParameter( "create" ) != null )
+                {
+                    return this.doCreateField( request );
+                }
+                else
+                    if ( request.getParameter( "refresh" ) != null )
+                    {
+                        return this.doRefreshFields( request );
+                    }
+                    else
+                    {
+                        return null;
+                    }
     }
 
-    public String doRefreshFields ( HttpServletRequest request )
+    public String doRefreshFields( HttpServletRequest request )
     {
         // Update fields to add dynamic fields of indexers
-        SolrFieldManager.updateFields( SolrIndexerService.getAdditionalFields(  ) );
-        SolrFieldManager.reloadField(  );
+        SolrFieldManager.updateFields( SolrIndexerService.getAdditionalFields( ) );
+        SolrFieldManager.reloadField( );
 
         return getPage( request );
     }
@@ -154,7 +157,7 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
     {
         String id = request.getParameter( "id" );
         FieldHome.remove( Integer.parseInt( id ) );
-        SolrFieldManager.reloadField(  );
+        SolrFieldManager.reloadField( );
 
         return getPage( request );
     }
@@ -166,38 +169,38 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
 
         try
         {
-            field.setLabel( URLDecoder.decode( request.getParameter( "label" ), "UTF-8" ) );
-            field.setDescription( URLDecoder.decode( request.getParameter( "description" ), "UTF-8" ) );
+            field.setLabel( URLDecoder.decode( request.getParameter( "label" ), UTF_8 ) );
+            field.setDescription( URLDecoder.decode( request.getParameter( "description" ), UTF_8 ) );
         }
-        catch ( UnsupportedEncodingException e )
+        catch( UnsupportedEncodingException e )
         {
-            AppLogService.error( e.getMessage(  ), e );
+            AppLogService.error( e.getMessage( ), e );
         }
 
         field.setIsFacet( request.getParameter( "isfacet" ) != null );
         field.setIsSort( request.getParameter( "issort" ) != null );
-        field.setWeight( Double.parseDouble(request.getParameter( "weight" ) ));
-        field.setFacetMincount(Integer.parseInt(request.getParameter( "facetMincount" ) ));
-        field.setOperator(request.getParameter( "operator" ) );
+        field.setWeight( Double.parseDouble( request.getParameter( "weight" ) ) );
+        field.setFacetMincount( Integer.parseInt( request.getParameter( "facetMincount" ) ) );
+        field.setOperator( request.getParameter( "operator" ) );
         FieldHome.update( field );
-        SolrFieldManager.reloadField(  );
+        SolrFieldManager.reloadField( );
 
         return getPage( request );
     }
 
     public String doCreateField( HttpServletRequest request )
     {
-        Field field = new Field(  );
+        Field field = new Field( );
         field.setName( request.getParameter( "name" ) );
 
         try
         {
-            field.setLabel( URLDecoder.decode( request.getParameter( "label" ), "UTF-8" ) );
-            field.setDescription( URLDecoder.decode( request.getParameter( "description" ), "UTF-8" ) );
+            field.setLabel( URLDecoder.decode( request.getParameter( "label" ), UTF_8 ) );
+            field.setDescription( URLDecoder.decode( request.getParameter( "description" ), UTF_8 ) );
         }
-        catch ( UnsupportedEncodingException e )
+        catch( UnsupportedEncodingException e )
         {
-            AppLogService.error( e.getMessage(  ), e );
+            AppLogService.error( e.getMessage( ), e );
         }
 
         field.setIsFacet( request.getParameter( "isfacet" ) != null );
@@ -205,11 +208,11 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
         field.setIsSort( request.getParameter( "issort" ) != null );
         field.setEnableSort( false );
         field.setDefaultSort( false );
-        field.setWeight( Double.parseDouble(request.getParameter( "weight" ) ));
-        field.setFacetMincount(Integer.parseInt(request.getParameter( "facetMincount" ) ));
+        field.setWeight( Double.parseDouble( request.getParameter( "weight" ) ) );
+        field.setFacetMincount( Integer.parseInt( request.getParameter( "facetMincount" ) ) );
 
         FieldHome.create( field );
-        SolrFieldManager.reloadField(  );
+        SolrFieldManager.reloadField( );
 
         return getPage( request );
     }

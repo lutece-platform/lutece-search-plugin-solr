@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,8 +33,12 @@
  */
 package fr.paris.lutece.plugins.search.solr.util;
 
-public class SolrConstants
+public final class SolrConstants
 {
+    private SolrConstants( )
+    {
+    }
+
     public static final String CONSTANT_EMPTY_STRING = "";
     public static final String CONSTANT_SPACE = " ";
     public static final String CONSTANT_BR_TAG = "<br/>";

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2020, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 /**
  *
  * SolrHighlight
@@ -49,7 +48,9 @@ public class SolrHighlight
 
     /**
      * Create a new instance of SolrHighlight
-     * @param map the highlights from SolrServer
+     * 
+     * @param map
+     *            the highlights from SolrServer
      */
     public SolrHighlight( Map<String, List<String>> map )
     {
@@ -58,16 +59,19 @@ public class SolrHighlight
 
     /**
      * Returns the map
+     * 
      * @return the map
      */
-    public Map<String, List<String>> getMap(  )
+    public Map<String, List<String>> getMap( )
     {
         return _map;
     }
 
     /**
      * Sets the map
-     * @param map the map
+     * 
+     * @param map
+     *            the map
      */
     public void setMap( Map<String, List<String>> map )
     {
@@ -76,16 +80,19 @@ public class SolrHighlight
 
     /**
      * Returns the fields names
+     * 
      * @return the fields names
      */
-    public Set<String> getFieldsNames(  )
+    public Set<String> getFieldsNames( )
     {
-        return _map.keySet(  );
+        return _map.keySet( );
     }
 
     /**
      * Return the value of the given field name
-     * @param strFieldName the field name
+     * 
+     * @param strFieldName
+     *            the field name
      * @return the value of the given field name
      */
     public List<String> getValues( String strFieldName )

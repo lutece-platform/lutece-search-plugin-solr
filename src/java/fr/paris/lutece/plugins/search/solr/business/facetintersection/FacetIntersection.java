@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
+ * Copyright (c) 2002-2020, City of Paris
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
  *
@@ -31,32 +31,34 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.search.solr.business.facetIntersection;
+package fr.paris.lutece.plugins.search.solr.business.facetintersection;
 
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
-
 
 /**
  * This is the business class for the object facetIntersection
  */
 public class FacetIntersection
 {
-    // Variables declarations 
+    // Variables declarations
     private Field _field1;
     private Field _field2;
 
     /**
      * Returns the IdField1
+     * 
      * @return The IdField1
      */
-    public Field getField1(  )
+    public Field getField1( )
     {
         return _field1;
     }
 
     /**
      * Sets the IdField1
-     * @param nIdField1 The IdField1
+     * 
+     * @param nIdField1
+     *            The IdField1
      */
     public void setField1( Field field1 )
     {
@@ -65,16 +67,19 @@ public class FacetIntersection
 
     /**
      * Returns the IdField2
+     * 
      * @return The IdField2
      */
-    public Field getField2(  )
+    public Field getField2( )
     {
         return _field2;
     }
 
     /**
      * Sets the IdField2
-     * @param nIdField2 The IdField2
+     * 
+     * @param nIdField2
+     *            The IdField2
      */
     public void setField2( Field field2 )
     {
