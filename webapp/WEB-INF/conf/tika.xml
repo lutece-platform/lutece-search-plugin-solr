@@ -4,8 +4,12 @@
         <!-- Default Parser for most things and never use the Executable 
             Parser -->
         <parser class="org.apache.tika.parser.DefaultParser">
-            <parser-exclude
-                class="org.apache.tika.parser.executable.ExecutableParser" />
+            <parser-exclude class="org.apache.tika.parser.executable.ExecutableParser" />
+            <parser-exclude class="org.apache.tika.parser.image.ImageParser" />
+            <parser-exclude class="org.apache.tika.parser.image.TiffParser" />
+            <parser-exclude class="org.apache.tika.parser.jpeg.JpegParser" />
+            <parser-exclude class="org.apache.tika.parser.video.FLVParser" />
+            <parser-exclude class="org.apache.tika.parser.mp3.Mp3Parser" />
         </parser>
         <!-- Use a different parser for PDF -->
         <parser class="org.apache.tika.parser.pdf.PDFParser">
