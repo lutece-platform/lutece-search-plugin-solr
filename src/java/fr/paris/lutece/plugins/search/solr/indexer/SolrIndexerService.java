@@ -448,7 +448,6 @@ public final class SolrIndexerService
     public static List<Field> getAdditionalFields( )
     {
         List<Field> lstFields = new ArrayList<>( );
-
         for ( SolrIndexer solrIndexer : INDEXERS )
         {
             List<Field> lstAdditionalFields = solrIndexer.getAdditionalFields( );

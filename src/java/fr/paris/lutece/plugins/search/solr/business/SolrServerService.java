@@ -35,7 +35,6 @@ package fr.paris.lutece.plugins.search.solr.business;
 
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import org.apache.solr.client.solrj.SolrClient;
-
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 
 /**
@@ -45,12 +44,11 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 public final class SolrServerService
 {
     private static final String PROPERTY_SOLR_SERVER_URL = "solr.server.address";
-    private static final String PROPERTY_SOLR_SERVER_MAX_CONNECTION = "solr.server.max.connection";
     private static final String PROPERTY_SOLR_TIMEOUT = "solr.server.timeout";
+    private static final String PROPERTY_SOLR_SOCKET_TIMEOUT = "solr.socket.timeout";
     private static final String SOLR_SERVER_URL = AppPropertiesService.getProperty( PROPERTY_SOLR_SERVER_URL );
-    private static final int NO_MAX_CONNECTION_SET = -1;
-    private static final int SOLR_SERVER_MAX_CONNECTION = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_SERVER_MAX_CONNECTION, NO_MAX_CONNECTION_SET );
-    private static final int SOLR_TIMEOUT = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_TIMEOUT, 60000 );
+    private static final int SOLR_CONNECTION_TIMEOUT = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_TIMEOUT, 10000 );
+    private static final int SOLR_SOCKET_TIMEOUT = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_SOCKET_TIMEOUT, 60000 );
     private static SolrServerService _instance;
     private SolrClient _solrServer;
 
@@ -101,13 +99,9 @@ public final class SolrServerService
      */
     private SolrClient createSolrServer( String strServerUrl )
     {
-        HttpSolrClient.Builder builder = new HttpSolrClient.Builder( ).withBaseSolrUrl( strServerUrl );
-        HttpSolrClient solrServer = builder.build( );
-        if ( SOLR_SERVER_MAX_CONNECTION != NO_MAX_CONNECTION_SET )
-        {
-            solrServer.setMaxTotalConnections( SOLR_SERVER_MAX_CONNECTION );
-        }
-        solrServer.setConnectionTimeout( SOLR_TIMEOUT );
-        return solrServer;
+    	return new HttpSolrClient.Builder(strServerUrl)
+    		    .withConnectionTimeout(SOLR_CONNECTION_TIMEOUT)
+    		    .withSocketTimeout(SOLR_SOCKET_TIMEOUT)
+    		    .build();
     }
 }
