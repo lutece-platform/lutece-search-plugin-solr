@@ -11,7 +11,6 @@
     language governing permissions and limitations under the License. -->
 <schema name="lutece" version="7.0">
     <types>
-        <!-- docValues are enabled by default for long type so we don't need to index the version field  -->
         <field name="_version_" type="long" indexed="false"
             stored="false" />
         <field name="_root_" type="string" indexed="true"
@@ -21,15 +20,15 @@
         <fieldType name="boolean" class="solr.BoolField"
             sortMissingLast="true" />
         <fieldType name="int" class="solr.IntPointField"
-            precisionStep="0" positionIncrementGap="0" />
+            docValues="true" />
         <fieldType name="float" class="solr.FloatPointField"
-            precisionStep="0" positionIncrementGap="0" />
+            docValues="true" />
         <fieldType name="long" class="solr.LongPointField"
-            precisionStep="0" positionIncrementGap="0" />
+            docValues="true" />
         <fieldType name="double" class="solr.DoublePointField"
-            precisionStep="0" positionIncrementGap="0" />
+            docValues="true" />
         <fieldType name="date" class="solr.DatePointField"
-            precisionStep="0" positionIncrementGap="0" />
+            docValues="true" />
         <fieldtype name="binary" class="solr.BinaryField" />
         <fieldType name="random" class="solr.RandomSortField"
             indexed="true" />
