@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2020, City of Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -99,9 +99,6 @@ public final class SolrServerService
      */
     private SolrClient createSolrServer( String strServerUrl )
     {
-    	return new HttpSolrClient.Builder(strServerUrl)
-    		    .withConnectionTimeout(SOLR_CONNECTION_TIMEOUT)
-    		    .withSocketTimeout(SOLR_SOCKET_TIMEOUT)
-    		    .build();
+        return new HttpSolrClient.Builder( strServerUrl ).withConnectionTimeout( SOLR_CONNECTION_TIMEOUT ).withSocketTimeout( SOLR_SOCKET_TIMEOUT ).build( );
     }
 }
