@@ -302,11 +302,18 @@ public class SolrSearchEngine implements SearchEngine
         {
             for ( String strFacetQuery : facetQueries )
             {
-                String [ ] myValues = strFacetQuery.split( ":", 2 );
-                if ( myValues != null && myValues.length == 2 )
-                {
-                    myValuesList = getFieldArrange( myValues, myValuesList );
-                }
+            	if ( isComplexFacetQuery(strFacetQuery) )
+            	{
+                    query.addFilterQuery( strFacetQuery );
+            	}
+            	else
+            	{
+	                String [ ] myValues = strFacetQuery.split( ":", 2 );
+	                if ( myValues != null && myValues.length == 2 )
+	                {
+	                    myValuesList = getFieldArrange( myValues, myValuesList );
+	                }
+            	}
             }
 
             for ( Entry<Field, List<String>> entry : myValuesList.entrySet( ) )
@@ -457,7 +464,23 @@ public class SolrSearchEngine implements SearchEngine
         return facetedResult;
     }
 
-    /**
+    private boolean isComplexFacetQuery(String strFacetQuery) 
+    {
+    	String[] tabComplexQueryChar = {"(",")","[","]", " OR ", " AND ", "-", "+", "=","^"};
+    	if ( strFacetQuery != null )
+    	{
+	    	for ( String strComplexChar : tabComplexQueryChar )
+	    	{
+				if ( StringUtils.contains(strFacetQuery, strComplexChar) )
+				{
+					return true;
+				}
+	    	}
+    	}
+		return false;
+	}
+
+	/**
      * @param strValues
      * @param strStart
      * @param strEnd
@@ -599,11 +622,18 @@ public class SolrSearchEngine implements SearchEngine
         {
             for ( String strFacetQuery : facetQueries )
             {
-                String [ ] myValues = strFacetQuery.split( ":", 2 );
-                if ( myValues != null && myValues.length == 2 )
-                {
-                    myValuesList = getFieldArrange( myValues, myValuesList );
-                }
+            	if ( isComplexFacetQuery(strFacetQuery) )
+            	{
+                    query.addFilterQuery( strFacetQuery );
+            	}
+            	else
+            	{
+	                String [ ] myValues = strFacetQuery.split( ":", 2 );
+	                if ( myValues != null && myValues.length == 2 )
+	                {
+	                    myValuesList = getFieldArrange( myValues, myValuesList );
+	                }
+            	}
             }
 
             for ( Entry<Field, List<String>> entry : myValuesList.entrySet( ) )
