@@ -1,0 +1,1 @@
+ALTER TABLE solr_fields MODIFY COLUMN id_field int NOT NULL;
