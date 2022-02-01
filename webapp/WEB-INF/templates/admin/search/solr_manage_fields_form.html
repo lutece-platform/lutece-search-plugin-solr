@@ -1,113 +1,69 @@
 <#setting url_escaping_charset='ISO-8859-1'>
-<div class="row">
-  <div class="col-xs-12 col-sm-12">
-    <div class="box box-danger">
-      <div class="box-header">
-        <h3 class="box-title"><#if create>#i18n{search.solr.adminFeature.fields.form.create.title}<#else>#i18n{search.solr.adminFeature.fields.form.update.title}</#if></h3>
-      </div>
-      <div class="box-body">
-        <form class="form-horizontal" method="get" name="doFields" action="jsp/admin/search/solr/ManageSolrFields.jsp" enctype="text/plain" accept-charset="ISO-8859-1">
-          <input type="hidden" name="id" value="${field.idField}">
-          <div class="form-group">
-            <label class="control-label col-xs-12 col-sm-3">#i18n{search.solr.adminFeature.fields.form.name} :</label>
-            <div class="col-xs-12 col-sm-9">
-              <input type="text" name="name" value="${field.name}" class="form-control">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="control-label col-xs-12 col-sm-3">#i18n{search.solr.adminFeature.fields.form.label} :</label>
-            <div class="col-xs-12 col-sm-9">
-              <input type="text" name="label" value="${field.label}" class="form-control">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="control-label col-xs-12 col-sm-3" for="isfacet">#i18n{search.solr.adminFeature.fields.form.facet} :</label>
-            <div class="col-xs-12 col-sm-9">
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" name="isfacet" id="isfacet" <#if field.isFacet>checked="checked"</#if>>
-                </label>
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="control-label col-xs-12 col-sm-3" for="issort">#i18n{search.solr.adminFeature.fields.form.sort} :</label>
-            <div class="col-xs-12 col-sm-9">
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" name="issort" id="issort" <#if field.isSort>checked="checked"</#if>>
-                </label>
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="control-label col-xs-12 col-sm-3">#i18n{search.solr.adminFeature.fields.form.weight} :</label>
-            <div class="col-xs-12 col-sm-9">
-              <input type="number" id="weight" name="weight" value="${field.weight}"  min="0" />
-              <p class="help-block">#i18n{search.solr.adminFeature.fields.form.weight.help}</p>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="control-label col-xs-12 col-sm-3">#i18n{search.solr.adminFeature.fields.form.facet.mincount} :</label>
-            <div class="col-xs-12 col-sm-2">
-              <select name="facetMincount" id="facetMincount" class="form-control">
-                <option value="1" <#if field.facetMincount==1>selected</#if> >#i18n{search.solr.adminFeature.fields.form.facet.mincount.onHere}</option>
-                <option value="0" <#if field.facetMincount==0>selected</#if> >#i18n{search.solr.adminFeature.fields.form.facet.mincount.allways}</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="control-label col-xs-12 col-sm-3">#i18n{search.solr.adminFeature.fields.form.facet.operator} :</label>
-            <div class="col-xs-12 col-sm-2">
-              <select name="operator" id="operator" class="form-control">
-                <option value="OR" <#if field.operator?upper_case=="OR">selected</#if> >#i18n{search.solr.adminFeature.fields.form.facet.or}</option>
-                <option value="SWITCH" <#if field.operator?upper_case=="SWITCH">selected</#if> >#i18n{search.solr.adminFeature.fields.form.facet.switch}</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="control-label col-xs-12 col-sm-3">#i18n{search.solr.adminFeature.fields.form.description} :</label>
-            <div class="col-xs-12 col-sm-9">
-              <input type="text" name="description" value="${field.description}" class="form-control">
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-xs-12 col-sm-offset-3 col-sm-9">
-              <#if create>
-                <button class="btn btn-primary btn-flat" type="submit" name="create">
-                  <i class="fa fa-check"></i> #i18n{portal.site.admin_page.buttonCreate}
-                </button>
-                <#else>
-                  <button class="btn btn-primary btn-flat" type="submit" name="update">
-                    <i class="fa fa-check-circle"></i> #i18n{portal.site.admin_page.buttonModify}
-                  </button>
-              </#if>
-              <button class="btn btn-default btn-flat" type="button" onClick="javascript:history.go(-1);">
-                <i class="fa fa-remove"></i> #i18n{portal.util.labelCancel}
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
+<@row>
+	<@columns>
+		<@box>
+      <#assign title><#if create??>#i18n{search.solr.adminFeature.fields.form.create.title}<#else>#i18n{search.solr.adminFeature.fields.form.update.title}</#if></#assign>
+		  <@boxHeader title=title skipHeader=true />
+			<@boxBody>
+        <@tform methode='get' name="doFields" action='jsp/admin/search/solr/ManageSolrFields.jsp' enctype='text/plain' params='accept-charset="ISO-8859-1"'>
+          <@input type='hidden' name='id' value='${field.idField}'/>
+          <@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.name}' labelFor='name' mandatory=true>
+						<@input type='text' id='name' name='name' maxlength=255 value=field.name />
+					</@formGroup>
+          <@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.label}' labelFor='label' mandatory=true>
+						<@input type='text' id='label' name='label' maxlength=255 value=field.label />
+					</@formGroup>
+          <@formGroup labelFor='isfacet'>
+            <@checkBox orientation='switch' name='isfacet' id='isfacet' labelKey='#i18n{search.solr.adminFeature.fields.form.facet}' labelFor='isfacet' checked=field.isFacet />
+          </@formGroup>
+          <@formGroup labelFor='issort'>
+            <@checkBox orientation='switch' name='issort' id='issort' labelKey='#i18n{search.solr.adminFeature.fields.form.sort}' labelFor='isfacet' checked=field.isSort />
+          </@formGroup>
+					<@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.weight}' labelFor='weight' helpKey='#i18n{search.solr.adminFeature.fields.form.weight.help}'>
+          <@input type='text' id='weight' name='weight' maxlength=255 value=field.weight min=0 />
+					</@formGroup>
+					<@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.description}' labelFor='description' >
+						<@input type='text' id='description' name='description' maxlength=255 value=field.description/>
+					</@formGroup>
+					<@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.facet.mincount}' labelFor='facetMincount'>
+            <#assign sel1><#if field.facetMincount=1>true<#else>false</#if></#assign>
+            <#assign sel2><#if field.facetMincount=0>true<#else>false</#if></#assign>
+						<@select id='facetMincount' name='facetMincount'>
+              <@option label='#i18n{search.solr.adminFeature.fields.form.facet.mincount.onHere}' value='1' selected=sel1?boolean />
+              <@option label='#i18n{search.solr.adminFeature.fields.form.facet.mincount.allways}' value='1' selected=sel2?boolean />
+						</@select>
+					</@formGroup>
+					<@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.facet.operator}' labelFor='operator'>
+            <#assign sel1><#if field.operator?upper_case=='OR'>true<#else>false</#if></#assign>
+            <#assign sel2><#if field.operator?upper_case=='SWITCH'>true<#else>false</#if></#assign>
+						<@select id='operator' name='operator'>
+              <@option value='OR' selected=sel1?boolean label='#i18n{search.solr.adminFeature.fields.form.facet.or}' />
+              <@option value='SWITCH' selected=sel2?boolean label='#i18n{search.solr.adminFeature.fields.form.facet.switch}' />
+						</@select>
+					</@formGroup>
+          <@formGroup>
+            <#if create><@button type='submit' buttonIcon='check' title='#i18n{portal.site.admin_page.buttonCreate}' name='create' color='primary' size='' /><#else><@button type='submit' name='update' buttonIcon='check' title='#i18n{portal.site.admin_page.buttonModify}' color='primary' size='' /></#if>
+						<@aButton href='jsp/admin/search/solr/ManageSolrFields.jsp' buttonIcon='times' color='danger' size='' title='#i18n{portal.util.labelCancel}' />
+					</@formGroup>
+        </@tform>
+      </@boxBody>
+    </@box>
+  </@columns>
+</@row>
 <script>
-    $(function() {
-      enableOrNot();
-      $("#facetMincount").change(function() {
-        enableOrNot();
-      });
-    });
-
-    function enableOrNot() {
-      var value = $("#facetMincount").val() == 0 ? false : true;
-      if (value) {
-        $("#operator").append('<option value="AND" selected="selected">#i18n{search.solr.adminFeature.fields.form.facet.and}</option>');
-      } else {
-        $("#operator option[value='AND']").remove();
-        $("#operator").prop("disabled", value);
-      }
-    }
-  </script>
+$(function() {
+  enableOrNot();
+  $("#facetMincount").change(function() {
+    enableOrNot();
+  });
+});
+function enableOrNot() {
+  var value = $("#facetMincount").val() == 0 ? false : true;
+  if (value) {
+    $("#operator").append('<option value="AND" selected="selected">#i18n{search.solr.adminFeature.fields.form.facet.and}</option>');
+  } else {
+    $("#operator option[value='AND']").remove();
+    $("#operator").prop("disabled", value);
+  }
+}
+</script>

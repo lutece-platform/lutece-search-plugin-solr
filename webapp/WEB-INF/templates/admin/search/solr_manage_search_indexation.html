@@ -1,89 +1,68 @@
-<div class="row">
-  <div class="col-xs-12 col-sm-12">
-    <div class="box box-danger">
-      <div class="box-header">
-        <h3 class="box-title">#i18n{portal.search.manage_indexer.labelIndexersList}</h3>
-        <div class="box-tools">
-<#if !(running?? && running)>
-          <form method="get" name="doIndexing" action="jsp/admin/search/solr/DoIndexing.jsp" class="form-inline">
-          <div class="form-group">
-            <button class="btn btn-danger btn-xs btn-flat" type="submit" name="del">
-              <i class="fa fa-trash"></i> #i18n{search.solr.adminFeature.buttonDoDel}
-            </button>
-            <button class="btn btn-primary btn-xs btn-flat" type="submit" name="total" >
-              <i class="fa fa-cogs"></i> #i18n{portal.search.manage_indexer.buttonDoIndex}
-            </button>
-            <button class="btn btn-primary btn-xs btn-flat" type="submit" name="incremental" >
-              <i class="fa fa-cog"></i> #i18n{portal.search.manage_indexer.buttonDoIncrementalIndex}
-            </button>
-            <button class="btn btn-default btn-xs btn-flat" type="button" onClick="javascript:history.go(-1);" >
-              <i class="fa fa-remove"></i> #i18n{portal.util.labelCancel}
-            </button>
-          </div>
-          </form>
-</#if>
-        </div>
-      </div>
-      <div class="box-body">
-        <table class="table table-striped table-condensed">
-          <tr>
-            <th>#i18n{portal.search.manage_indexer.columnIndexerName}</th>
-            <th>#i18n{portal.search.manage_indexer.columnIndexerVersion}</th>
-            <th>#i18n{portal.search.manage_indexer.columnIndexerEnable}</th>
-            <th>#i18n{portal.search.manage_indexer.columnIndexerEnable}</th>
-          </tr>
+<@row>
+	<@columns>
+		<@box color='info'>
+			<@boxHeader title='#i18n{portal.search.manage_indexer.labelIndexersList}' skipHeader=true boxTools=true>
+      <#if !(running?? && running)>
+        <@tform method='get' type='inline' name='doIndexing' action='jsp/admin/search/solr/DoIndexing.jsp'>
+          <@button type='submit' buttonIcon='trash' title='#i18n{search.solr.adminFeature.buttonDoDel}' name='del' color='danger' size='sm' />
+          <@button type='submit' buttonIcon='cogs' title='#i18n{portal.search.manage_indexer.buttonDoIndex}' color='primary' name='total' size='sm' />
+          <@button type='submit' buttonIcon='cog' title='#i18n{portal.search.manage_indexer.buttonDoIncrementalIndex}' color='primary' name='incremental' size='sm' />
+        </@tform>
+      </#if>
+      </@boxHeader>
+      <@boxBody>
+      <@table>
+        <@tr>
+            <@th>#i18n{portal.search.manage_indexer.columnIndexerName}</@th>
+            <@th>#i18n{portal.search.manage_indexer.columnIndexerVersion}</@th>
+            <@th>#i18n{portal.search.manage_indexer.columnIndexerEnable}</@th>
+            <@th>#i18n{portal.search.manage_indexer.columnIndexerEnable}</@th>
+          </@tr>
+          <@tableHeadBodySeparator />
           <#list indexers_list as indexer>
-            <tr>
-              <td>${indexer.name}</td>
-              <td>${indexer.version}</td>
-              <td>${indexer.description}</td>
-              <td>
+          <@tr>
+              <@td>${indexer.name}</@td>
+              <@td>${indexer.version}</@td>
+              <@td>${indexer.description}</@td>
+              <@td>
               <#if indexer.enable >
-                <span class="label label-success"><i class="fa fa-check"></i> #i18n{portal.util.labelEnabled}</span>
+                <@tag color='success'><@icon style='check' /> #i18n{portal.util.labelEnabled}</@tag>
               <#else>
-                <span class="label label-important"><i class="fa fa-remove"></i> #i18n{portal.util.labelDisabled}</span>
+                <@tag color='important'><@icon style='times' /> #i18n{portal.util.labelDisabled}</@tag>
               </#if>
-              </td>
-            </tr>
+              </@td>
+            </@tr>
           </#list>
-        </table>
-      </div>
-    </div>
+        </@table>
+      </@boxBody>
+    </@box>
+  </@columns>
+</@row>
 <#if running?? && running>
-    <div class="box">
-      <div class="box-header">
-        <h3 class="box-title">
-        <i class="fa fa-gear fa-spin"></i> &nbsp; #i18n{search.solr.adminFeature.operationInProgress} :
-        <#if command = "del">
-            #i18n{search.solr.adminFeature.buttonDoDel}
-        <#elseif command = "total">
-            #i18n{portal.search.manage_indexer.buttonDoIndex}
-        <#elseif command = "incremental" >
-            #i18n{portal.search.manage_indexer.buttonDoIncrementalIndex}
-        <#else>
-            ${command}
-        </#if> ...
-      </div>
-      <div class="box-body">
-      <pre>${logs}</pre>
-      </div>
-    </div>
-    <script>
-        // Refresh the page every 3s
-        var time = new Date().getTime();
-        $(document.body).bind("mousemove keypress", function (e) {
-            time = new Date().getTime();
-        });
-
-        function refresh() {
-            if (new Date().getTime() - time >= 3000)
-                window.location.reload(true);
-            else
-                setTimeout(refresh, 3000);
-        }
-
-        setTimeout(refresh, 3000);
-    </script>
-  </#if>
-  </div>
-</div>
+<@row>
+	<@columns>
+		<@box color='info'>
+			<@boxHeader title='#i18n{search.solr.adminFeature.operationInProgress}' />
+      <@boxBody>
+        <@p><@icon style='gear fa-spin'/> #i18n{search.solr.adminFeature.operationInProgress} :</@p>
+        <@p><#if command = "del"> #i18n{search.solr.adminFeature.buttonDoDel}<#elseif command = "total">#i18n{portal.search.manage_indexer.buttonDoIndex}<#elseif command = "incremental" >#i18n{portal.search.manage_indexer.buttonDoIncrementalIndex}<#else>${command}</#if> ...</@p>
+        <pre>${logs}</pre>
+      </@boxBody>
+    </@box>
+  </@columns>
+</@row>
+<script>
+// Refresh the page every 3s
+var time = new Date().getTime();
+$(document.body).bind("mousemove keypress", function (e) {
+    time = new Date().getTime();
+});
+function refresh() {
+if (new Date().getTime() - time >= 3000)
+    window.location.reload(true);
+else
+    setTimeout(refresh, 3000);
+}
+setTimeout(refresh, 3000);
+</script>
+</#if>
