@@ -65,6 +65,7 @@ public class SolrItem
     public static final String FIELD_CATEGORIE = "categorie";
     public static final String FIELD_HIERATCHY_DATE = "hiedate";
     public static final String FIELD_METADATA = "metadata";
+    public static final String FIELD_ID_RESOURCE = "id_resource";
     public static final String DYNAMIC_STRING_FIELD_SUFFIX = "_string";
     public static final String DYNAMIC_TEXT_FIELD_SUFFIX = "_text";
     public static final String DYNAMIC_URL_FIELD_SUFFIX = "_url";
@@ -77,6 +78,7 @@ public class SolrItem
     public static final String DYNAMIC_GEOJSON_ADDRESS_FIELD_SUFFIX = "_address";
     private static final String GEOLOC_JSON_PATH_GEOMETRY = "geometry";
     private static final String GEOLOC_JSON_PATH_GEOMETRY_COORDINATES = "coordinates";
+
     @Field( SearchItem.FIELD_URL )
     private String _strUrl;
     @Field( SearchItem.FIELD_DATE )
@@ -107,7 +109,8 @@ public class SolrItem
     private String _strDocPortletId;
     @Field( FIELD_FILE_CONTENT )
     private String _strFileContent;
-
+    @Field( FIELD_ID_RESOURCE )
+    private String _strIdresource;
     // DynamicField
     @Field( "*" + DYNAMIC_LIST_FIELD_SUFFIX )
     private Map<String, List<String>> _dfListBox;
@@ -711,6 +714,22 @@ public class SolrItem
     public void setFileContent( String strFileContent )
     {
         _strFileContent = strFileContent;
+    }
+    /**
+     * @return the strIdresource
+     */
+    public String getIdResource( )
+    {
+        return _strIdresource;
+    }
+
+    /**
+     * @param strIdresource
+     *            the resource id to set
+     */
+    public void setIdResource( String strIdresource )
+    {
+    	_strIdresource = strIdresource;
     }
 
 }

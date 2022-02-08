@@ -194,6 +194,8 @@ public final class SolrIndexerService
         {
             int commitSize = Integer.parseInt( AppPropertiesService.getProperty( PROPERTY_COMMIT_SIZE ) );
             int count = 0;
+            provideExternalFields( solrItems );
+            
             for ( SolrItem solrItem : solrItems )
             {
                 count++;
@@ -371,6 +373,7 @@ public final class SolrIndexerService
 
                 if ( CollectionUtils.isNotEmpty( lstItems ) )
                 {
+                	provideExternalFields( lstItems );
                     for ( SolrItem item : lstItems )
                     {
                         indexSolrItem( action, item );
@@ -533,6 +536,7 @@ public final class SolrIndexerService
         solrInputDocument.addField( SolrItem.FIELD_CATEGORIE, solrItem.getCategorie( ) );
         solrInputDocument.addField( SolrItem.FIELD_CONTENT, solrItem.getContent( ) );
         solrInputDocument.addField( SolrItem.FIELD_FILE_CONTENT, solrItem.getFileContent( ) );
+        solrInputDocument.addField( SolrItem.FIELD_ID_RESOURCE, solrItem.getIdResource( ) );
         solrInputDocument.addField( SearchItem.FIELD_DOCUMENT_PORTLET_ID, solrItem.getDocPortletId( ) );
 
         // Add the dynamic fields
@@ -634,4 +638,19 @@ public final class SolrIndexerService
     {
         return _sbLogs;
     }
+
+    /**
+     * Provide external fields for the solrItem
+     * 
+     * @param listSolrItem
+     *            list of solrItem objects
+     */
+    private static void provideExternalFields( Collection<SolrItem> listSolrItem  )
+    {
+        for ( ISolrItemExternalFieldProvider provider : SpringContextService.getBeansOfType( ISolrItemExternalFieldProvider.class ) )
+        {
+            provider.provideFields( listSolrItem );
+        }
+    }
+
 }
