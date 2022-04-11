@@ -48,6 +48,7 @@ public class SolrSearchAppConf
 {
     private String _strCode = SolrSearchAppConfService.EMPTY_CODE;
     private String _strFilterQuery = SolrConstants.CONSTANT_DEFAULT_FILTER_QUERY;
+    private String _strFieldList = SolrConstants.CONSTANT_WILDCARD;
     private String _strTemplate = SolrConstants.CONSTANT_DEFAULT_TEMPLATE;
     private boolean _bExtraMappingQuery = SolrConstants.CONSTANT_DEFAULT_EXTRA_MAPPING_QUERY;
     private List<String> _listAddonBeanNames = new ArrayList<>( );
@@ -114,6 +115,23 @@ public class SolrSearchAppConf
     {
         _strFilterQuery = strFilterQuery;
     }
+    /**
+     * Returns the FieldList
+     * @return The FieldList
+     */ 
+     public String getFieldList()
+     {
+         return _strFieldList;
+     }
+ 
+    /**
+     * Sets the FieldList
+     * @param strFieldList The FieldList
+     */ 
+     public void setFieldList( String strFieldList )
+     {
+         _strFieldList = strFieldList;
+     }
 
     /**
      * Returns the boolean indicating if we need an extra query for mapping

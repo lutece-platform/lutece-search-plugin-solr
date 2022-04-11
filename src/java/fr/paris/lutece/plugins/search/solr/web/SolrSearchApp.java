@@ -333,7 +333,7 @@ public class SolrSearchApp implements XPageApplication
 
         SolrSearchEngine engine = SolrSearchEngine.getInstance( );
 
-        SolrFacetedResult facetedResult = engine.getFacetedSearchResults( strQuery, facetQuery, sort, order, nLimit, Integer.parseInt( strCurrentPageIndex ),
+        SolrFacetedResult facetedResult = engine.getFacetedSearchResults( strQuery, new String [] {conf.getFieldList()}, facetQuery, sort, order, nLimit, Integer.parseInt( strCurrentPageIndex ),
                 nItemsPerPage, SOLR_SPELLCHECK );
         List<SolrSearchResult> listResults = facetedResult.getSolrSearchResults( );
 

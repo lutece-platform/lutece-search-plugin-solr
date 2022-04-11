@@ -516,14 +516,16 @@ public final class SolrIndexerService
      *            the item to convert
      * @return A {@link SolrInputDocument} object corresponding to the item parameter
      */
-    private static SolrInputDocument solrItem2SolrInputDocument( SolrItem solrItem )
+    public static SolrInputDocument solrItem2SolrInputDocument( SolrItem solrItem )
     {
-        SolrInputDocument solrInputDocument = new SolrInputDocument( );
+        final SolrInputDocument solrInputDocument = new SolrInputDocument( );
         String strWebappName = getWebAppName( );
 
-        // Prefix the uid by the name of the site. Without that, it is necessary imposible to index two resources of two different sites with the same
-        // identifier
-        solrInputDocument.addField( SearchItem.FIELD_UID, strWebappName + SolrConstants.CONSTANT_UNDERSCORE + solrItem.getUid( ) );
+        if( solrItem.getUid( ) != null ) {
+        	// Prefix the uid by the name of the site. Without that, it is necessary imposible to index two resources of two different sites with the same
+             // identifier           
+        	solrInputDocument.addField( SearchItem.FIELD_UID, strWebappName + SolrConstants.CONSTANT_UNDERSCORE + solrItem.getUid( ) );
+        }
         solrInputDocument.addField( SearchItem.FIELD_DATE, solrItem.getDate( ) );
         solrInputDocument.addField( SearchItem.FIELD_TYPE, solrItem.getType( ) );
         solrInputDocument.addField( SearchItem.FIELD_SUMMARY, solrItem.getSummary( ) );
@@ -538,7 +540,6 @@ public final class SolrIndexerService
         solrInputDocument.addField( SolrItem.FIELD_FILE_CONTENT, solrItem.getFileContent( ) );
         solrInputDocument.addField( SolrItem.FIELD_ID_RESOURCE, solrItem.getIdResource( ) );
         solrInputDocument.addField( SearchItem.FIELD_DOCUMENT_PORTLET_ID, solrItem.getDocPortletId( ) );
-
         // Add the dynamic fields
         // They must be declared into the schema.xml of the solr server
         Map<String, Object> mapDynamicFields = solrItem.getDynamicFields( );
@@ -547,6 +548,13 @@ public final class SolrIndexerService
         {
             solrInputDocument.addField( dynamicField.getKey( ), dynamicField.getValue( ) );
         }
+        //Add the child documents
+        if ( solrItem.hasChildDocuments())
+        {
+        	solrItem.getChilSolrInputDocument().forEach((key, child) -> 
+        	solrInputDocument.setField( key , child));
+        }
+      
 
         return solrInputDocument;
     }

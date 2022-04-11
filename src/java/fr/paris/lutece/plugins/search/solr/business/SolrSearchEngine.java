@@ -210,6 +210,28 @@ public class SolrSearchEngine implements SearchEngine
     public SolrFacetedResult getFacetedSearchResults( String strQuery, String [ ] facetQueries, String sortName, String sortOrder, int nLimit,
             int nCurrentPageIndex, int nItemsPerPage, Boolean bSpellCheck )
     {
+    	return getFacetedSearchResults( strQuery, null, facetQueries,  sortName,  sortOrder, nLimit, nCurrentPageIndex, nItemsPerPage,  bSpellCheck );  
+    }
+    /**
+     * Return the result with facets. Does NOT support authentification yet.
+     * 
+     * @param strQuery
+     *            the query
+     * @param facetQueries
+     *            The selected facets
+     * @param fl
+     * 			the list of fields 
+     * @param sortName
+     *            The facet name to sort by
+     * @param sortOrder
+     *            "asc" or "desc"
+     * @param nLimit
+     *            Maximal number of results.
+     * @return the result with facets
+     */
+    public SolrFacetedResult getFacetedSearchResults( String strQuery, String[] fl, String [ ] facetQueries, String sortName, String sortOrder, int nLimit,
+            int nCurrentPageIndex, int nItemsPerPage, Boolean bSpellCheck )
+    {
         SolrFacetedResult facetedResult = new SolrFacetedResult( );
 
         SolrClient solrServer = SolrServerService.getInstance( ).getSolrServer( );
@@ -232,6 +254,7 @@ public class SolrSearchEngine implements SearchEngine
         query.setParam( "f.summary.hl.fragsize", Integer.toString( SOLR_HIGHLIGHT_SUMMARY_FRAGSIZE ) );
         query.setFacet( true );
         query.setFacetLimit( SOLR_FACET_LIMIT );
+        query.setFields(fl != null ? fl: new String [] { SolrConstants.CONSTANT_WILDCARD });
 
         for ( Field field : SolrFieldManager.getFacetList( ).values( ) )
         {

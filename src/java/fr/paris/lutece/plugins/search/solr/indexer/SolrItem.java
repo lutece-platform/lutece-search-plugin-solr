@@ -38,12 +38,14 @@ import fr.paris.lutece.portal.service.search.SearchItem;
 import fr.paris.lutece.portal.service.util.AppLogService;
 
 import org.apache.solr.client.solrj.beans.Field;
-
+import org.apache.solr.common.SolrInputDocument;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -78,6 +80,7 @@ public class SolrItem
     public static final String DYNAMIC_GEOJSON_ADDRESS_FIELD_SUFFIX = "_address";
     private static final String GEOLOC_JSON_PATH_GEOMETRY = "geometry";
     private static final String GEOLOC_JSON_PATH_GEOMETRY_COORDINATES = "coordinates";
+    public static final String FIELD_CHILD_DOCUMENTS = "_childDocuments";
 
     @Field( SearchItem.FIELD_URL )
     private String _strUrl;
@@ -128,6 +131,8 @@ public class SolrItem
     private Map<String, String> _dfGeojson;
     @Field( "*" + DYNAMIC_LIST_DATE_FIELD_SUFFIX )
     private Map<String, List<Date>> _dfListDate;
+    @Field( "*" + FIELD_CHILD_DOCUMENTS )
+    private Map<String, Collection<SolrItem>> _childDocuments;
 
     /**
      * Returns list of all dynamic fields
@@ -731,5 +736,57 @@ public class SolrItem
     {
     	_strIdresource = strIdresource;
     }
+    public void addChildDocument(String strName, SolrItem child) {
+    	
+   	   if (_childDocuments == null) {
+   		   
+    	   _childDocuments = new HashMap<>( );
+   	   }
+   	   Collection<SolrItem> items= _childDocuments.get(strName);
+   	   if(items == null) {
+   		   
+   		   Collection<SolrItem> list =new ArrayList<>();
+   		   list.add(child);
+   		   _childDocuments.put( strName + FIELD_CHILD_DOCUMENTS , list);
+   	   }
+   	   else {
+	   		items.add(child);
+	   		_childDocuments.put(strName + FIELD_CHILD_DOCUMENTS, items);
+   	   }
+   }
+
+   public void addChildDocuments(String strName, Collection<SolrItem> children) {
+	   
+       for (SolrItem child : children) {
+   	      addChildDocument(strName, child);
+   	    }
+   }
+   /** Returns the list of child documents, or null if none. */
+   public Map<String, Collection<SolrItem>> getChildDocuments( ) {
+     return _childDocuments;
+   }
+   
+   /** Returns the list of child documents, or null if none. */
+   public Map<String, Collection<SolrInputDocument>> getChilSolrInputDocument( ) 
+   {
+	   Map<String, Collection<SolrInputDocument>> childSolrInputDocument = new HashMap<>( );
+	   if(hasChildDocuments( )) {
+		   
+		   _childDocuments.forEach( ( key, value) ->{
+			   Collection<SolrInputDocument> coll= new ArrayList<>( );
+			   value.forEach( child -> 
+					   coll.add( SolrIndexerService.solrItem2SolrInputDocument(child))
+				);
+			   childSolrInputDocument.put(key, coll);
+		   });
+		   
+	   }
+     return childSolrInputDocument;
+   }
+
+   public boolean hasChildDocuments() {
+     boolean isEmpty = (_childDocuments == null || _childDocuments.isEmpty());
+     return !isEmpty;
+   }
 
 }
