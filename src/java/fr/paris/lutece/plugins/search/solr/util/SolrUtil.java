@@ -137,12 +137,12 @@ public final class SolrUtil
 
             // The name of the dynamic fields is like NAME_XXX where XXX is a SolrItem dynamic field type
             searchResult.setDynamicFields( item.getDynamicFields( ) );
-            //Put child documents result
-            if ( item.hasChildDocuments())
+            //Put child solr documents result
+            if ( item.getSearchChilDocuments( ) != null)
             {
-            	item.getChildDocuments().forEach((key, child) -> 
+            	item.getSearchChilDocuments( ).forEach((key, child) -> 
             	
-            		searchResult.putChildDocuments(key, transformSolrItemsToSolrSearchResults ((List<SolrItem>) child, null))
+            		searchResult.putChildDocuments(key, child )
             	);
             }
           

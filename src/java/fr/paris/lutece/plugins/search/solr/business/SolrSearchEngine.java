@@ -422,7 +422,6 @@ public class SolrSearchEngine implements SearchEngine
             // resultList
             List<SolrItem> itemList = response.getBeans( SolrItem.class );
             results = SolrUtil.transformSolrItemsToSolrSearchResults( itemList, highlights );
-
             // set the spellcheckresult
             facetedResult.setSolrSpellCheckResponse( response.getSpellCheckResponse( ) );
 

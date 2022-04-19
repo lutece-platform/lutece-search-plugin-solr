@@ -38,6 +38,7 @@ import fr.paris.lutece.portal.service.search.SearchItem;
 import fr.paris.lutece.portal.service.util.AppLogService;
 
 import org.apache.solr.client.solrj.beans.Field;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -132,6 +133,7 @@ public class SolrItem
     @Field( "*" + DYNAMIC_LIST_DATE_FIELD_SUFFIX )
     private Map<String, List<Date>> _dfListDate;
     @Field( "*" + FIELD_CHILD_DOCUMENTS )
+    private Map<String, List<SolrDocument>> _searchChilDocuments;
     private Map<String, Collection<SolrItem>> _childDocuments;
 
     /**
@@ -764,6 +766,10 @@ public class SolrItem
    /** Returns the list of child documents, or null if none. */
    public Map<String, Collection<SolrItem>> getChildDocuments( ) {
      return _childDocuments;
+   }
+   /** Returns the list of child solr documents, or null if none. */
+   public Map<String, List<SolrDocument>> getSearchChilDocuments( ) {
+     return _searchChilDocuments;
    }
    
    /** Returns the list of child documents, or null if none. */

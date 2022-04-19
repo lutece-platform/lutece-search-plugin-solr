@@ -39,6 +39,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.solr.common.SolrDocument;
+
 /**
  *
  * SolrSearchResult is more complete than a SearchResult with the highlights and the site name.
@@ -54,7 +56,7 @@ public class SolrSearchResult extends SearchResult
     private String _strDocPortletId;
     private String _strHieDate;
     private String _strXmlContent;
-    private Map<String, List<SolrSearchResult>> _childDocuments;
+    private Map<String, List<SolrDocument>> _childDocuments;
 
     /**
      * Return the highlight
@@ -225,19 +227,19 @@ public class SolrSearchResult extends SearchResult
         _strXmlContent = strXmlContent;
     }
     /** Returns the map of child documents, or null if none. */
-    public Map<String, List<SolrSearchResult>> getChildDocuments( ) {
+    public Map<String, List<SolrDocument>> getChildDocuments( ) {
       return _childDocuments;
     }
     /**
      * Set child documents
      * @param children the child document
      */
-    public void setChildDocuments( Map<String, List<SolrSearchResult>> children) {
+    public void setChildDocuments( Map<String, List<SolrDocument>> children) {
  	   
     	_childDocuments= children;
     }
     
-    public void putChildDocuments(String strName, List<SolrSearchResult> children) {
+    public void putChildDocuments(String strName, List<SolrDocument> children) {
  	   
     	 if (_childDocuments == null) {
      		   
