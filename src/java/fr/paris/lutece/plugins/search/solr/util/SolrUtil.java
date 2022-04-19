@@ -52,6 +52,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,7 +123,7 @@ public final class SolrUtil
             SolrSearchResult searchResult = new SolrSearchResult( );
             searchResult.setDate( item.getDate( ) );
             searchResult.setId( item.getUid( ) );
-            searchResult.setRole( new ArrayList<String>( ) );
+            searchResult.setRole( new ArrayList< >( ) );
             searchResult.setSummary( item.getSummary( ) );
             searchResult.setSite( item.getSite( ) );
             searchResult.setTitle( item.getTitle( ) );
@@ -136,7 +137,15 @@ public final class SolrUtil
 
             // The name of the dynamic fields is like NAME_XXX where XXX is a SolrItem dynamic field type
             searchResult.setDynamicFields( item.getDynamicFields( ) );
-
+            //Put child documents result
+            if ( item.hasChildDocuments())
+            {
+            	item.getChildDocuments().forEach((key, child) -> 
+            	
+            		searchResult.putChildDocuments(key, transformSolrItemsToSolrSearchResults ((List<SolrItem>) child, null))
+            	);
+            }
+          
             if ( highlights != null )
             {
                 searchResult.setHighlight( highlights.getHighlights( searchResult.getId( ) ) );
