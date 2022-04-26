@@ -106,7 +106,7 @@ public class SolrSearchApp implements XPageApplication
     private static final String PARAMETER_PAGE_INDEX = "page_index";
     private static final String PARAMETER_NB_ITEMS_PER_PAGE = "items_per_page";
     private static final String PARAMETER_QUERY = "query";
-    private static final String PARAMETER_CONF = "conf";
+    public static final String PARAMETER_CONF = "conf";
     private static final String PARAMETER_FACET_QUERY = "fq";
 
     private static final String PARAMETER_FACET_LABEL = "facetlabel";

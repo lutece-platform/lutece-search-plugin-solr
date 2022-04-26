@@ -92,6 +92,12 @@
             </servlet-class>
             <url-pattern>/servlet/plugins/SolrSuggest</url-pattern>
         </servlet>
+        <servlet>
+            <servlet-name>SolrSearchServlet</servlet-name>
+            <servlet-class>fr.paris.lutece.plugins.search.solr.web.SolrSearchServlet
+            </servlet-class>
+            <url-pattern>/servlet/plugins/SolrSearchServlet</url-pattern>
+        </servlet>
     </servlets>
 
 </plug-in>
