@@ -1,7 +1,7 @@
 <@row>
 	<@columns>
 		<@box color='info'>
-			<@boxHeader title='#i18n{search.solr.adminFeature.fields.display.title}' skipHeader=true boxTools=true>
+			<@boxHeader title='#i18n{search.solr.adminFeature.fields.display.title}' boxTools=true>
       <#if !(running?? && running)>
         <@tform method='get' type='inline' name='doFields' action='jsp/admin/search/solr/SolrCreateUpdateFields.jsp'>
           <@btnGroup>
@@ -40,7 +40,7 @@
                   #i18n{search.solr.adminFeature.fields.form.facet.mincount.onHere}
                 </#if>
               </@td>
-              <@td>${field.operator}</@td>
+              <@td>${field.operator!}</@td>
               <@td>${field.isSort?string}</@td>
               <@td>${field.weight}</@td>
               <@td>${field.description}</@td>

@@ -1,40 +1,37 @@
-<div class="row">
-  <div class="col-xs-12 col-sm-12">
-    <div class="box box-danger">
-      <div class="box-header">
-        <h3 class="box-title">#i18n{search.solr.adminFeature.configuration.facet.title} <small>#i18n{search.solr.adminFeature.configuration.facet.description}</small></h3>
-      </div>
-      <div class="box-body">
-        <form method="get" name="doFacet" action="jsp/admin/search/solr/DoFacet.jsp" class="form-horizontal">
-          <table class="table table-striped table-hover">
+<@row>
+	<@columns>
+		<@box>
+      <#assign title>#i18n{search.solr.adminFeature.configuration.facet.title} <small>#i18n{search.solr.adminFeature.configuration.facet.description}</small></#assign>
+		  <@boxHeader title=title  />
+			<@boxBody>
+        <@tform method="get" name="doFacet" action="jsp/admin/search/solr/DoFacet.jsp" >
+          <@table headBody=true>
+            <@tr>
+              <@th>#i18n{search.solr.adminFeature.fields.form.label}</@th>
+              <@th>#i18n{search.solr.adminFeature.fields.form.description}</@th>
+              <@th></@th>
+            </@tr>
+            <@tableHeadBodySeparator />
           <#list field_list as field>
             <#if field.isFacet >
-              <tr>
-                <td>${field.label}</td>
-                <td>${field.description}</td>
-                <td>
-                  <#if field.enableFacet >
-                    <input name="${field.idField}" class="checkbox" type="checkbox" value="${field.idField}" checked="checked">
-                  <#else>
-                    <input name="${field.idField}" class="checkbox" type="checkbox" value="${field.idField}">
-                  </#if>
-                </td>
-              </tr>
+              <@tr>
+                <@td>${field.label}</@td>
+                <@td>${field.description}</@td>
+                <@td>
+                  <#assign sel1><#if field.enableFacet >true<#else>false</#if></#assign>
+                  <@formGroup>
+                      <@checkBox orientation='switch' name='${field.idField}' id='${field.idField}' value="${field.idField}" labelKey='' labelFor='${field.idField}' hideLabel=['all'] checked=sel1?boolean />
+                  </@formGroup>
+                </@td>
+              </@tr>
             </#if>
           </#list>
-          </table>
-          <div class="form-group">
-            <div class="col-xs-12 col-sm-offset-2 col-sm-10">
-              <button class="btn btn-primary btn-flat" type="submit" >
-                <i class="fa fa-check"></i> #i18n{portal.util.labelValidate}
-              </button>
-              <button class="btn btn-default btn-flat" type="button" onClick="javascript:history.go(-1);" >
-                <i class="fa fa-remove"></i> #i18n{portal.util.labelCancel}
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
+          </@table>
+          <@formGroup rows=2>
+            <@button type='submit' buttonIcon='check' title='#i18n{portal.util.labelModify}' name='create' color='primary' size='' />
+          </@formGroup>
+        </@tform>
+      </@boxBody>
+    </@box>
+  </@columns>
+</@row>
