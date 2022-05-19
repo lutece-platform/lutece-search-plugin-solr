@@ -4,7 +4,7 @@
 DROP TABLE IF EXISTS solr_fields;
 CREATE TABLE solr_fields (
 	id_field int NOT NULL,
-	name varchar(30) default NULL,
+	name varchar(75) default NULL,
 	label varchar(255) default NULL,
 	description varchar(255) default NULL,
 	is_facet boolean default false,

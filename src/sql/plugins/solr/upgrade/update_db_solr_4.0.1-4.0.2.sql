@@ -1,0 +1,1 @@
+ALTER TABLE `solr_fields` CHANGE COLUMN `name` `name` VARCHAR(75) NULL DEFAULT NULL COLLATE 'utf8_unicode_ci' AFTER `id_field`;
