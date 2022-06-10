@@ -46,10 +46,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.NoOpResponseParser;
+import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.SpellCheckResponse;
@@ -191,6 +194,40 @@ public class SolrSearchEngine implements SearchEngine
 
         return results;
     }
+    
+    /**
+     * Return search results as json
+     * 
+     * @param solrParam
+     *            The solrParam
+     * @return Results as json
+     */
+    public String getJsonSearchResults( Map<String, String[] > solrParam )
+    {
+        SolrClient solrServer = SolrServerService.getInstance( ).getSolrServer( );
+        if ( ( solrServer != null )  )
+        {
+        	SolrQuery query = new SolrQuery();
+        	solrParam.forEach( (key, value) -> query.set(key, value) );
+        	QueryRequest req = new QueryRequest( query );
+        	NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
+        	rawJsonResponseParser.setWriterType("json");
+        	req.setResponseParser(rawJsonResponseParser);
+        	 try
+             {
+        		NamedList<Object> resp = solrServer.request(req);
+             	return  (String) resp.get("response");
+             
+             }
+             catch( SolrServerException | IOException e )
+             {
+                 AppLogService.error( e.getMessage( ), e );
+             }           
+        }
+
+        return Strings.EMPTY;
+    }
+
 
     /**
      * Return the result with facets. Does NOT support authentification yet.

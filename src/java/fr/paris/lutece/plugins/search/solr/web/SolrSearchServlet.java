@@ -35,16 +35,12 @@ package fr.paris.lutece.plugins.search.solr.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.SpellCheckResponse.Collation;
 
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchAppConf;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
@@ -94,12 +90,32 @@ public class SolrSearchServlet extends HttpServlet
          return template.getHtml( );
     }
 
+    /**
+     * Returns search results
+     *
+     * @param request
+     *            the http request
+     * @return Returns search results
+     * @throws SiteMessageException 
+     */
+    public String getJsonSearchResults( HttpServletRequest request ) throws SiteMessageException
+    {
+        return SolrSearchEngine.getInstance( ).getJsonSearchResults(request.getParameterMap());
+
+    }
+
     @Override
     public void doGet( HttpServletRequest req, HttpServletResponse resp ) throws ServletException, IOException
     {
     	String strHtml= null;
        try {
-			  strHtml= this.searchSolr( req );
+    	   	  if( "json".equals( req.getParameter("wt"))) 
+    	   	  {
+    	   		strHtml= this.getJsonSearchResults( req );
+    	   	  }else 
+    	   	  {
+    	   		strHtml= this.searchSolr( req );
+    	   	  }
 		} catch (SiteMessageException e) {
 			
 			AppLogService.error( e.getMessage(), e );
