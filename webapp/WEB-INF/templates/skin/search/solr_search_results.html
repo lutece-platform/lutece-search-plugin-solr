@@ -49,7 +49,7 @@ ${encoded_facets_queries}
   <script src="js/plugins/leaflet/leaflet/leaflet.markercluster.js"></script>
 
   <script type="text/javascript">
-  $(window).load(function () {
+  $(window).on('load', function () {
         var map = L.map('map').setView([48.85632, 2.33272], 12);
         var points = [
             <#list points as point>
