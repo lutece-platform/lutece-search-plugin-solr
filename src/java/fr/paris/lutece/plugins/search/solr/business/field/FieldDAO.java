@@ -223,7 +223,7 @@ public final class FieldDAO implements IFieldDAO
                 field.setDefaultSort( daoUtil.getBoolean( ++i ) );
                 field.setWeight( daoUtil.getDouble( ++i ) );
                 field.setFacetMincount( daoUtil.getInt( ++i ) );
-                field.setOperator( daoUtil.getString( i ) );
+                field.setOperator( daoUtil.getString( ++i ) );
                 fieldList.add( field );
             }
         }
