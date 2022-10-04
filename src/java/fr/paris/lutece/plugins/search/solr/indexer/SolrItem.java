@@ -744,7 +744,7 @@ public class SolrItem
    		   
     	   _childDocuments = new HashMap<>( );
    	   }
-   	   Collection<SolrItem> items= _childDocuments.get(strName);
+   	   Collection<SolrItem> items= _childDocuments.get(strName + FIELD_CHILD_DOCUMENTS );
    	   if(items == null) {
    		   
    		   Collection<SolrItem> list =new ArrayList<>();
