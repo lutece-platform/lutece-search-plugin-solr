@@ -283,159 +283,41 @@ public class SolrSearchEngine implements SearchEngine
         }
 
         SolrQuery query = new SolrQuery( strQuery );
-        query.setHighlight( true );
-        query.setHighlightSimplePre( SOLR_HIGHLIGHT_PRE );
-        query.setHighlightSimplePost( SOLR_HIGHLIGHT_POST );
-        query.setHighlightSnippets( SOLR_HIGHLIGHT_SNIPPETS );
-        query.setHighlightFragsize( SOLR_HIGHLIGHT_FRAGSIZE );
-        query.setParam( "f.summary.hl.fragsize", Integer.toString( SOLR_HIGHLIGHT_SUMMARY_FRAGSIZE ) );
-        query.setFacet( true );
-        query.setFacetLimit( SOLR_FACET_LIMIT );
-        query.setFields(fl != null ? fl: new String [] { SolrConstants.CONSTANT_WILDCARD });
-
-        for ( Field field : SolrFieldManager.getFacetList( ).values( ) )
-        {
-            // Add facet Field
-            if ( field.getEnableFacet( ) )
-            {
-                StringBuilder exclusionTag = new StringBuilder( );
-                // If exclusion enabled, ignore the fq for the current facet count results.
-                if ( SOLR_FACET_COUNT_EXCLUDE )
-                {
-                    exclusionTag.append( "{!ex=t" ).append( field.getName( ) ).append( "}" );
-                }
-
-                if ( isFieldDate( field.getName( ) ) )
-                {
-                    query.setParam( "facet.range", exclusionTag + field.getName( ) );
-                    query.setParam( "facet.range.start", SOLR_FACET_DATE_START );
-                    query.setParam( "facet.range.gap", SOLR_FACET_DATE_GAP );
-                    query.setParam( "facet.range.end", SOLR_FACET_DATE_END );
-                    query.setParam( "facet.range.mincount", "0" );
-                }
-                else
-                {
-                    query.addFacetField( exclusionTag + field.getSolrName( ) );
-                    query.setParam( "f." + field.getSolrName( ) + ".facet.mincount", String.valueOf( field.getFacetMincount( ) ) );
-                }
-                myValuesList.put( field, new ArrayList<String>( ) );
-            }
-        }
-
-        // Facet intersection
-        List<String> treeParam = new ArrayList<>( );
-
-        for ( FacetIntersection intersect : SolrFieldManager.getIntersectionlist( ) )
-        {
-            treeParam.add( intersect.getField1( ).getSolrName( ) + "," + intersect.getField2( ).getSolrName( ) );
-        }
-
-        query.setParam( "facet.tree", (String [ ]) treeParam.toArray( new String [ 0] ) );
+        
+        setHighlightSolrQuery( query );
+        setFacetParamsSolrQuery( fl, myValuesList, query );
+        setFacetIntersectionSolrQuery( query );
         query.setParam( "spellcheck", bSpellCheck );
+        setSortSolrQuery( sortName, sortOrder, query );
+        addFilterSolrQuery( facetQueries, myValuesList, query );
 
-        // sort order
-        if ( StringUtils.isNotEmpty( sortName ) )
-        {
-            if ( sortOrder.equals( "asc" ) )
-            {
-                query.setSort( sortName, ORDER.asc );
-            }
-            else
-            {
-                query.setSort( sortName, ORDER.desc );
-            }
-        }
-        else
-        {
-            for ( Field field : SolrFieldManager.getSortList( ) )
-            {
-                if ( field.getDefaultSort( ) )
-                {
-                    query.setSort( field.getName( ), ORDER.desc );
-                }
-            }
-        }
+        results = processSolrQueryResult( strQuery, nLimit, nCurrentPageIndex, nItemsPerPage, facetedResult, solrServer, results, query );
 
-        // Treat HttpRequest
-        // FacetQuery
-        if ( facetQueries != null )
-        {
-            for ( String strFacetQuery : facetQueries )
-            {
-                String [ ] myValues = strFacetQuery.split( ":", 2 );
-                if ( myValues != null && myValues.length == 2 )
-                {
-                    myValuesList = getFieldArrange( myValues, myValuesList );
-                }
-            }
+        facetedResult.setSolrSearchResults( results );
 
-            for ( Entry<Field, List<String>> entry : myValuesList.entrySet( ) )
-            {
-                Field tmpFieldValue = entry.getKey( );
-                List<String> strValues = entry.getValue( );
-                String strFacetString = "";
-                if ( CollectionUtils.isNotEmpty( strValues ) )
-                {
-                    strFacetString = extractQuery( strValues, tmpFieldValue.getOperator( ) );
-                    if ( isFieldDate( tmpFieldValue.getName( ) ) )
-                    {
-                        strFacetString = strFacetString.replaceAll( "\"", "" );
-                    }
+        return facetedResult;
+    }
 
-                    StringBuilder facetFilter = new StringBuilder( tmpFieldValue.getName( ) );
-                    // If exclusion enabled, add the tag so that it can be excluded.
-                    if ( SOLR_FACET_COUNT_EXCLUDE )
-                    {
-                        StringBuilder tag = new StringBuilder( "{!tag=t" ).append( tmpFieldValue.getName( ) ).append( "}" );
-                        facetFilter.insert( 0, tag );
-                    }
-                    facetFilter.append( ":" );
-                    facetFilter.append( strFacetString );
-                    query.addFilterQuery( facetFilter.toString( ) );
-                }
-            }
-        }
-
+    /**
+     * Process Solr Query Result
+     * @param strQuery
+     * @param nLimit
+     * @param nCurrentPageIndex
+     * @param nItemsPerPage
+     * @param facetedResult
+     * @param solrServer
+     * @param results
+     * @param query
+     * @return
+     */
+    private List<SolrSearchResult> processSolrQueryResult( String strQuery, int nLimit, int nCurrentPageIndex, int nItemsPerPage, SolrFacetedResult facetedResult, SolrClient solrServer,
+            List<SolrSearchResult> results, SolrQuery query )
+    {
         try
         {
-
             // count query
             query.setRows( 0 );
-            if ( !strQuery.equals( "*:*" ) )
-            {
-                query.setParam( "defType", DEF_TYPE );
-                String strWeightValue = generateQueryWeightValue( );
-                query.setParam( "qf", strWeightValue );
-                String strPhraseSlop = AppPropertiesService.getProperty( PROPERTY_SOLR_SEARCH_PS, DEFAULT_SOLR_SEARCH_PS );
-
-                if ( StringUtils.isNotBlank( strPhraseSlop ) )
-                {
-                    query.setParam( "pf", strWeightValue );
-                    query.setParam( "pf2", strWeightValue );
-                    query.setParam( "pf3", strWeightValue );
-
-                    query.setParam( "ps", strPhraseSlop );
-                    query.setParam( "qs", strPhraseSlop ); // Slop when the user explicitly uses quotes
-                }
-
-                String strTie = AppPropertiesService.getProperty( PROPERTY_SOLR_SEARCH_TIE, DEFAULT_SOLR_SEARCH_TIE );
-                if ( StringUtils.isNotBlank( strTie ) )
-                {
-                    query.setParam( "tie", strTie );
-                }
-
-                String strAutoRelaxmm = AppPropertiesService.getProperty( PROPERTY_SOLR_SEARCH_AUTORELAXMM, DEFAULT_SOLR_SEARCH_AUTORELAXMM );
-                if ( StringUtils.isNotBlank( strAutoRelaxmm ) )
-                {
-                    query.setParam( "mm.autoRelax", strAutoRelaxmm );
-                }
-
-                String strBoostRecent = AppPropertiesService.getProperty( PROPERTY_SOLR_SEARCH_BOOSTRECENT, DEFAULT_SOLR_SEARCH_BOOSTRECENT );
-                if ( StringUtils.isNotBlank( strBoostRecent ) )
-                {
-                    query.setParam( "boost", "recip(ms(NOW/HOUR,date)," + strBoostRecent + ",1,1)" );
-                }
-            }
+            setDefTypeParamsSolrQuery( strQuery, query );
 
             QueryResponse response = solrServer.query( query );
 
@@ -510,10 +392,202 @@ public class SolrSearchEngine implements SearchEngine
         {
             AppLogService.error( e.getMessage( ), e );
         }
+        return results;
+    }
+    
+    /**
+     * Set defType params
+     * @param strQuery
+     * @param query
+     */
+    private void setDefTypeParamsSolrQuery( String strQuery, SolrQuery query )
+    {
+        if ( !strQuery.equals( "*:*" ) )
+        {
+            query.setParam( "defType", DEF_TYPE );
+            String strWeightValue = generateQueryWeightValue( );
+            query.setParam( "qf", strWeightValue );
+            String strPhraseSlop = AppPropertiesService.getProperty( PROPERTY_SOLR_SEARCH_PS, DEFAULT_SOLR_SEARCH_PS );
 
-        facetedResult.setSolrSearchResults( results );
+            if ( StringUtils.isNotBlank( strPhraseSlop ) )
+            {
+                query.setParam( "pf", strWeightValue );
+                query.setParam( "pf2", strWeightValue );
+                query.setParam( "pf3", strWeightValue );
 
-        return facetedResult;
+                query.setParam( "ps", strPhraseSlop );
+                query.setParam( "qs", strPhraseSlop ); // Slop when the user explicitly uses quotes
+            }
+
+            String strTie = AppPropertiesService.getProperty( PROPERTY_SOLR_SEARCH_TIE, DEFAULT_SOLR_SEARCH_TIE );
+            if ( StringUtils.isNotBlank( strTie ) )
+            {
+                query.setParam( "tie", strTie );
+            }
+
+            String strAutoRelaxmm = AppPropertiesService.getProperty( PROPERTY_SOLR_SEARCH_AUTORELAXMM, DEFAULT_SOLR_SEARCH_AUTORELAXMM );
+            if ( StringUtils.isNotBlank( strAutoRelaxmm ) )
+            {
+                query.setParam( "mm.autoRelax", strAutoRelaxmm );
+            }
+
+            String strBoostRecent = AppPropertiesService.getProperty( PROPERTY_SOLR_SEARCH_BOOSTRECENT, DEFAULT_SOLR_SEARCH_BOOSTRECENT );
+            if ( StringUtils.isNotBlank( strBoostRecent ) )
+            {
+                query.setParam( "boost", "recip(ms(NOW/HOUR,date)," + strBoostRecent + ",1,1)" );
+            }
+        }
+    }
+
+    /**
+     * Facet intersection Query
+     * @param query
+     */
+    private void setFacetIntersectionSolrQuery( SolrQuery query )
+    {
+        // Facet intersection
+        List<String> treeParam = new ArrayList<>( );
+
+        for ( FacetIntersection intersect : SolrFieldManager.getIntersectionlist( ) )
+        {
+            treeParam.add( intersect.getField1( ).getSolrName( ) + "," + intersect.getField2( ).getSolrName( ) );
+        }
+
+        query.setParam( "facet.tree", (String [ ]) treeParam.toArray( new String [ 0] ) );
+    }
+
+    /**
+     * Add filter query
+     * @param facetQueries
+     * @param myValuesList
+     * @param query
+     */
+    private void addFilterSolrQuery( String[] facetQueries, Map<Field, List<String>> myValuesList, SolrQuery query )
+    {
+        if ( facetQueries != null )
+        {
+            for ( String strFacetQuery : facetQueries )
+            {
+                String [ ] myValues = strFacetQuery.split( ":", 2 );
+                if ( myValues != null && myValues.length == 2 )
+                {
+                    myValuesList = getFieldArrange( myValues, myValuesList );
+                }
+            }
+
+            for ( Entry<Field, List<String>> entry : myValuesList.entrySet( ) )
+            {
+                Field tmpFieldValue = entry.getKey( );
+                List<String> strValues = entry.getValue( );
+                String strFacetString = "";
+                if ( CollectionUtils.isNotEmpty( strValues ) )
+                {
+                    strFacetString = extractQuery( strValues, tmpFieldValue.getOperator( ) );
+                    if ( isFieldDate( tmpFieldValue.getName( ) ) )
+                    {
+                        strFacetString = strFacetString.replaceAll( "\"", "" );
+                    }
+
+                    StringBuilder facetFilter = new StringBuilder( tmpFieldValue.getName( ) );
+                    // If exclusion enabled, add the tag so that it can be excluded.
+                    if ( SOLR_FACET_COUNT_EXCLUDE )
+                    {
+                        StringBuilder tag = new StringBuilder( "{!tag=t" ).append( tmpFieldValue.getName( ) ).append( "}" );
+                        facetFilter.insert( 0, tag );
+                    }
+                    facetFilter.append( ":" );
+                    facetFilter.append( strFacetString );
+                    query.addFilterQuery( facetFilter.toString( ) );
+                }
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param sortName
+     * @param sortOrder
+     * @param query
+     */
+    private void setSortSolrQuery( String sortName, String sortOrder, SolrQuery query )
+    {
+        if ( StringUtils.isNotEmpty( sortName ) )
+        {
+            if ( sortOrder.equals( "asc" ) )
+            {
+                query.setSort( sortName, ORDER.asc );
+            }
+            else
+            {
+                query.setSort( sortName, ORDER.desc );
+            }
+        }
+        else
+        {
+            for ( Field field : SolrFieldManager.getSortList( ) )
+            {
+                if ( field.getDefaultSort( ) )
+                {
+                    query.setSort( field.getName( ), ORDER.desc );
+                }
+            }
+        }
+    }
+    
+    /**
+     * Params Facet Query
+     * @param fl
+     * @param myValuesList
+     * @param query
+     */
+    private void setFacetParamsSolrQuery( String[] fl, Map<Field, List<String>> myValuesList, SolrQuery query )
+    {
+        query.setFacet( true );
+        query.setFacetLimit( SOLR_FACET_LIMIT );
+        query.setFields(fl != null ? fl: new String [] { SolrConstants.CONSTANT_WILDCARD });
+
+        for ( Field field : SolrFieldManager.getFacetList( ).values( ) )
+        {
+            // Add facet Field
+            if ( field.getEnableFacet( ) )
+            {
+                StringBuilder exclusionTag = new StringBuilder( );
+                // If exclusion enabled, ignore the fq for the current facet count results.
+                if ( SOLR_FACET_COUNT_EXCLUDE )
+                {
+                    exclusionTag.append( "{!ex=t" ).append( field.getName( ) ).append( "}" );
+                }
+
+                if ( isFieldDate( field.getName( ) ) )
+                {
+                    query.setParam( "facet.range", exclusionTag + field.getName( ) );
+                    query.setParam( "facet.range.start", SOLR_FACET_DATE_START );
+                    query.setParam( "facet.range.gap", SOLR_FACET_DATE_GAP );
+                    query.setParam( "facet.range.end", SOLR_FACET_DATE_END );
+                    query.setParam( "facet.range.mincount", "0" );
+                }
+                else
+                {
+                    query.addFacetField( exclusionTag + field.getSolrName( ) );
+                    query.setParam( "f." + field.getSolrName( ) + ".facet.mincount", String.valueOf( field.getFacetMincount( ) ) );
+                }
+                myValuesList.put( field, new ArrayList<String>( ) );
+            }
+        }
+    }
+    
+    /**
+     * Enable Highlighting (hl)
+     * @param query
+     */
+    private void setHighlightSolrQuery( SolrQuery query )
+    {
+        query.setHighlight( true );
+        query.setHighlightSimplePre( SOLR_HIGHLIGHT_PRE );
+        query.setHighlightSimplePost( SOLR_HIGHLIGHT_POST );
+        query.setHighlightSnippets( SOLR_HIGHLIGHT_SNIPPETS );
+        query.setHighlightFragsize( SOLR_HIGHLIGHT_FRAGSIZE );
+        query.setParam( "f.summary.hl.fragsize", Integer.toString( SOLR_HIGHLIGHT_SUMMARY_FRAGSIZE ) );
     }
 
     /**
@@ -579,6 +653,16 @@ public class SolrSearchEngine implements SearchEngine
                 getValuesFromFrield.add( myValues [1] );
                 lstReturn.put( tmpField, getValuesFromFrield );
             }
+        } else
+        {
+            //New field if not exist
+            Field newField = new Field( );
+            newField.setName( myValues [0] );
+            
+            //Put field and value
+            List<String> getValuesFromFrield = new ArrayList<>();
+            getValuesFromFrield.add(  myValues [1]  );
+            lstReturn.put( newField, getValuesFromFrield );
         }
         return lstReturn;
     }
