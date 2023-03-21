@@ -40,8 +40,8 @@ import fr.paris.lutece.portal.service.util.AppLogService;
 import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -404,7 +404,7 @@ public class SolrItem
             else
             {
                 double [ ] parsedCoordinates = new double [ 2];
-                Iterator<JsonNode> it = objCoordinates.getElements( );
+                Iterator<JsonNode> it = objCoordinates.elements( );
 
                 for ( int i = 0; i < parsedCoordinates.length; i++ )
                 {
