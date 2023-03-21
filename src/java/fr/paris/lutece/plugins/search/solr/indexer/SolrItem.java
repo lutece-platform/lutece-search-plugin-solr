@@ -321,7 +321,7 @@ public class SolrItem
         }
 
         List<Double> coordinates = geolocItem.getLonLat( );
-        if ( coordinates != null )
+        if ( coordinates != null || geolocItem.getTypegeometry().equals( GeolocItem.VALUE_GEOMETRY_TYPE_POLYGON) || geolocItem.getTypegeometry().equals( GeolocItem.VALUE_GEOMETRY_TYPE_POLYLINE) )
         {
             if ( _dfGeoloc == null )
             {
@@ -333,9 +333,12 @@ public class SolrItem
                 _dfGeojson = new HashMap<>( );
             }
 
-            String strCoordinates = String.format( Locale.ENGLISH, "%.6f,%.6f", coordinates.get( 1 ), coordinates.get( 0 ) );
-            _dfGeoloc.put( strName + DYNAMIC_GEOLOC_FIELD_SUFFIX, strCoordinates );
-
+            if ( geolocItem.getTypegeometry( ).equals( GeolocItem.VALUE_GEOMETRY_TYPE ) )
+            {
+	            String strCoordinates = String.format( Locale.ENGLISH, "%.6f,%.6f", coordinates.get( 1 ), coordinates.get( 0 ) );
+	            _dfGeoloc.put( strName + DYNAMIC_GEOLOC_FIELD_SUFFIX, strCoordinates );
+            }
+            
             _dfGeojson.put( strName + DYNAMIC_GEOJSON_FIELD_SUFFIX, geolocItem.toJSON( ) );
 
             if ( geolocItem.getAddress( ) != null )
@@ -385,6 +388,8 @@ public class SolrItem
 
         HashMap<String, Object> geometry = new HashMap<>( );
         geometry.put( GeolocItem.PATH_GEOMETRY_COORDINATES, Arrays.asList( dLongitude, dLatitude ) );
+        geometry.put( GeolocItem.PATH_GEOMETRY_TYPE, GeolocItem.VALUE_GEOMETRY_TYPE );
+        
         geolocItem.setGeometry( geometry );
         geolocItem.setProperties( properties );
         addDynamicFieldGeoloc( strName, geolocItem, codeDocumentType );

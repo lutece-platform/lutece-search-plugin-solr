@@ -151,7 +151,20 @@ ${encoded_facets_queries}
                 marker_icons[layer] = icon;
             }
 
-            var marker = L.marker([points[i]["geojson"]["geometry"]["coordinates"][1],points[i]["geojson"]["geometry"]["coordinates"][0]] ,{icon: icon});
+			var marker;
+            
+            if ( points[i]["geojson"]["geometry"]["type"] == "Point" ) {
+            	marker = L.marker([points[i]["geojson"]["geometry"]["coordinates"][1],points[i]["geojson"]["geometry"]["coordinates"][0]] ,{icon: icon});
+            }
+            else if ( points[i]["geojson"]["geometry"]["type"] == "Polygon" ) {
+                
+            	var aPolygon = points[i]["geojson"]["geometry"]["coordinates"];
+	    		marker = L.polygon(aPolygon, {color: points[i]["colorPolygon"], weight: points[i]["weight"] } );
+            }
+            else if ( points[i]["geojson"]["geometry"]["type"] == "Polyline" ) {
+              	 var coordPolyline = points[i]["geojson"]["geometry"]["coordinates"];
+              	marker = L.polyline(coordPolyline );
+            }
 
             if ( (typeof(properties) != 'undefined') && (typeof(properties["popupContent"]) != 'undefined') ) {
                 if (properties["popupContent"]) {
@@ -170,7 +183,7 @@ ${encoded_facets_queries}
                         } else {
                             url = "rest/leaflet/popup/" + point["type"] + "/" + point["id"] + "/" + point["code"];
                         }
-     
+
                         $.get(url).done(function(data) {
                             popup.setContent(data);
                             popup.update();
