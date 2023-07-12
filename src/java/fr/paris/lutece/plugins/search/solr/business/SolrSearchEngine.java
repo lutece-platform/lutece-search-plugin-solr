@@ -133,6 +133,7 @@ public class SolrSearchEngine implements SearchEngine
     public static final int SOLR_FACET_LIMIT = AppPropertiesService.getPropertyInt( "solr.facet.limit", 100 );
     private static SolrSearchEngine _instance;
     private static final String DEF_TYPE = "edismax";
+    private static final String[] TAB_COMPLEX_QUERY_CHAR = {"(",")","[","]", " OR ", " AND ", "-", "+", "=","^"};
 
     /**
      * Return search results
@@ -362,10 +363,17 @@ public class SolrSearchEngine implements SearchEngine
         {
             for ( String strFacetQuery : facetQueries )
             {
-                String [ ] myValues = strFacetQuery.split( ":", 2 );
-                if ( myValues != null && myValues.length == 2 )
+                if ( isComplexFacetQuery(strFacetQuery) )
                 {
-                    myValuesList = getFieldArrange( myValues, myValuesList );
+                    query.addFilterQuery( strFacetQuery );
+                }
+                else
+                {
+                    String [ ] myValues = strFacetQuery.split( ":", 2 );
+                    if ( myValues != null && myValues.length == 2 )
+                    {
+                        myValuesList = getFieldArrange( myValues, myValuesList );
+                    }
                 }
             }
 
@@ -658,10 +666,17 @@ public class SolrSearchEngine implements SearchEngine
         {
             for ( String strFacetQuery : facetQueries )
             {
-                String [ ] myValues = strFacetQuery.split( ":", 2 );
-                if ( myValues != null && myValues.length == 2 )
+                if ( isComplexFacetQuery(strFacetQuery) )
                 {
-                    myValuesList = getFieldArrange( myValues, myValuesList );
+                    query.addFilterQuery( strFacetQuery );
+                }
+                else
+                {
+                    String [ ] myValues = strFacetQuery.split( ":", 2 );
+                    if ( myValues != null && myValues.length == 2 )
+                    {
+                        myValuesList = getFieldArrange( myValues, myValuesList );
+                    }
                 }
             }
 
@@ -852,5 +867,26 @@ public class SolrSearchEngine implements SearchEngine
     private boolean isFieldDate( String fieldName )
     {
         return fieldName.equalsIgnoreCase( "date" ) || fieldName.toLowerCase( ).endsWith( "_date" );
+    }
+
+    /**
+     * Tests id the current query is complex or not
+     * @param strFacetQuery
+     * @return true if query is complex, false otherwise
+     */
+    private boolean isComplexFacetQuery(String strFacetQuery)
+    {
+
+        if ( strFacetQuery != null )
+        {
+            for ( String strComplexChar : TAB_COMPLEX_QUERY_CHAR )
+            {
+                if ( StringUtils.contains(strFacetQuery, strComplexChar) )
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
