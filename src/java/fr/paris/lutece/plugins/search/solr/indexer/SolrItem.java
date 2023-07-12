@@ -78,6 +78,7 @@ public class SolrItem
     public static final String DYNAMIC_LIST_FIELD_SUFFIX = "_list";
     public static final String DYNAMIC_GEOLOC_FIELD_SUFFIX = "_geoloc";
     public static final String DYNAMIC_GEOJSON_FIELD_SUFFIX = "_geojson";
+    public static final String DYNAMIC_FLOAT_FIELD_SUFFIX = "_float";
     public static final String DYNAMIC_GEOJSON_ADDRESS_FIELD_SUFFIX = "_address";
     private static final String GEOLOC_JSON_PATH_GEOMETRY = "geometry";
     private static final String GEOLOC_JSON_PATH_GEOMETRY_COORDINATES = "coordinates";
@@ -130,6 +131,8 @@ public class SolrItem
     private Map<String, String> _dfGeoloc;
     @Field( "*" + DYNAMIC_GEOJSON_FIELD_SUFFIX )
     private Map<String, String> _dfGeojson;
+    @Field( "*" + DYNAMIC_FLOAT_FIELD_SUFFIX )
+    private Map<String, Float> _dfFloat;
     @Field( "*" + DYNAMIC_LIST_DATE_FIELD_SUFFIX )
     private Map<String, List<Date>> _dfListDate;
     @Field( "*" + FIELD_CHILD_DOCUMENTS )
@@ -183,6 +186,11 @@ public class SolrItem
         if ( _dfListDate != null )
         {
             mapDynamicFields.putAll( _dfListDate );
+        }
+
+        if ( _dfFloat != null )
+        {
+            mapDynamicFields.putAll( _dfFloat );
         }
         return mapDynamicFields;
     }
@@ -335,6 +343,24 @@ public class SolrItem
                 addDynamicField( strName + DYNAMIC_GEOJSON_ADDRESS_FIELD_SUFFIX, geolocItem.getAddress( ) );
             }
         }
+    }
+
+    /**
+     * Add a dynamic field
+     *
+     * @param strName
+     *            the name of the field
+     * @param value
+     *            the value of the field
+     */
+    public void addDynamicField( String strName, Float value )
+    {
+        if ( _dfFloat == null )
+        {
+            _dfFloat = new HashMap<>( );
+        }
+
+        _dfFloat.put( strName + DYNAMIC_FLOAT_FIELD_SUFFIX, value );
     }
 
     /**
