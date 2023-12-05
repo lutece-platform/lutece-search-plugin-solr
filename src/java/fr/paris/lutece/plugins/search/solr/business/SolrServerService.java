@@ -35,7 +35,7 @@ package fr.paris.lutece.plugins.search.solr.business;
 
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.Http2SolrClient;
 
 /**
  * This service provides an instance of SolrServer.
@@ -45,10 +45,16 @@ public final class SolrServerService
 {
     private static final String PROPERTY_SOLR_SERVER_URL = "solr.server.address";
     private static final String PROPERTY_SOLR_TIMEOUT = "solr.server.timeout";
-    private static final String PROPERTY_SOLR_SOCKET_TIMEOUT = "solr.socket.timeout";
+    private static final String PROPERTY_SOLR_IDLE_TIMEOUT = "solr.idle.timeout";
+    private static final String PROPERTY_SOLR_HTTP_BASIC_AUTH_USER = "solr.httpBasicAuthUser";
+    private static final String PROPERTY_SOLR_HTTP_BASIC_AUTH_PASSWORD = "solr.httpBasicAuthPassword";
+        
     private static final String SOLR_SERVER_URL = AppPropertiesService.getProperty( PROPERTY_SOLR_SERVER_URL );
-    private static final int SOLR_CONNECTION_TIMEOUT = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_TIMEOUT, 10000 );
-    private static final int SOLR_SOCKET_TIMEOUT = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_SOCKET_TIMEOUT, 60000 );
+    private static final int SOLR_CONNECTION_TIMEOUT = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_TIMEOUT, 60000 );
+    private static final int SOLR_IDLE_TIMEOUT = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_IDLE_TIMEOUT, 600000 );
+
+    private static final String SOLR_HTTP_BASIC_AUTH_USER = AppPropertiesService.getProperty( PROPERTY_SOLR_HTTP_BASIC_AUTH_USER );
+    private static final String SOLR_HTTP_BASIC_AUTH_PASSWORD = AppPropertiesService.getProperty( PROPERTY_SOLR_HTTP_BASIC_AUTH_PASSWORD );
     private static SolrServerService _instance;
     private SolrClient _solrServer;
 
@@ -98,7 +104,7 @@ public final class SolrServerService
      * @return the SolrServer.
      */
     private SolrClient createSolrServer( String strServerUrl )
-    {
-        return new HttpSolrClient.Builder( strServerUrl ).withConnectionTimeout( SOLR_CONNECTION_TIMEOUT ).withSocketTimeout( SOLR_SOCKET_TIMEOUT ).build( );
+    {    	
+    	return new Http2SolrClient.Builder(strServerUrl).connectionTimeout(SOLR_CONNECTION_TIMEOUT).idleTimeout(SOLR_IDLE_TIMEOUT).withBasicAuthCredentials(SOLR_HTTP_BASIC_AUTH_USER, SOLR_HTTP_BASIC_AUTH_PASSWORD).build();
     }
 }
