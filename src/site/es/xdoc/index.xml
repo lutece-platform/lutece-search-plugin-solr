@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+	<properties>
+		<title>Lutece Solr</title>
+	</properties>
+	<body>
+		<section name="Solr">
+			<subsection name="Introduction">
+				<p>Plugin to change the default search engine in Lutece (based on lucene) by Solr server.</p>
+				<p>Its major features include powerful full-text search, hit highlighting, faceted search, auto-suggest, spelling suggestions ...</p>
+			</subsection>
+			<subsection name="Install">
+				<p>Download Solr 1.4 from source : http://svn.apache.org/repos/asf/lucene/solr/tags/release-1.4.0</p>
+				<p>Apply <a href="http://issues.apache.org/jira/browse/SOLR-64">SOLR-64</a>
+				and <a href="http://issues.apache.org/jira/browse/SOLR-792">SOLR-792</a></p>
+			</subsection>
+			<subsection name="Re-index all periodically">
+			<p>To re-index all content from scratch, one can use the following JSP which can be call from a CRON (ex: every weekend)</p>
+<pre>
+&lt;html&gt;
+&lt;body&gt;
+&lt;div&gt;
+&lt;%= fr.paris.lutece.plugins.search.solr.indexer.SolrIndexerService.processDel(  ) %&gt;
+&lt;/div&gt;
+&lt;pre&gt;
+&lt;%= fr.paris.lutece.plugins.search.solr.indexer.SolrIndexerService.processIndexing( true ) %&gt;
+&lt;/pre&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+			</subsection>
+
+			<subsection name="XPage search-solr configuration">
+            <p>Different configurations can be applied to the xpage by using the query parameter "conf=XXX". Configurations have the following parameters:</p>
+            <ul>
+                <li>mapping: display results on a map</li>
+                <li>fq: apply extra filters on the server</li>
+                <li>template: set the freemarker template to use instead of the default "skin/search/solr_search_results.html"</li>
+                <li>addonBeans.X: use spring beans implementing the ISolrSearchAppAddOn interface to add data to the freemarker model. Multiple beans can be used by specifying multiple values for this parameter with different values of "X" (by convention, "0", "1" ...)</li>
+            </ul>
+            <p>To add or edit configuration, insert datastore keys in the form: solr.app.conf.XXX.YYY where XXX is the name of the configuration (the query parameter of the xpage), and YYY the parameter the previous list to modify. By convention, also add a key "solr.app.conf.XXX.installed" with the value "true".</p>
+			</subsection>
+			
+		</section>
+		<section/>
+	</body>
+</document>
