@@ -1,83 +1,82 @@
 <#setting url_escaping_charset='ISO-8859-1'>
-<@row>
-	<@columns>
-		<@box>
-      <#assign title><#if create??>#i18n{search.solr.adminFeature.fields.form.create.title}<#else>#i18n{search.solr.adminFeature.fields.form.update.title}</#if></#assign>
-		  <@boxHeader title=title  />
-			<@boxBody>
-        <@tform method='get' name="doFields" action='jsp/admin/search/solr/ManageSolrFields.jsp' enctype='text/plain' params='accept-charset="ISO-8859-1"'>
-          <@input type='hidden' name='id' value='${field.idField}'/>
-          <@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.name}' labelFor='name' mandatory=true>
-						<@input type='text' id='name' name='name' maxlength=255 value=field.name />
-					</@formGroup>
-          <@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.label}' labelFor='label' mandatory=true>
-						<@input type='text' id='label' name='label' maxlength=255 value=field.label />
-					</@formGroup>
-          <@formGroup labelFor='isfacet'>
-            <@checkBox orientation='switch' name='isfacet' id='isfacet' labelKey='#i18n{search.solr.adminFeature.fields.form.facet}' labelFor='isfacet' checked=field.isFacet />
-          </@formGroup>
-          <@formGroup labelFor='issort'>
-            <@checkBox orientation='switch' name='issort' id='issort' labelKey='#i18n{search.solr.adminFeature.fields.form.sort}' labelFor='isfacet' checked=field.isSort />
-          </@formGroup>
-					<@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.weight}' labelFor='weight' helpKey='#i18n{search.solr.adminFeature.fields.form.weight.help}'>
-            <@row>
-              <@columns sm=1>
-                <@input type='number' id='weight' name='weight' maxlength=255 value=field.weight min=0 />
-              </@columns>
-            </@row>
-					</@formGroup>
-					<@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.description}' labelFor='description' >
-						<@input type='text' id='description' name='description' maxlength=255 value=field.description/>
-					</@formGroup>
-					<@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.facet.mincount}' labelFor='facetMincount'>
-            <#assign sel1><#if field.facetMincount=1>true<#else>false</#if></#assign>
-            <#assign sel2><#if field.facetMincount=0>true<#else>false</#if></#assign>
-            <@row>
-              <@columns sm=2>
-                <@select id='facetMincount' name='facetMincount'>
-                  <@option label='#i18n{search.solr.adminFeature.fields.form.facet.mincount.onHere}' value='1' selected=sel1?boolean />
-                  <@option label='#i18n{search.solr.adminFeature.fields.form.facet.mincount.allways}' value='0' selected=sel2?boolean />
-                </@select>
-              </@columns>
-            </@row>
-					</@formGroup>
-					<@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.facet.operator}' labelFor='operator'>
-            <#assign sel1><#if field.operator?upper_case=='OR'>true<#else>false</#if></#assign>
-            <#assign sel2><#if field.operator?upper_case=='SWITCH'>true<#else>false</#if></#assign>
-            <#assign sel3><#if field.operator?upper_case=='AND'>true<#else>false</#if></#assign>
-            <@row>
-              <@columns sm=2>
-                <@select id='operator' name='operator'>
-                  <@option value='OR' selected=sel1?boolean label='#i18n{search.solr.adminFeature.fields.form.facet.or}' />
-                  <@option value='SWITCH' selected=sel2?boolean label='#i18n{search.solr.adminFeature.fields.form.facet.switch}' />
-                  <@option value='AND' selected=sel3?boolean label='#i18n{search.solr.adminFeature.fields.form.facet.and}' disabled=true />
-                </@select>
-              </@columns>
-            </@row>
-					</@formGroup>
-          <@formGroup>
-            <#if create><@button type='submit' buttonIcon='check' title='#i18n{portal.site.admin_page.buttonCreate}' name='create' color='primary' size='' /><#else><@button type='submit' name='update' buttonIcon='check' title='#i18n{portal.site.admin_page.buttonModify}' color='primary' size='' /></#if>
-						<@aButton href='jsp/admin/search/solr/ManageSolrFields.jsp' buttonIcon='times' color='danger' size='' title='#i18n{portal.util.labelCancel}' />
-					</@formGroup>
-        </@tform>
-      </@boxBody>
-    </@box>
-  </@columns>
-</@row>
+<#assign title><#if create?? && create>#i18n{search.solr.adminFeature.fields.form.create.title}<#else>#i18n{search.solr.adminFeature.fields.form.update.title}</#if></#assign>
+<@pageContainer>
+  <@pageColumn>
+	  <@pageHeader title=title />
+		<@tform method='get' name='doFields' action='jsp/admin/search/solr/ManageSolrFields.jsp' params='enctype="text/plain" accept-charset="ISO-8859-1"'>
+      <@input type='hidden' name='id' value='${field.idField}'/>
+      <@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.name}' labelFor='name' mandatory=true>
+        <@input type='text' id='name' name='name' maxlength=255 value=field.name />
+      </@formGroup>
+      <@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.label}' labelFor='label' mandatory=true>
+        <@input type='text' id='label' name='label' maxlength=255 value=field.label />
+      </@formGroup>
+      <@formGroup labelFor='isfacet'>
+        <@checkBox orientation='switch' name='isfacet' id='isfacet' labelKey='#i18n{search.solr.adminFeature.fields.form.facet}' labelFor='isfacet' checked=field.isFacet />
+      </@formGroup>
+      <@formGroup labelFor='issort'>
+        <@checkBox orientation='switch' name='issort' id='issort' labelKey='#i18n{search.solr.adminFeature.fields.form.sort}' labelFor='isfacet' checked=field.isSort />
+      </@formGroup>
+      <@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.weight}' labelFor='weight' helpKey='#i18n{search.solr.adminFeature.fields.form.weight.help}'>
+        <@row>
+          <@columns sm=1>
+            <@input type='number' id='weight' name='weight' maxlength=255 value=field.weight min=0 />
+          </@columns>
+        </@row>
+      </@formGroup>
+      <@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.description}' labelFor='description' >
+        <@input type='text' id='description' name='description' maxlength=255 value=field.description/>
+      </@formGroup>
+      <@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.facet.mincount}' labelFor='facetMincount'>
+        <#assign selMincount1><#if field.facetMincount=1>true<#else>false</#if></#assign>
+        <#assign selMincount2><#if field.facetMincount=0>true<#else>false</#if></#assign>
+        <@row>
+          <@columns sm=2>
+            <@select id='facetMincount' name='facetMincount'>
+              <@option label='#i18n{search.solr.adminFeature.fields.form.facet.mincount.onHere}' value='1' selected=selMincount1?boolean />
+              <@option label='#i18n{search.solr.adminFeature.fields.form.facet.mincount.allways}' value='0' selected=selMincount2?boolean />
+            </@select>
+          </@columns>
+        </@row>
+      </@formGroup>
+      <@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.facet.operator}' labelFor='operator'>
+        <#assign sel1><#if field.operator?upper_case=='OR'>true<#else>false</#if></#assign>
+        <#assign sel2><#if field.operator?upper_case=='SWITCH'>true<#else>false</#if></#assign>
+        <#assign sel3><#if field.operator?upper_case=='AND'>true<#else>false</#if></#assign>
+        <@row>
+          <@columns sm=2>
+            <@select id='operator' name='operator'>
+              <@option value='OR' selected=sel1?boolean label='#i18n{search.solr.adminFeature.fields.form.facet.or}' />
+              <@option value='SWITCH' selected=sel2?boolean label='#i18n{search.solr.adminFeature.fields.form.facet.switch}' />
+              <@option value='AND' selected=sel3?boolean label='#i18n{search.solr.adminFeature.fields.form.facet.and}' disabled=true />
+            </@select>
+          </@columns>
+        </@row>
+      </@formGroup>
+      <@formGroup>
+        <#if create><@button type='submit' buttonIcon='check' title='#i18n{portal.site.admin_page.buttonAdd}' name='create' color='primary' size='' /><#else><@button type='submit' name='update' buttonIcon='check' title='#i18n{portal.site.admin_page.buttonModify}' color='primary' size='' /></#if>
+        <@aButton href='jsp/admin/search/solr/ManageSolrFields.jsp' buttonIcon='times' color='danger' size='' title='#i18n{portal.util.labelCancel}' />
+      </@formGroup>
+    </@tform>
+  </@pageColumn>
+</@pageContainer>
 <script>
-$(function() {
+document.addEventListener('DOMContentLoaded', function () {
   enableOrNot();
-  $("#facetMincount").change(function() {
-    enableOrNot();
-  });
+  document.getElementById('facetMincount').addEventListener('change', enableOrNot );
 });
+
 function enableOrNot() {
-  var value = $("#facetMincount").val() == 0 ? false : true;
+  var facetMincount = document.getElementById('facetMincount');
+  var operator = document.getElementById('operator');
+  var andOption = operator.querySelector("option[value='AND']");
+  var value = facetMincount.value === '0' ? false : true;
+
   if (value) {
-    $("#operator option[value='AND']").prop('disabled','');
+    andOption.disabled = false;
   } else {
-    $("#operator option[value='AND']").prop('disabled','disabled');
-    $("#operator").prop("disabled", value );
+    andOption.disabled = true;
+    operator.disabled = value;
   }
 }
 </script>

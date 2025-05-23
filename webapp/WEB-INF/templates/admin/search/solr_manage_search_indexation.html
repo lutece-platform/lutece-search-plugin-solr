@@ -1,56 +1,48 @@
-<@row>
-	<@columns>
-		<@box color='info'>
-			<@boxHeader title='#i18n{portal.search.manage_indexer.labelIndexersList}' skipHeader=true boxTools=true>
+<@pageContainer>
+  <@pageColumn>
+		<@pageHeader title='#i18n{portal.search.manage_indexer.labelIndexersList}' >
       <#if !(running?? && running)>
         <@tform method='get' type='inline' name='doIndexing' action='jsp/admin/search/solr/DoIndexing.jsp'>
-          <@button type='submit' buttonIcon='trash' title='#i18n{search.solr.adminFeature.buttonDoDel}' name='del' color='danger' size='sm' />
-          <@button type='submit' buttonIcon='cogs' title='#i18n{portal.search.manage_indexer.buttonDoIndex}' color='primary' name='total' size='sm' />
-          <@button type='submit' buttonIcon='cog' title='#i18n{portal.search.manage_indexer.buttonDoIncrementalIndex}' color='primary' name='incremental' size='sm' />
+          <@button type='submit' buttonIcon='trash' title='#i18n{search.solr.adminFeature.buttonDoDel}' name='del' color='danger' />
+          <@button type='submit' buttonIcon='player-play' title='#i18n{portal.search.manage_indexer.buttonDoIndex}' color='primary' name='total'  />
+          <@button type='submit' buttonIcon='cog' title='#i18n{portal.search.manage_indexer.buttonDoIncrementalIndex}' color='primary' name='incremental' />
         </@tform>
       </#if>
-      </@boxHeader>
-      <@boxBody>
-      <@table>
-        <@tr>
-            <@th>#i18n{portal.search.manage_indexer.columnIndexerName}</@th>
-            <@th>#i18n{portal.search.manage_indexer.columnIndexerVersion}</@th>
-            <@th>#i18n{portal.search.manage_indexer.columnIndexerEnable}</@th>
-            <@th>#i18n{portal.search.manage_indexer.columnIndexerEnable}</@th>
-          </@tr>
-          <@tableHeadBodySeparator />
-          <#list indexers_list as indexer>
-          <@tr>
-              <@td>${indexer.name}</@td>
-              <@td>${indexer.version}</@td>
-              <@td>${indexer.description}</@td>
-              <@td>
-              <#if indexer.enable >
-                <@tag color='success'><@icon style='check' /> #i18n{portal.util.labelEnabled}</@tag>
-              <#else>
-                <@tag color='important'><@icon style='times' /> #i18n{portal.util.labelDisabled}</@tag>
-              </#if>
-              </@td>
-            </@tr>
-          </#list>
-        </@table>
-      </@boxBody>
-    </@box>
-  </@columns>
-</@row>
+    </@pageHeader>
+    <@table>
+      <@tr>
+        <@th>#i18n{portal.search.manage_indexer.columnIndexerName}</@th>
+        <@th>#i18n{portal.search.manage_indexer.columnIndexerVersion}</@th>
+        <@th>#i18n{portal.search.manage_indexer.columnIndexerEnable}</@th>
+        <@th>#i18n{portal.search.manage_indexer.columnIndexerEnable}</@th>
+      </@tr>
+      <@tableHeadBodySeparator />
+      <#list indexers_list as indexer>
+      <@tr>
+        <@td>${indexer.name}</@td>
+        <@td>${indexer.version}</@td>
+        <@td>${indexer.description}</@td>
+        <@td>
+        <#if indexer.enable >
+          <@tag color='success'><@icon style='check' /> #i18n{portal.util.labelEnabled}</@tag>
+        <#else>
+          <@tag color='danger'><@icon style='times' /> #i18n{portal.util.labelDisabled}</@tag>
+        </#if>
+        </@td>
+      </@tr>
+      </#list>
+    </@table>
+    </@pageColumn>
+</@pageContainer>
 <#if running?? && running>
-<@row>
-	<@columns>
-		<@box color='info'>
-			<@boxHeader title='#i18n{search.solr.adminFeature.operationInProgress}' />
-      <@boxBody>
-        <@p><@icon style='gear fa-spin'/> #i18n{search.solr.adminFeature.operationInProgress} :</@p>
+<@pageContainer>
+    <@pageColumn>
+		<@pageHeader title='#i18n{search.solr.adminFeature.operationInProgress}' />
+        <@p><@icon style='gear'/> #i18n{search.solr.adminFeature.operationInProgress} :</@p>
         <@p><#if command = "del"> #i18n{search.solr.adminFeature.buttonDoDel}<#elseif command = "total">#i18n{portal.search.manage_indexer.buttonDoIndex}<#elseif command = "incremental" >#i18n{portal.search.manage_indexer.buttonDoIncrementalIndex}<#else>${command}</#if> ...</@p>
         <pre>${logs}</pre>
-      </@boxBody>
-    </@box>
-  </@columns>
-</@row>
+    </@pageColumn>
+</@pageContainer>
 <script>
 // Refresh the page every 3s
 var time = new Date().getTime();

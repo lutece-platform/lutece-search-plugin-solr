@@ -1,60 +1,52 @@
-<@row>
-	<@columns>
-		<@box color='info'>
-			<@boxHeader title='#i18n{search.solr.adminFeature.fields.display.title}' boxTools=true>
-      <#if !(running?? && running)>
-        <@tform method='get' type='inline' name='doFields' action='jsp/admin/search/solr/SolrCreateUpdateFields.jsp'>
-          <@btnGroup>
-            <@button type='submit' buttonIcon='plus' title='#i18n{portal.site.admin_page.buttonAdd}' name='create' color='primary'  />
-            <@link class='btn btn-primary btn-sm' href="jsp/admin/search/solr/ManageSolrFields.jsp?refresh=" >
-              <@icon style='refresh' class='me-1 mr-1' /> #i18n{search.solr.adminFeature.fields.display.buttonRefresh}
-            </@link>
-          </@btnGroup>
-        </@tform>
-      </#if>
-      </@boxHeader>
-      <@boxBody>
-        <@p>#i18n{search.solr.adminFeature.fields.display.description}</@p>
-        <@table>
-          <@tr>
-            <@th>#i18n{search.solr.adminFeature.fields.form.name}</@th>
-            <@th>#i18n{search.solr.adminFeature.fields.form.label}</@th>
-            <@th>#i18n{search.solr.adminFeature.fields.form.facet}</@th>
-            <@th>#i18n{search.solr.adminFeature.fields.form.facet.mincount}</@th>
-            <@th>#i18n{search.solr.adminFeature.fields.form.facet.operator}</@th>
-            <@th>#i18n{search.solr.adminFeature.fields.form.sort}</@th>
-            <@th>#i18n{search.solr.adminFeature.fields.form.weight}</@th>
-            <@th>#i18n{search.solr.adminFeature.fields.form.description}</@th>
-            <@th>#i18n{search.solr.adminFeature.fields.form.actions}</@th>
-          </@tr>
-          <@tableHeadBodySeparator />
-          <#list field_list as field>
-            <@tr>
-              <@td>${field.name}</@td>
-              <@td>${field.label}</@td>
-              <@td>${field.isFacet?string}</@td>
-              <@td>
-                <#if field.facetMincount==0>
-                  #i18n{search.solr.adminFeature.fields.form.facet.mincount.allways}
-                <#elseif field.facetMincount==1>
-                  #i18n{search.solr.adminFeature.fields.form.facet.mincount.onHere}
-                </#if>
-              </@td>
-              <@td>${field.operator!}</@td>
-              <@td>${field.isSort?string}</@td>
-              <@td>${field.weight}</@td>
-              <@td>${field.description}</@td>
-              <@td>
-                <@tform method='get' type='inline' name='doFields' action='jsp/admin/search/solr/ManageSolrFields.jsp'>
-                  <@input type='hidden' value='${field.idField}' name='id' />
-                  <@aButton href='jsp/admin/search/solr/SolrCreateUpdateFields.jsp?id=${field.idField}&update=Update' buttonIcon='pencil-alt' title='' color='primary' size='sm' />
-                  <@button type='submit' buttonIcon='trash' title='' name='create' color='danger' size='sm' />
-                </@tform>
-              </@td>
-            </@tr>
-          </#list>
-        </@table>
-      </@boxBody>
-    </@box>
-  </@columns>
-</@row>
+<@pageContainer>
+    <@pageColumn>
+		<@pageHeader title='#i18n{search.solr.adminFeature.fields.display.title}'>
+    <#if !(running?? && running)>
+      <@tform type='inline' name='doFields' action='jsp/admin/search/solr/SolrCreateUpdateFields.jsp'>
+          <@button type='submit' buttonIcon='plus' title='#i18n{portal.site.admin_page.buttonAdd}' name='create' color='primary'  />
+          <@aButton class='btn btn-outline-primary' href="jsp/admin/search/solr/ManageSolrFields.jsp?refresh=" buttonIcon='refresh' title='#i18n{search.solr.adminFeature.fields.display.buttonRefresh}' color='primary' />
+      </@tform>
+    </#if>
+    </@pageHeader>
+    <@p>#i18n{search.solr.adminFeature.fields.display.description}</@p>
+    <@table>
+      <@tr>
+        <@th>#i18n{search.solr.adminFeature.fields.form.name}</@th>
+        <@th>#i18n{search.solr.adminFeature.fields.form.label}</@th>
+        <@th>#i18n{search.solr.adminFeature.fields.form.facet}</@th>
+        <@th>#i18n{search.solr.adminFeature.fields.form.facet.mincount}</@th>
+        <@th>#i18n{search.solr.adminFeature.fields.form.facet.operator}</@th>
+        <@th>#i18n{search.solr.adminFeature.fields.form.sort}</@th>
+        <@th>#i18n{search.solr.adminFeature.fields.form.weight}</@th>
+        <@th>#i18n{search.solr.adminFeature.fields.form.description}</@th>
+        <@th>#i18n{search.solr.adminFeature.fields.form.actions}</@th>
+      </@tr>
+      <@tableHeadBodySeparator />
+      <#list field_list as field>
+        <@tr>
+          <@td>${field.name}</@td>
+          <@td>${field.label}</@td>
+          <@td>${field.isFacet?string}</@td>
+          <@td>
+            <#if field.facetMincount==0>
+              #i18n{search.solr.adminFeature.fields.form.facet.mincount.allways}
+            <#elseif field.facetMincount==1>
+              #i18n{search.solr.adminFeature.fields.form.facet.mincount.onHere}
+            </#if>
+          </@td>
+          <@td>${field.operator!}</@td>
+          <@td>${field.isSort?string}</@td>
+          <@td>${field.weight}</@td>
+          <@td>${field.description}</@td>
+          <@td>
+            <@tform type='inline' name='doFields' action='jsp/admin/search/solr/ManageSolrFields.jsp'>
+              <@input type='hidden' value='${field.idField}' name='id' />
+              <@aButton href='jsp/admin/search/solr/SolrCreateUpdateFields.jsp?id=${field.idField}&update=update' buttonIcon='pencil' title='#i18n{portal.util.labelModify}' hideTitle=['all'] />
+              <@button type='submit' buttonIcon='trash' title='#i18n{portal.util.labelDelete}' color='danger' params='name="delete"' hideTitle=['all'] />
+            </@tform>
+          </@td>
+        </@tr>
+      </#list>
+    </@table>
+  </@pageColumn>
+</@pageContainer>

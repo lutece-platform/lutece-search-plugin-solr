@@ -1,36 +1,32 @@
-<@row>
-	<@columns>
-		<@box color='info'>
-      <#assign solrTitle><#if command = "del"> #i18n{search.solr.adminFeature.buttonDoDel}<#elseif command = "total">#i18n{portal.search.manage_indexer.buttonDoIndex}<#elseif command = "incremental" >#i18n{portal.search.manage_indexer.buttonDoIncrementalIndex}<#else>${command}</#if></#assign>
-			<@boxHeader title=solrTitle  />
-      <@boxBody>
-      <#if command?has_content>
-        <#if running?? && running>
-          <@p><@icon style='spinner fa-spin'/> #i18n{search.solr.adminFeature.operationInProgress}</@p>
-        <#else>
-          <@p><#if command = "del"> #i18n{search.solr.adminFeature.buttonDoDel}<#elseif command = "total">#i18n{portal.search.manage_indexer.buttonDoIndex}<#elseif command = "incremental" >#i18n{portal.search.manage_indexer.buttonDoIncrementalIndex}<#else>${command}</#if> ...</@p>
-          <pre>${logs}</pre>
-        </#if>
-      </#if>
-      </@boxBody>
-    </@box>
-  </@columns>
-</@row>
+<#assign solrTitle><#if command = "del"> #i18n{search.solr.adminFeature.buttonDoDel}<#elseif command = "total">#i18n{portal.search.manage_indexer.buttonDoIndex}<#elseif command = "incremental" >#i18n{portal.search.manage_indexer.buttonDoIncrementalIndex}<#else>${command}</#if></#assign>
+<@pageContainer>
+  <@pageColumn>
+  <@pageHeader title=solrTitle  />
+  <#if command?has_content>
+    <#if running?? && running>
+      <@p><@icon style='refresh badge-blink'/> #i18n{search.solr.adminFeature.operationInProgress}</@p>
+    <#else>
+      <@p><#if command = "del">#i18n{search.solr.adminFeature.buttonDoDel}<#elseif command = "total">#i18n{portal.search.manage_indexer.buttonDoIndex}<#elseif command = "incremental" >#i18n{portal.search.manage_indexer.buttonDoIncrementalIndex}<#else>${command}</#if> ...</@p>
+      <pre>${logs}</pre>
+    </#if>
+  </#if>
+  </@pageColumn>
+</@pageContainer>
 <#if command?has_content>
-  <#if running?? && running>
-  <script>
-  // Refresh the page every 3s
-  var time = new Date().getTime();
-  $(document.body).bind("mousemove keypress", function (e) {
-      time = new Date().getTime();
-  });
-  function refresh() {
-  if (new Date().getTime() - time >= 3000)
+<#if running?? && running>
+<script>
+// Refresh the page every 3s using vanilla JS
+let lastActivity = Date.now();
+document.body.addEventListener("mousemove", () => lastActivity = Date.now());
+document.body.addEventListener("keypress", () => lastActivity = Date.now());
+function refresh() {
+  if (Date.now() - lastActivity >= 3000) {
     window.location.reload(true);
-  else
+  } else {
     setTimeout(refresh, 3000);
   }
-  setTimeout(refresh, 3000);
-  </script>
-  </#if>
+}
+setTimeout(refresh, 3000);
+</script>
+</#if>
 </#if>

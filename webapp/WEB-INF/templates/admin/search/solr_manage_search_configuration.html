@@ -1,36 +1,36 @@
+<#assign title>#i18n{search.solr.adminFeature.configuration.facet.title} <small>#i18n{search.solr.adminFeature.configuration.facet.description}</small></#assign>
 <@row>
 	<@columns>
 		<@box>
-      <#assign title>#i18n{search.solr.adminFeature.configuration.facet.title} <small>#i18n{search.solr.adminFeature.configuration.facet.description}</small></#assign>
-		  <@boxHeader title=title  />
+		  <@boxHeader title=title />
 			<@boxBody>
-        <@tform method="get" name="doFacet" action="jsp/admin/search/solr/DoFacet.jsp" >
-          <@table headBody=true>
-            <@tr>
-              <@th>#i18n{search.solr.adminFeature.fields.form.label}</@th>
-              <@th>#i18n{search.solr.adminFeature.fields.form.description}</@th>
-              <@th></@th>
-            </@tr>
-            <@tableHeadBodySeparator />
-          <#list field_list as field>
-            <#if field.isFacet >
-              <@tr>
-                <@td>${field.label}</@td>
-                <@td>${field.description}</@td>
-                <@td>
-                  <#assign sel1><#if field.enableFacet >true<#else>false</#if></#assign>
-                  <@formGroup>
-                      <@checkBox orientation='switch' name='${field.idField}' id='${field.idField}' value="${field.idField}" labelKey='' labelFor='${field.idField}' hideLabel=['all'] checked=sel1?boolean />
-                  </@formGroup>
-                </@td>
-              </@tr>
-            </#if>
-          </#list>
-          </@table>
-          <@formGroup rows=2>
-            <@button type='submit' buttonIcon='check' title='#i18n{portal.util.labelModify}' name='create' color='primary' size='' />
-          </@formGroup>
-        </@tform>
+      <@tform method="get" name="doFacet" action="jsp/admin/search/solr/DoFacet.jsp" >
+        <@table headBody=true>
+        <@tr>
+          <@th>#i18n{search.solr.adminFeature.fields.form.label}</@th>
+          <@th>#i18n{search.solr.adminFeature.fields.form.description}</@th>
+          <@th></@th>
+        </@tr>
+        <@tableHeadBodySeparator />
+        <#list field_list as field>
+        <#if field.isFacet >
+        <@tr>
+          <@td>${field.label}</@td>
+          <@td>${field.description}</@td>
+          <@td>
+            <#assign sel1><#if field.enableFacet >true<#else>false</#if></#assign>
+            <@formGroup>
+                <@checkBox orientation='switch' name='${field.idField}' id='${field.idField}' value="${field.idField}" labelKey='' labelFor='${field.idField}' hideLabel=['all'] checked=sel1?boolean />
+            </@formGroup>
+          </@td>
+        </@tr>
+        </#if>
+        </#list>
+        </@table>
+        <@p class='text-center mt-3'>
+          <@button type='submit' buttonIcon='check' title='#i18n{portal.util.labelModify}' name='create' color='primary' size='' />
+        </@p>
+      </@tform>
       </@boxBody>
     </@box>
   </@columns>
