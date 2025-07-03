@@ -368,7 +368,8 @@ public class SolrSearchApp implements XPageApplication
         {
             url.addParameter( PARAMETER_FACET_QUERY, SolrUtil.encodeUrl( strFacetName ) );
         }
-
+        url.addParameter( MARK_SORT_NAME, sort );
+        url.addParameter( MARK_SORT_ORDER, order );
         // nb items per page
         IPaginator<SolrSearchResult> paginator = new DelegatePaginator<>( listResults, nItemsPerPage, url.getUrl( ), PARAMETER_PAGE_INDEX, strCurrentPageIndex,
                 facetedResult.getCount( ) );
