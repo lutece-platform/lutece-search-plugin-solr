@@ -61,6 +61,8 @@ public class SolrSearchServlet extends HttpServlet
 {
     private static final long serialVersionUID = -3273825949482572338L;
 
+    private static final String CONTENT_TYPE_JSON = "application/json";
+
     /**
      * Returns search results
      *
@@ -112,6 +114,7 @@ public class SolrSearchServlet extends HttpServlet
     	   	  if( "json".equals( req.getParameter("wt"))) 
     	   	  {
     	   		strHtml= this.getJsonSearchResults( req );
+                resp.setContentType( CONTENT_TYPE_JSON ) ;
     	   	  }else 
     	   	  {
     	   		strHtml= this.searchSolr( req );
