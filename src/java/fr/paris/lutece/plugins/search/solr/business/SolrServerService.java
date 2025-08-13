@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.search.solr.business;
 
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.Http2SolrClient;
@@ -46,6 +47,7 @@ public final class SolrServerService
     private static final String PROPERTY_SOLR_SERVER_URL = "solr.server.address";
     private static final String PROPERTY_SOLR_TIMEOUT = "solr.server.timeout";
     private static final String PROPERTY_SOLR_IDLE_TIMEOUT = "solr.idle.timeout";
+    private static final String PROPERTY_SOLR_USE_HTTP1_1 = "solr.use.http1_1";
     private static final String PROPERTY_SOLR_HTTP_BASIC_AUTH_USER = "solr.httpBasicAuthUser";
     private static final String PROPERTY_SOLR_HTTP_BASIC_AUTH_PASSWORD = "solr.httpBasicAuthPassword";
         
@@ -53,6 +55,7 @@ public final class SolrServerService
     private static final int SOLR_CONNECTION_TIMEOUT = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_TIMEOUT, 60000 );
     private static final int SOLR_IDLE_TIMEOUT = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_IDLE_TIMEOUT, 600000 );
 
+    private static final boolean SOLR_USE_HTTP1_1 = AppPropertiesService.getPropertyBoolean( PROPERTY_SOLR_USE_HTTP1_1, Boolean.FALSE );
     private static final String SOLR_HTTP_BASIC_AUTH_USER = AppPropertiesService.getProperty( PROPERTY_SOLR_HTTP_BASIC_AUTH_USER );
     private static final String SOLR_HTTP_BASIC_AUTH_PASSWORD = AppPropertiesService.getProperty( PROPERTY_SOLR_HTTP_BASIC_AUTH_PASSWORD );
     private static SolrServerService _instance;
@@ -104,7 +107,12 @@ public final class SolrServerService
      * @return the SolrServer.
      */
     private SolrClient createSolrServer( String strServerUrl )
-    {    	
-    	return new Http2SolrClient.Builder(strServerUrl).connectionTimeout(SOLR_CONNECTION_TIMEOUT).idleTimeout(SOLR_IDLE_TIMEOUT).withBasicAuthCredentials(SOLR_HTTP_BASIC_AUTH_USER, SOLR_HTTP_BASIC_AUTH_PASSWORD).build();
+    {
+        AppLogService.info("Connection Solr configured on " + strServerUrl + " using http/" + (SOLR_USE_HTTP1_1 ? "1.1" : "2"));
+        return new Http2SolrClient.Builder(strServerUrl)
+                .connectionTimeout(SOLR_CONNECTION_TIMEOUT)
+                .idleTimeout(SOLR_IDLE_TIMEOUT)
+                .withBasicAuthCredentials(SOLR_HTTP_BASIC_AUTH_USER, SOLR_HTTP_BASIC_AUTH_PASSWORD)
+                .useHttp1_1(SOLR_USE_HTTP1_1).build();
     }
 }
