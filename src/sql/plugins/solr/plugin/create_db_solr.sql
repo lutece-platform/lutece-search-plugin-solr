@@ -1,3 +1,6 @@
+-- liquibase formatted sql
+-- changeset solr:create_db_solr.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 --
 -- Table structure for table solr_facet
 --

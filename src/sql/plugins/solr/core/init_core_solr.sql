@@ -1,3 +1,6 @@
+-- liquibase formatted sql
+-- changeset solr:init_core_solr.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 /*==============================================================*/
 /* Update :  core_admin_right 								    */
 /*==============================================================*/

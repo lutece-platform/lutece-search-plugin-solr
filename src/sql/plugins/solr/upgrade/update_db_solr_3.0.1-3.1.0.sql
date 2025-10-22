@@ -1,3 +1,6 @@
+-- liquibase formatted sql
+-- changeset solr:update_db_solr_3.0.1-3.1.0.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 ALTER TABLE solr_fields ADD facet_mincount int DEFAULT 1;
 ALTER TABLE solr_fields ADD operator_type  varchar(30) DEFAULT 'OR';
 
