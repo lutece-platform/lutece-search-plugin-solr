@@ -46,15 +46,6 @@ import java.util.List;
 public interface ISolrIndexerActionDAO
 {
     /**
-     * Generates a new primary key
-     *
-     * @param plugin
-     *            the plugin
-     * @return The new primary key
-     */
-    int newPrimaryKey( Plugin plugin );
-
-    /**
      * Insert a new record in the table.
      *
      * @param indexerAction

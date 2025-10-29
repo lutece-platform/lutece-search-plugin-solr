@@ -6,7 +6,7 @@
 --
 DROP TABLE IF EXISTS solr_fields;
 CREATE TABLE solr_fields (
-	id_field int NOT NULL,
+	id_field int AUTO_INCREMENT,
 	name varchar(75) default NULL,
 	label varchar(255) default NULL,
 	description varchar(255) default NULL,
@@ -29,7 +29,7 @@ CREATE TABLE solr_facet_intersection (
 
 DROP TABLE IF EXISTS solr_indexer_action;
 CREATE TABLE  solr_indexer_action (
-  id_action int default 0 NOT NULL,
+  id_action int AUTO_INCREMENT,
   id_document varchar(255) NOT NULL,
   id_task int default 0 NOT NULL,
   type_ressource varchar(255) NOT NULL,

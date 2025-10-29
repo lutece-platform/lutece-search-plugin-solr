@@ -37,6 +37,7 @@ import fr.paris.lutece.portal.business.indexeraction.IndexerActionFilter;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
 
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,11 +49,10 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
     // Constants
     public static final String CONSTANT_WHERE = " WHERE ";
     public static final String CONSTANT_AND = " AND ";
-    private static final String SQL_QUERY_NEW_PK = "SELECT max( id_action ) FROM solr_indexer_action";
     private static final String SQL_QUERY_FIND_BY_PRIMARY_KEY = "SELECT id_action,id_document,id_task,type_ressource, id_portlet"
             + " FROM solr_indexer_action WHERE id_action = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO solr_indexer_action( id_action,id_document,id_task ,type_ressource,id_portlet)"
-            + " VALUES(?,?,?,?,?)";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO solr_indexer_action( id_document,id_task ,type_ressource,id_portlet)"
+            + " VALUES(?,?,?,?)";
     private static final String SQL_QUERY_DELETE = "DELETE FROM solr_indexer_action WHERE id_action = ? ";
     private static final String SQL_QUERY_TRUNCATE = "DELETE FROM solr_indexer_action  ";
     private static final String SQL_QUERY_UPDATE = "UPDATE solr_indexer_action SET id_action=?,id_document=?,id_task=?,type_ressource=?,id_portlet=? WHERE id_action = ? ";
@@ -62,30 +62,11 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
     /**
      * {@inheritDoc}
      */
-    public int newPrimaryKey( Plugin plugin )
-    {
-        int nKey = 1;
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEW_PK, plugin ) )
-        {
-            daoUtil.executeQuery( );
-            if ( daoUtil.next( ) )
-            {
-                nKey = daoUtil.getInt( 1 ) + 1;
-            }
-        }
-        return nKey;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public synchronized void insert( SolrIndexerAction indexerAction, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
         {
             int i = 0;
-            indexerAction.setIdAction( newPrimaryKey( plugin ) );
-            daoUtil.setInt( ++i, indexerAction.getIdAction( ) );
             daoUtil.setString( ++i, indexerAction.getIdDocument( ) );
             daoUtil.setInt( ++i, indexerAction.getIdTask( ) );
             daoUtil.setString( ++i, indexerAction.getTypeResource( ) );

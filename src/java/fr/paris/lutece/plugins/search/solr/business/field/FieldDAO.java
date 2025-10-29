@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.search.solr.business.field;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
 
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,33 +46,11 @@ import java.util.List;
 public final class FieldDAO implements IFieldDAO
 {
     // Constants
-    private static final String SQL_QUERY_NEW_PK = "SELECT max( id_field ) FROM solr_fields";
     private static final String SQL_QUERY_SELECT = "SELECT id_field, name, label, description, is_facet, enable_facet, is_sort, enable_sort, default_sort, weight, facet_mincount, operator_type FROM solr_fields WHERE id_field = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO solr_fields ( id_field, name, label, description, is_facet, enable_facet, is_sort, enable_sort, default_sort, weight, facet_mincount, operator_type ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO solr_fields ( name, label, description, is_facet, enable_facet, is_sort, enable_sort, default_sort, weight, facet_mincount, operator_type ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM solr_fields WHERE id_field = ? ";
     private static final String SQL_QUERY_UPDATE = "UPDATE solr_fields SET id_field = ?, name = ?, label = ?, description = ?, is_facet = ?, enable_facet = ?, is_sort = ?, enable_sort = ?, default_sort = ?, weight = ?, facet_mincount = ?, operator_type = ? WHERE id_field = ?";
     private static final String SQL_QUERY_SELECTALL = "SELECT id_field, name, label, description, is_facet, enable_facet, is_sort, enable_sort, default_sort, weight, facet_mincount, operator_type  FROM solr_fields";
-
-    /**
-     * Generates a new primary key
-     * 
-     * @param plugin
-     *            The Plugin
-     * @return The new primary key
-     */
-    public int newPrimaryKey( Plugin plugin )
-    {
-        int nKey = 1;
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEW_PK, plugin ) )
-        {
-            daoUtil.executeQuery( );
-            if ( daoUtil.next( ) )
-            {
-                nKey = daoUtil.getInt( 1 ) + 1;
-            }
-        }
-        return nKey;
-    }
 
     /**
      * Insert a new record in the table.
@@ -83,12 +62,9 @@ public final class FieldDAO implements IFieldDAO
      */
     public void insert( Field field, Plugin plugin )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
         {
-            field.setIdField( newPrimaryKey( plugin ) );
-
             int i = 0;
-            daoUtil.setInt( ++i, field.getIdField( ) );
             daoUtil.setString( ++i, field.getName( ) );
             daoUtil.setString( ++i, field.getLabel( ) );
             daoUtil.setString( ++i, field.getDescription( ) );
