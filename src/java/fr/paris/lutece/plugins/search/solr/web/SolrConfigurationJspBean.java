@@ -42,11 +42,13 @@ import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
+import fr.paris.lutece.portal.web.cdi.mvc.Models;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -55,6 +57,8 @@ import org.apache.commons.lang.StringUtils;
  * SolrIndexerJspBean
  *
  */
+@RequestScoped
+@Named
 public class SolrConfigurationJspBean extends PluginAdminPageJspBean
 {
     private static final long serialVersionUID = 8010702541285203732L;
@@ -69,6 +73,9 @@ public class SolrConfigurationJspBean extends PluginAdminPageJspBean
     private static final String MESSAGE_VALID = "search.solr.adminFeature.configuration.valid";
     private static final String PARAMETER_DEFAULT_SORT = "default_sort";
 
+    @Inject
+    private Models model;
+    
     /**
      * Displays the indexing parameters
      *
@@ -78,7 +85,6 @@ public class SolrConfigurationJspBean extends PluginAdminPageJspBean
      */
     private String getFacet( )
     {
-        HashMap<String, Object> model = new HashMap<>( );
         model.put( MARK_FIELD, SolrFieldManager.getFieldList( ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MANAGE_FACET_CONFIGURATION, getLocale( ), model );
@@ -88,7 +94,6 @@ public class SolrConfigurationJspBean extends PluginAdminPageJspBean
 
     private String getSort( )
     {
-        HashMap<String, Object> model = new HashMap<>( );
         model.put( MARK_FIELD, SolrFieldManager.getFieldList( ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MANAGE_SORT_CONFIGURATION, getLocale( ), model );
@@ -98,7 +103,6 @@ public class SolrConfigurationJspBean extends PluginAdminPageJspBean
 
     private String getIntersection( )
     {
-        HashMap<String, Object> model = new HashMap<>( );
         model.put( MARK_FIELD, SolrFieldManager.getFacetList( ).values( ) );
 
         // load facet intersection

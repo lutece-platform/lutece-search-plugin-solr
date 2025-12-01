@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.search.solr.business.field;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ import java.util.List;
 /**
  * This class provides Data Access methods for Field objects
  */
+@ApplicationScoped
 public final class FieldDAO implements IFieldDAO
 {
     // Constants
@@ -59,8 +61,9 @@ public final class FieldDAO implements IFieldDAO
      *            instance of the Field object to insert
      * @param plugin
      *            The plugin
+     * @return the created instance
      */
-    public void insert( Field field, Plugin plugin )
+    public Field insert( Field field, Plugin plugin )
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
         {
@@ -77,7 +80,13 @@ public final class FieldDAO implements IFieldDAO
             daoUtil.setInt( ++i, field.getFacetMincount( ) );
             daoUtil.setString( ++i, field.getOperator( ) );
             daoUtil.executeUpdate( );
+            
+            if ( daoUtil.nextGeneratedKey( ) )
+            {
+            	field.setIdField( daoUtil.getGeneratedKeyInt( 1 ) );
+            }
         }
+        return field;
     }
 
     /**
@@ -146,8 +155,9 @@ public final class FieldDAO implements IFieldDAO
      *            The reference of the field
      * @param plugin
      *            The plugin
+     * @return the created instance
      */
-    public void store( Field field, Plugin plugin )
+    public Field store( Field field, Plugin plugin )
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
         {
@@ -168,6 +178,7 @@ public final class FieldDAO implements IFieldDAO
 
             daoUtil.executeUpdate( );
         }
+        return field;
     }
 
     /**

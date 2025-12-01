@@ -37,7 +37,7 @@ import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.plugins.search.solr.service.SolrPlugin;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+import jakarta.enterprise.inject.spi.CDI;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ import java.util.List;
 public final class FacetIntersectionHome
 {
     // Static variable pointed at the DAO instance
-    private static IFacetIntersectionDAO _dao = SpringContextService.getBean( "facetIntersectionDAO" );
+    private static IFacetIntersectionDAO _dao = CDI.current( ).select( IFacetIntersectionDAO.class ).get( ) ;
     private static Plugin _plugin = PluginService.getPlugin( SolrPlugin.PLUGIN_NAME );
 
     /**

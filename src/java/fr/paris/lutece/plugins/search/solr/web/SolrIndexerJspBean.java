@@ -42,13 +42,18 @@ import fr.paris.lutece.util.html.HtmlTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.concurrent.Asynchronous;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  *
  * SolrIndexerJspBean
  *
  */
+@RequestScoped
+@Named
 public class SolrIndexerJspBean extends PluginAdminPageJspBean
 {
     private static final long serialVersionUID = -817567539235503458L;
@@ -62,11 +67,12 @@ public class SolrIndexerJspBean extends PluginAdminPageJspBean
     private static final String MARK_COMMAND = "command";
     private static final String MARK_INDEXERS_LIST = "indexers_list";
 
-    private static final String JSP_VIEW_INDEXATION = "ViewSearchIndexation.jsp";
+    public static final String JSP_VIEW_INDEXATION = "ViewSearchIndexation.jsp";
     private static final String INDEX_INCR = "incremental";
     private static final String INDEX_TOTAL = "total";
+    private static final String INDEX_DELETE = "del";
 
-    private static Thread _thread;
+    private static boolean _bIndexing;
     private static String _threadLogs;
     private static String _command;
 
@@ -76,7 +82,7 @@ public class SolrIndexerJspBean extends PluginAdminPageJspBean
 
         String strLogs;
         boolean bRunning;
-        if ( _thread != null )
+        if( _bIndexing )
         {
             strLogs = SolrIndexerService.getSbLogs( ).toString( );
             bRunning = true;
@@ -133,62 +139,53 @@ public class SolrIndexerJspBean extends PluginAdminPageJspBean
      *            the http request
      * @return the result of the indexing process
      */
-    public static synchronized String doIndexing( HttpServletRequest request )
+    @Asynchronous
+    public synchronized void doIndexing( HttpServletRequest request )
     {
-        if ( _thread != null )
+        if( _bIndexing )
         {
-            return JSP_VIEW_INDEXATION;
+        	return;
         }
+        
         if ( request.getParameter( INDEX_INCR ) != null )
         {
             _command = INDEX_INCR;
         }
-        else
-            if ( request.getParameter( INDEX_TOTAL ) != null )
-            {
-                _command = INDEX_TOTAL;
-            }
-            else
-                if ( request.getParameter( "del" ) != null )
-                {
-                    _command = "del";
-                }
-        _thread = new Thread( )
+        else if ( request.getParameter( INDEX_TOTAL ) != null )
         {
-            @Override
-            public void run( )
-            {
-                try
-                {
-                    if ( INDEX_INCR.equals( _command ) )
-                    {
-                        _threadLogs = SolrIndexerService.processIndexing( false );
-                    }
-                    else
-                        if ( INDEX_TOTAL.equals( _command ) )
-                        {
-                            _threadLogs = SolrIndexerService.processIndexing( true );
-                        }
-                        else
-                            if ( "del".equals( _command ) )
-                            {
-                                _threadLogs = SolrIndexerService.processDel( );
-                            }
-                }
-                catch( Exception e )
-                {
-                    _threadLogs = e.toString( );
-                    AppLogService.error( "Error during solr indexation", e );
-                }
-                finally
-                {
-                    _thread = null;
-                }
-            }
-        };
-        _thread.start( );
+        	_command = INDEX_TOTAL;
+        }
+        else if ( request.getParameter( INDEX_DELETE ) != null )
+        {
+        	_command = INDEX_DELETE;
+        }
+        
+        _bIndexing = true;
 
-        return JSP_VIEW_INDEXATION;
+        try
+        {
+            if ( INDEX_INCR.equals( _command ) )
+            {
+                _threadLogs = SolrIndexerService.processIndexing( false );
+            }
+            else if ( INDEX_TOTAL.equals( _command ) )
+            {
+            	_threadLogs = SolrIndexerService.processIndexing( true );
+            }
+             else if ( INDEX_DELETE.equals( _command ) )
+            {
+                _threadLogs = SolrIndexerService.processDel( );
+            }
+        }
+        catch( Exception e )
+        {
+            _threadLogs = e.toString( );
+            AppLogService.error( "Error during solr indexation", e );
+        }
+        finally
+        {
+        	_bIndexing = false;
+        }
     }
 
 }

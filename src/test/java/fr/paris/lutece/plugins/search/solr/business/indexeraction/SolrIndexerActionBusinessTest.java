@@ -35,11 +35,15 @@ package fr.paris.lutece.plugins.search.solr.business.indexeraction;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 import fr.paris.lutece.plugins.search.solr.service.SolrPlugin;
 import fr.paris.lutece.test.LuteceTestCase;
 
 public class SolrIndexerActionBusinessTest extends LuteceTestCase
 {
+	
+	@Test
     public void testCRUD( )
     {
         SolrIndexerAction action = new SolrIndexerAction( );
@@ -48,8 +52,8 @@ public class SolrIndexerActionBusinessTest extends LuteceTestCase
         action.setIdTask( 15 );
         action.setTypeResource( "strTypeResource" );
 
-        SolrIndexerActionHome.create( action, SolrPlugin._plugin );
-        SolrIndexerAction loaded = SolrIndexerActionHome.findByPrimaryKey( action.getIdAction( ), SolrPlugin._plugin );
+        int idSolrIndexerActionCreated = SolrIndexerActionHome.create( action, SolrPlugin._plugin );
+        SolrIndexerAction loaded = SolrIndexerActionHome.findByPrimaryKey( idSolrIndexerActionCreated, SolrPlugin._plugin );
         assertEquals( action.getIdDocument( ), loaded.getIdDocument( ) );
         assertEquals( action.getIdPortlet( ), loaded.getIdPortlet( ) );
         assertEquals( action.getIdTask( ), loaded.getIdTask( ) );
@@ -60,8 +64,8 @@ public class SolrIndexerActionBusinessTest extends LuteceTestCase
         action.setIdTask( 115 );
         action.setTypeResource( "strTypeResource2" );
 
-        SolrIndexerActionHome.update( action, SolrPlugin._plugin );
-        loaded = SolrIndexerActionHome.findByPrimaryKey( action.getIdAction( ), SolrPlugin._plugin );
+        int idSolrIndexerActionUpdated = SolrIndexerActionHome.update( action, SolrPlugin._plugin );
+        loaded = SolrIndexerActionHome.findByPrimaryKey( idSolrIndexerActionUpdated, SolrPlugin._plugin );
         assertEquals( action.getIdDocument( ), loaded.getIdDocument( ) );
         assertEquals( action.getIdPortlet( ), loaded.getIdPortlet( ) );
         assertEquals( action.getIdTask( ), loaded.getIdTask( ) );

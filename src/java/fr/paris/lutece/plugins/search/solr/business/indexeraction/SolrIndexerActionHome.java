@@ -35,7 +35,7 @@ package fr.paris.lutece.plugins.search.solr.business.indexeraction;
 
 import fr.paris.lutece.portal.business.indexeraction.IndexerActionFilter;
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+import jakarta.enterprise.inject.spi.CDI;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ import java.util.List;
 public final class SolrIndexerActionHome
 {
     // Static variable pointed at the DAO instance
-    private static ISolrIndexerActionDAO _dao = SpringContextService.getBean( "solrIndexerActionDAO" );
+    private static ISolrIndexerActionDAO _dao = CDI.current( ).select( ISolrIndexerActionDAO.class ).get( ) ;
 
     /**
      * Private constructor - this class need not be instantiated
@@ -61,10 +61,11 @@ public final class SolrIndexerActionHome
      *            The instance of the indexer action which contains the informations to store
      * @param plugin
      *            The plugin
+     * @return the id of the created instance
      */
-    public static void create( SolrIndexerAction indexerAction, Plugin plugin )
+    public static int create( SolrIndexerAction indexerAction, Plugin plugin )
     {
-        _dao.insert( indexerAction, plugin );
+        return _dao.insert( indexerAction, plugin );
     }
 
     /**
@@ -74,10 +75,11 @@ public final class SolrIndexerActionHome
      *            The instance of the indexerAction which contains the informations to update
      * @param plugin
      *            The plugin
+     * @return the id of the updated instance           
      */
-    public static void update( SolrIndexerAction indexerAction, Plugin plugin )
+    public static int update( SolrIndexerAction indexerAction, Plugin plugin )
     {
-        _dao.store( indexerAction, plugin );
+        return _dao.store( indexerAction, plugin );
     }
 
     /**

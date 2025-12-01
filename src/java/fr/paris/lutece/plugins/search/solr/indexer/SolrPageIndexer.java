@@ -36,27 +36,26 @@ package fr.paris.lutece.plugins.search.solr.indexer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xml.sax.ContentHandler;
-
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
-import fr.paris.lutece.plugins.search.solr.util.LuteceSolrException;
 import fr.paris.lutece.plugins.search.solr.util.LuteceSolrRuntimeException;
 import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
-import fr.paris.lutece.plugins.search.solr.util.TikaIndexerUtil;
+import fr.paris.lutece.plugins.search.solr.util.SolrHtmlParserUtil;
 import fr.paris.lutece.portal.business.page.Page;
 import fr.paris.lutece.portal.business.page.PageHome;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.page.IPageService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.url.UrlItem;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 /**
  * The indexer service for Solr.
  *
  */
+@ApplicationScoped
 public class SolrPageIndexer implements SolrIndexer
 {
     public static final String RESSOURCE_PAGE = "PAGE_PAGE";
@@ -72,6 +71,10 @@ public class SolrPageIndexer implements SolrIndexer
     private static final List<String> LIST_RESSOURCES_NAME = new ArrayList<>( );
     private static final String PAGE_INDEXATION_ERROR = "[SolrPageIndexer] An error occured during the indexation of the page number ";
 
+    @Inject
+    @Named( BEAN_PAGE_SERVICE )
+    IPageService _pageService;
+    
     /**
      * Creates a new SolrPageIndexer
      */
@@ -135,19 +138,11 @@ public class SolrPageIndexer implements SolrIndexer
         SolrItem item = new SolrItem( );
 
         // indexing page content
-        IPageService pageService = SpringContextService.getBean( BEAN_PAGE_SERVICE );
-        String strPageContent = pageService.getPageContent( page.getId( ), 0, null );
-        try
-        {
-            ContentHandler handler = TikaIndexerUtil.parseHtml( strPageContent );
-            // the content of the article is recovered in the parser because this one
-            // had replaced the encoded caracters (as &eacute;) by the corresponding special caracter (as ?)
-            item.setContent( handler.toString( ) );
-        }
-        catch( LuteceSolrException e )
-        {
-            throw new AppException( "Error during page parsing.", e );
-        }
+        String strPageContent = _pageService.getPageContent( page.getId( ), 0, null );
+
+        // the content of the article is recovered in the parser because this one
+        // had replaced the encoded characters (as &eacute;) by the corresponding special character (as ?)
+        item.setContent( SolrHtmlParserUtil.parseHtml( strPageContent ) );
 
         item.setTitle( page.getName( ) );
         item.setRole( page.getRole( ) );

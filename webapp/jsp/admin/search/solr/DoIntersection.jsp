@@ -1,6 +1,8 @@
 <%@ page errorPage="../../ErrorPage.jsp" %>
 
-<jsp:useBean id="solr_conf" scope="session" class="fr.paris.lutece.plugins.search.solr.web.SolrConfigurationJspBean" />
+<%@page import="fr.paris.lutece.plugins.search.solr.web.SolrConfigurationJspBean"%>
 
-<% solr_conf.init( request , solr_conf.RIGHT_CONFIGURATION ); %>
-<%  response.sendRedirect(solr_conf.doIntersect( request )); %>
+${ solrConfigurationJspBean.init( pageContext.request, SolrConfigurationJspBean.RIGHT_CONFIGURATION ) }
+${ pageContext.response.sendRedirect( solrConfigurationJspBean.doIntersect( pageContext.request ) ) }
+
+

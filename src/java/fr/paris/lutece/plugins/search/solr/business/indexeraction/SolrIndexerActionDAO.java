@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.search.solr.business.indexeraction;
 import fr.paris.lutece.portal.business.indexeraction.IndexerActionFilter;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ import java.util.List;
 /**
  * This class provides Data Access methods for Indexer Action objects
  */
+@ApplicationScoped
 public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
 {
     // Constants
@@ -62,7 +64,7 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
     /**
      * {@inheritDoc}
      */
-    public synchronized void insert( SolrIndexerAction indexerAction, Plugin plugin )
+    public int insert( SolrIndexerAction indexerAction, Plugin plugin )
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
         {
@@ -73,7 +75,12 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
             daoUtil.setInt( ++i, indexerAction.getIdPortlet( ) );
 
             daoUtil.executeUpdate( );
+            if ( daoUtil.nextGeneratedKey( ) )
+            {
+            	indexerAction.setIdAction( daoUtil.getGeneratedKeyInt( 1 ) );
+            }
         }
+        return indexerAction.getIdAction( ); 
     }
 
     /**
@@ -128,7 +135,7 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
     /**
      * {@inheritDoc}
      */
-    public void store( SolrIndexerAction indexerAction, Plugin plugin )
+    public int store( SolrIndexerAction indexerAction, Plugin plugin )
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin ) )
         {
@@ -142,6 +149,7 @@ public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
 
             daoUtil.executeUpdate( );
         }
+        return indexerAction.getIdAction( );
     }
 
     /**

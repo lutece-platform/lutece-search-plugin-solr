@@ -59,10 +59,10 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.search.IndexationService;
 import fr.paris.lutece.portal.service.search.SearchItem;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import jakarta.enterprise.inject.spi.CDI;
 
 /**
  *
@@ -255,7 +255,7 @@ public final class SolrIndexerService
             _sbLogs.append( "\r\n with message: " );
             _sbLogs.append( e.getMessage( ) );
             _sbLogs.append( "\r\n See error logs for the stacktrace.\r\n" );
-            AppLogService.error( "Indexing error : " + e.getMessage( ), e );
+            AppLogService.error( "Indexing error : {}", e.getMessage( ), e );
         }
 
         return _sbLogs.toString( );
@@ -566,7 +566,7 @@ public final class SolrIndexerService
      */
     private static List<SolrIndexer> initIndexersList( )
     {
-        return SpringContextService.getBeansOfType( SolrIndexer.class );
+        return CDI.current( ).select( SolrIndexer.class ).stream( ).toList( );
     }
 
     /**
@@ -655,7 +655,7 @@ public final class SolrIndexerService
      */
     private static void provideExternalFields( Collection<SolrItem> listSolrItem  )
     {
-        for ( ISolrItemExternalFieldProvider provider : SpringContextService.getBeansOfType( ISolrItemExternalFieldProvider.class ) )
+        for ( ISolrItemExternalFieldProvider provider : CDI.current( ).select( ISolrItemExternalFieldProvider.class ).stream( ).toList( ) )
         {
             provider.provideFields( listSolrItem );
         }

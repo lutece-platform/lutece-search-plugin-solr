@@ -35,11 +35,14 @@ package fr.paris.lutece.plugins.search.solr.business.field;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 import fr.paris.lutece.test.LuteceTestCase;
 
 public class FieldBusinessTest extends LuteceTestCase
 {
 
+	@Test
     public void testCRUD( )
     {
         Field field = new Field( );
@@ -55,7 +58,7 @@ public class FieldBusinessTest extends LuteceTestCase
         field.setWeight( 5D );
         field.setDefaultSort( true );
 
-        FieldHome.create( field );
+        field = FieldHome.create( field );
         Field loaded = FieldHome.findByPrimaryKey( field.getIdField( ) );
         assertEquals( field.getName( ), loaded.getName( ) );
         assertEquals( field.getDescription( ), loaded.getDescription( ) );

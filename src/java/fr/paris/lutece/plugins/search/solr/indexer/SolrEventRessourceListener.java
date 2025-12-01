@@ -36,14 +36,23 @@ package fr.paris.lutece.plugins.search.solr.indexer;
 import fr.paris.lutece.plugins.search.solr.business.indexeraction.SolrIndexerAction;
 import fr.paris.lutece.plugins.search.solr.business.indexeraction.SolrIndexerActionHome;
 import fr.paris.lutece.plugins.search.solr.service.SolrPlugin;
-import fr.paris.lutece.portal.business.event.EventRessourceListener;
 import fr.paris.lutece.portal.business.event.ResourceEvent;
 import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
+import fr.paris.lutece.portal.service.event.EventAction;
+import fr.paris.lutece.portal.service.event.Type;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
 
-public class SolrEventRessourceListener implements EventRessourceListener
+@ApplicationScoped
+public class SolrEventRessourceListener
 {
-    @Override
-    public void updatedResource( ResourceEvent event )
+	/**
+	 * handle the event for the update Solr indexer event
+	 * 
+	 * @param event
+	 *             the update event
+	 */
+    public void observeUpdatedResourceEvent( @Observes @Type( EventAction.UPDATE ) ResourceEvent event )
     {
         SolrIndexerAction indexerAction = new SolrIndexerAction( );
         indexerAction.setIdTask( IndexerAction.TASK_MODIFY );
@@ -53,8 +62,13 @@ public class SolrEventRessourceListener implements EventRessourceListener
         SolrIndexerActionHome.create( indexerAction, SolrPlugin._plugin );
     }
 
-    @Override
-    public void deletedResource( ResourceEvent event )
+    /**
+	 * handle the event for the delete Solr indexer event
+	 * 
+	 * @param event
+	 *             the delete event
+	 */
+    public void observeDeletedResourceEvent( @Observes @Type( EventAction.REMOVE ) ResourceEvent event )
     {
         SolrIndexerAction indexerAction = new SolrIndexerAction( );
         indexerAction.setIdTask( IndexerAction.TASK_DELETE );
@@ -64,8 +78,13 @@ public class SolrEventRessourceListener implements EventRessourceListener
         SolrIndexerActionHome.create( indexerAction, SolrPlugin._plugin );
     }
 
-    @Override
-    public void addedResource( ResourceEvent event )
+    /**
+	 * handle the event for the create Solr indexer event
+	 * 
+	 * @param event
+	 *             the create event
+	 */
+    public void observeAddedResourceEvent( @Observes @Type( EventAction.CREATE ) ResourceEvent event )
     {
         SolrIndexerAction indexerAction = new SolrIndexerAction( );
         indexerAction.setIdTask( IndexerAction.TASK_CREATE );
@@ -73,11 +92,5 @@ public class SolrEventRessourceListener implements EventRessourceListener
         indexerAction.setIdPortlet( event.getIdPortlet( ) );
         indexerAction.setTypeResource( event.getTypeResource( ) );
         SolrIndexerActionHome.create( indexerAction, SolrPlugin._plugin );
-    }
-
-    @Override
-    public String getName( )
-    {
-        return SolrPlugin.PLUGIN_NAME;
     }
 }

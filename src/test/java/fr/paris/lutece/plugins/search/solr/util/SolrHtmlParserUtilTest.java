@@ -33,33 +33,57 @@
  */
 package fr.paris.lutece.plugins.search.solr.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xml.sax.ContentHandler;
+import org.junit.jupiter.api.Test;
 
 import fr.paris.lutece.plugins.search.solr.indexer.SolrItem;
 import fr.paris.lutece.test.LuteceTestCase;
 
-public class TikaIndexerUtilTest extends LuteceTestCase
+public class SolrHtmlParserUtilTest extends LuteceTestCase
 {
 
-    public void testParseHtml( ) throws LuteceSolrException
+	@Test
+    public void testParse( ) throws LuteceSolrException
     {
         String content = "<div><p>Hello World !</p></div>";
-        ContentHandler handler = TikaIndexerUtil.parseHtml( content );
-        assertEquals( "Hello World !", handler.toString( ).trim( ) );
+        
+        assertEquals( "Hello World !", SolrHtmlParserUtil.parseHtml( content ).trim( ) );
     }
 
-    public void testAddFileContentToSolrItem( ) throws LuteceSolrException
+	@Test
+    public void testParseInputStream( ) throws LuteceSolrException
+    {
+        String content = "<div><p>Hello World !</p></div>";
+        InputStream stream = new ByteArrayInputStream( content.getBytes( Charset.forName( "UTF-8" ) ) );
+               
+        assertEquals( "Hello World !", SolrHtmlParserUtil.parse( stream ).trim( ) );
+    }
+    
+	@Test
+    public void testAddFileContentToSolrItemFileContent( ) throws LuteceSolrException
     {
         SolrItem item = new SolrItem( );
         List<byte [ ]> contentList = new ArrayList<>( );
         contentList.add( "<div><p>Hello World !</p></div>".getBytes( ) );
         contentList.add( "<div><p>Goodbye</p></div>".getBytes( ) );
-        TikaIndexerUtil.addFileContentToSolrItem( item, contentList );
+        SolrHtmlParserUtil.addFileContentToSolrItem( item, contentList );
 
         assertTrue( item.getFileContent( ).trim( ).startsWith( "Hello World !" ) );
         assertTrue( item.getFileContent( ).trim( ).endsWith( "Goodbye" ) );
+    }
+    
+	@Test
+    public void testAddFileContentToSolrItemFileContentList( ) throws LuteceSolrException
+    {
+        SolrItem item = new SolrItem( );
+        byte[ ] content = "<div><p>Hello World !</p></div>".getBytes( );
+        SolrHtmlParserUtil.addFileContentToSolrItem( item, content );
+
+        assertTrue( item.getFileContent( ).trim( ).startsWith( "Hello World !" ) );
     }
 }

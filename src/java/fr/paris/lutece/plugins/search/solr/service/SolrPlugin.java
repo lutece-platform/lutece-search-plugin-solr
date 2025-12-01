@@ -33,8 +33,6 @@
  */
 package fr.paris.lutece.plugins.search.solr.service;
 
-import fr.paris.lutece.plugins.search.solr.indexer.SolrEventRessourceListener;
-import fr.paris.lutece.portal.service.event.ResourceEventManager;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
 import fr.paris.lutece.portal.service.plugin.PluginService;
@@ -48,8 +46,5 @@ public class SolrPlugin extends PluginDefaultImplementation
     public void init( )
     {
         super.init( );
-
-        // Subscribes to the EventManager
-        ResourceEventManager.register( new SolrEventRessourceListener( ) );
     }
 }

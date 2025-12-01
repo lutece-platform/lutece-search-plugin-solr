@@ -35,12 +35,15 @@ package fr.paris.lutece.plugins.search.solr.business.facetintersection;
 
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.test.LuteceTestCase;
 
 public class FacetIntersectionBusinessTest extends LuteceTestCase
 {
 
+	@Test
     public void testCRUD( )
     {
         Field f1 = new Field( );

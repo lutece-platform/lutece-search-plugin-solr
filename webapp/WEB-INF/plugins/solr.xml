@@ -4,7 +4,7 @@
     <name>solr</name>
     <class>fr.paris.lutece.plugins.search.solr.service.SolrPlugin
     </class>
-    <version>4.0.7-SNAPSHOT</version>
+    <version>5.0.0-SNAPSHOT</version>
     <documentation/>
     <installation/>
     <changes/>
@@ -15,7 +15,7 @@
     <icon-url>images/admin/skin/plugins/search/solr_FC.jpg</icon-url>
     <copyright>Copyright 2001-2011 Mairie de Paris</copyright>
     <core-version-dependency>
-        <min-core-version>4.9.9</min-core-version>
+        <min-core-version>8.0.0</min-core-version>
         <max-core-version/>
     </core-version-dependency>
     <db-pool-required>1</db-pool-required>
@@ -23,8 +23,6 @@
     <applications>
         <application>
             <application-id>search-solr</application-id>
-            <application-class>fr.paris.lutece.plugins.search.solr.web.SolrSearchApp
-            </application-class>
         </application>
     </applications>
 
@@ -84,20 +82,4 @@
             </daemon-class>
         </daemon>
     </daemons>
-
-    <servlets>
-        <servlet>
-            <servlet-name>SolrSuggestServlet</servlet-name>
-            <servlet-class>fr.paris.lutece.plugins.search.solr.web.SolrSuggestServlet
-            </servlet-class>
-            <url-pattern>/servlet/plugins/SolrSuggest</url-pattern>
-        </servlet>
-        <servlet>
-            <servlet-name>SolrSearchServlet</servlet-name>
-            <servlet-class>fr.paris.lutece.plugins.search.solr.web.SolrSearchServlet
-            </servlet-class>
-            <url-pattern>/servlet/plugins/SolrSearchServlet</url-pattern>
-        </servlet>
-    </servlets>
-
 </plug-in>

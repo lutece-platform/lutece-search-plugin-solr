@@ -52,8 +52,9 @@ public interface ISolrIndexerActionDAO
      *            instance of the IndexerAction object to insert
      * @param plugin
      *            the plugin
+     * @return the id of the created instance
      */
-    void insert( SolrIndexerAction indexerAction, Plugin plugin );
+    int insert( SolrIndexerAction indexerAction, Plugin plugin );
 
     /**
      * Load the data of the IndexerAction from the table
@@ -92,8 +93,9 @@ public interface ISolrIndexerActionDAO
      *            instance of the IndexerAction object to update
      * @param plugin
      *            the plugin
+     * @return the id of the updated instance
      */
-    void store( SolrIndexerAction indexerAction, Plugin plugin );
+    int store( SolrIndexerAction indexerAction, Plugin plugin );
 
     /**
      * Load the data of all indexerAction and returns them in a list
