@@ -42,7 +42,7 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -712,7 +712,7 @@ public class SolrSearchEngine implements SearchEngine
         }
         catch( SolrServerException | IOException e )
         {
-            AppLogService.error( "Solr getGeolocSearchResults error: " + e.getMessage( ), e );
+            AppLogService.error( "Solr getGeolocSearchResults error: {}", e.getMessage( ), e );
             return new ArrayList<>( );
         }
         // resultList

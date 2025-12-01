@@ -108,11 +108,11 @@ public final class SolrServerService
      */
     private SolrClient createSolrServer( String strServerUrl )
     {
-        AppLogService.info("Connection Solr configured on " + strServerUrl + " using http/" + (SOLR_USE_HTTP1_1 ? "1.1" : "2"));
-        return new Http2SolrClient.Builder(strServerUrl)
-                .connectionTimeout(SOLR_CONNECTION_TIMEOUT)
-                .idleTimeout(SOLR_IDLE_TIMEOUT)
-                .withBasicAuthCredentials(SOLR_HTTP_BASIC_AUTH_USER, SOLR_HTTP_BASIC_AUTH_PASSWORD)
-                .useHttp1_1(SOLR_USE_HTTP1_1).build();
+        AppLogService.info("Connection Solr configured on {} using http/{}", strServerUrl, ( SOLR_USE_HTTP1_1 ? "1.1" : "2" ) );
+        return new Http2SolrClient.Builder( strServerUrl )
+                .connectionTimeout( SOLR_CONNECTION_TIMEOUT )
+                .idleTimeout( SOLR_IDLE_TIMEOUT )
+                .withBasicAuthCredentials( SOLR_HTTP_BASIC_AUTH_USER, SOLR_HTTP_BASIC_AUTH_PASSWORD )
+                .useHttp1_1( SOLR_USE_HTTP1_1 ).build( );
     }
 }

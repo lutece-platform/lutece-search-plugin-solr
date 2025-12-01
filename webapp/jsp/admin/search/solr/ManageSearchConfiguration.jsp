@@ -1,10 +1,10 @@
 <%@ page errorPage="../../ErrorPage.jsp" %>
 <jsp:include page="../../AdminHeader.jsp" />
 
-<jsp:useBean id="solr_conf" scope="session" class="fr.paris.lutece.plugins.search.solr.web.SolrConfigurationJspBean" />
+<%@page import="fr.paris.lutece.plugins.search.solr.web.SolrConfigurationJspBean"%>
 
-<% solr_conf.init( request , solr_conf.RIGHT_CONFIGURATION ); %>
+${ solrConfigurationJspBean.init( pageContext.request , SolrConfigurationJspBean.RIGHT_CONFIGURATION ) }
 
-<%= solr_conf.getPage( request ) %>
+${ solrConfigurationJspBean.getPage( pageContext.request ) }
 
 <%@ include file="../../AdminFooter.jsp" %>

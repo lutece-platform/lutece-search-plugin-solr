@@ -415,7 +415,7 @@ public class SolrItem
         }
         catch( IOException e )
         {
-            AppLogService.error( "SolrItem: exception during GEOJSON parsing : " + strValue + " : " + e );
+            AppLogService.error( "SolrItem: exception during GEOJSON parsing : {} : {}", strValue, e );
 
             return;
         }
@@ -424,13 +424,13 @@ public class SolrItem
 
         if ( objCoordinates.isMissingNode( ) )
         {
-            AppLogService.error( "SolrItem: missing coordinates : " + strValue );
+            AppLogService.error( "SolrItem: missing coordinates : {}", strValue );
         }
         else
         {
             if ( !objCoordinates.isArray( ) )
             {
-                AppLogService.error( "SolrItem: coordinates not an array : " + strValue );
+                AppLogService.error( "SolrItem: coordinates not an array : {}", strValue );
             }
             else
             {
@@ -441,14 +441,14 @@ public class SolrItem
                 {
                     if ( !it.hasNext( ) )
                     {
-                        AppLogService.error( "SolrItem: coordinates array too short : " + strValue + " at element " + Integer.toString( i ) );
+                        AppLogService.error( "SolrItem: coordinates array too short : {} at element {}", strValue, Integer.toString( i ) );
                     }
                     else
                     {
                         JsonNode node = it.next( );
                         if ( !node.isNumber( ) )
                         {
-                            AppLogService.error( "SolrItem: coordinate not a number : " + strValue + " at element " + Integer.toString( i ) );
+                            AppLogService.error( "SolrItem: coordinate not a number : {} at element {}", strValue, Integer.toString( i ) );
                         }
                         else
                         {
@@ -468,7 +468,7 @@ public class SolrItem
         }
         catch( IOException e )
         {
-            AppLogService.error( "SolrItem: Error parsing JSON: " + strValue + "exception: " + e );
+            AppLogService.error( "SolrItem: Error parsing JSON: {} exception: {}", strValue, e );
         }
         if ( geolocItem != null )
         {

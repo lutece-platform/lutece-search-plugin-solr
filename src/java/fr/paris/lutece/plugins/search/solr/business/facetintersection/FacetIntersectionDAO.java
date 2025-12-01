@@ -37,6 +37,7 @@ import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.plugins.search.solr.business.field.FieldHome;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,7 @@ import java.util.List;
 /**
  * This class provides Data Access methods for FacetIntersection objects
  */
+@ApplicationScoped
 public final class FacetIntersectionDAO implements IFacetIntersectionDAO
 {
     // Constants

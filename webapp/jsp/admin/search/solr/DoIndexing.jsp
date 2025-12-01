@@ -1,8 +1,7 @@
 <%@ page errorPage="../../ErrorPage.jsp" %>
 
-<jsp:useBean id="solr_index" scope="session" class="fr.paris.lutece.plugins.search.solr.web.SolrIndexerJspBean" />
+<%@page import="fr.paris.lutece.plugins.search.solr.web.SolrIndexerJspBean"%>
 
-<%
-    solr_index.init( request , solr_index.RIGHT_INDEXER );
-	response.sendRedirect( solr_index.doIndexing( request ) );
-%>
+${ solrIndexerJspBean.init( pageContext.request, SolrIndexerJspBean.RIGHT_INDEXER ) }
+${ solrIndexerJspBean.doIndexing( pageContext.request ) }
+${ pageContext.response.sendRedirect( SolrIndexerJspBean.JSP_VIEW_INDEXATION ) }

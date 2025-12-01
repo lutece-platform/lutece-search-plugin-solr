@@ -49,8 +49,9 @@ public interface IFieldDAO
      *            instance of the Field object to inssert
      * @param plugin
      *            the Plugin
+     * @return the created instance
      */
-    void insert( Field field, Plugin plugin );
+    Field insert( Field field, Plugin plugin );
 
     /**
      * Update the record in the table
@@ -59,8 +60,9 @@ public interface IFieldDAO
      *            the reference of the Field
      * @param plugin
      *            the Plugin
+     * @return the updated instance
      */
-    void store( Field field, Plugin plugin );
+    Field store( Field field, Plugin plugin );
 
     /**
      * Delete a record from the table

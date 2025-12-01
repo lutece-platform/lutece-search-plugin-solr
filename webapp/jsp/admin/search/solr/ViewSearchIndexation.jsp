@@ -1,9 +1,9 @@
 <%@ page errorPage="../../ErrorPage.jsp" %>
 <jsp:include page="../../AdminHeader.jsp" />
 
-<jsp:useBean id="solr_index" scope="session" class="fr.paris.lutece.plugins.search.solr.web.SolrIndexerJspBean" />
+<%@page import="fr.paris.lutece.plugins.search.solr.web.SolrIndexerJspBean"%>
 
-<% solr_index.init( request , solr_index.RIGHT_INDEXER ); %>
-<%= solr_index.getIndexing( request ) %>
+${ solrIndexerJspBean.init( pageContext.request, SolrIndexerJspBean.RIGHT_INDEXER ) }
+${ solrIndexerJspBean.getIndexing( pageContext.request ) }
 
 <%@ include file="../../AdminFooter.jsp" %>

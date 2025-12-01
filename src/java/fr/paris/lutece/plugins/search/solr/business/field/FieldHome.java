@@ -36,7 +36,7 @@ package fr.paris.lutece.plugins.search.solr.business.field;
 import fr.paris.lutece.plugins.search.solr.service.SolrPlugin;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+import jakarta.enterprise.inject.spi.CDI;
 
 import java.util.List;
 
@@ -46,7 +46,7 @@ import java.util.List;
 public final class FieldHome
 {
     // Static variable pointed at the DAO instance
-    private static IFieldDAO _dao = SpringContextService.getBean( "solrFieldDAO" );
+    private static IFieldDAO _dao = CDI.current( ).select( IFieldDAO.class ).get( ) ;
     private static Plugin _plugin = PluginService.getPlugin( SolrPlugin.PLUGIN_NAME );
 
     /**
@@ -65,9 +65,7 @@ public final class FieldHome
      */
     public static Field create( Field field )
     {
-        _dao.insert( field, _plugin );
-
-        return field;
+        return _dao.insert( field, _plugin );
     }
 
     /**
@@ -79,9 +77,7 @@ public final class FieldHome
      */
     public static Field update( Field field )
     {
-        _dao.store( field, _plugin );
-
-        return field;
+        return _dao.store( field, _plugin );
     }
 
     /**

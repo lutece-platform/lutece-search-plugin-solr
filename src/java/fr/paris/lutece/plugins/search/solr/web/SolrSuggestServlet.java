@@ -37,10 +37,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.SpellCheckResponse.Collation;
@@ -52,6 +53,7 @@ import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
  * SolrIndexerJspBean
  *
  */
+@WebServlet( name = "SolrSuggestServlet", urlPatterns = { "/servlet/plugins/SolrSuggest" } )
 public class SolrSuggestServlet extends HttpServlet
 {
     private static final long serialVersionUID = -3273825949482572338L;

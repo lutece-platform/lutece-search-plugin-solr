@@ -37,17 +37,22 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.enterprise.event.Event;
+import jakarta.enterprise.inject.literal.NamedLiteral;
+import jakarta.enterprise.inject.spi.CDI;
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchAppConf;
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
 import fr.paris.lutece.plugins.search.solr.service.ISolrSearchAppAddOn;
 import fr.paris.lutece.plugins.search.solr.service.SolrSearchAppConfService;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.search.QueryEvent;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.util.html.HtmlTemplate;
@@ -57,12 +62,17 @@ import fr.paris.lutece.util.html.HtmlTemplate;
  * SolrIndexerJspBean
  *
  */
+@WebServlet( name = "SolrSearchServlet", urlPatterns = { "/servlet/plugins/SolrSearchServlet" } )
 public class SolrSearchServlet extends HttpServlet
 {
     private static final long serialVersionUID = -3273825949482572338L;
 
     private static final String CONTENT_TYPE_JSON = "application/json";
 
+
+    @Inject
+    private Event<QueryEvent> _queryEvent;
+    
     /**
      * Returns search results
      *
@@ -81,10 +91,10 @@ public class SolrSearchServlet extends HttpServlet
              conf = SolrSearchAppConfService.loadConfiguration( null );
          }
 
-         Map<String, Object> model = SolrSearchApp.getSearchResultModel( request, conf );
+         Map<String, Object> model = SolrSearchApp.getSearchResultModel( request, conf, _queryEvent );
          for ( String beanName : conf.getAddonBeanNames( ) )
          {
-             ISolrSearchAppAddOn solrSearchAppAddon = SpringContextService.getBean( beanName );
+             ISolrSearchAppAddOn solrSearchAppAddon = CDI.current( ).select( ISolrSearchAppAddOn.class, NamedLiteral.of( beanName ) ).get( );
              solrSearchAppAddon.buildPageAddOn( model, request );
          }
          HtmlTemplate template = AppTemplateService.getTemplate( conf.getTemplate( ), request.getLocale( ), model );

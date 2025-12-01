@@ -35,9 +35,11 @@ package fr.paris.lutece.plugins.search.solr.web;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.HashMap;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.plugins.search.solr.business.field.FieldHome;
@@ -46,6 +48,7 @@ import fr.paris.lutece.plugins.search.solr.indexer.SolrIndexerService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
+import fr.paris.lutece.portal.web.cdi.mvc.Models;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
 /**
@@ -53,6 +56,8 @@ import fr.paris.lutece.util.html.HtmlTemplate;
  * SolrIndexerJspBean
  *
  */
+@RequestScoped
+@Named
 public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
 {
     private static final long serialVersionUID = 1633639212933752088L;
@@ -64,6 +69,9 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
     private static final String MARK_FIELD = "field_list";
     private static final String UTF_8 = "UTF-8";
 
+    @Inject
+    private Models model;
+    
     /**
      * Displays the indexing parameters
      *
@@ -73,7 +81,6 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
      */
     public String getFieldList( HttpServletRequest request )
     {
-        HashMap<String, Object> model = new HashMap<>( );
         model.put( MARK_FIELD, SolrFieldManager.getFieldList( ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_DISPLAY_SOLR_FIELDS, getLocale( ), model );
@@ -91,8 +98,6 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
 
     public String getForm( HttpServletRequest request )
     {
-        HashMap<String, Object> model = new HashMap<>( );
-
         // UPDATE
         if ( request.getParameter( "update" ) != null )
         {
@@ -140,7 +145,7 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
                     }
                     else
                     {
-                        return null;
+                        return getPage( request );
                     }
     }
 

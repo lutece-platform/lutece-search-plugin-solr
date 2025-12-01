@@ -33,145 +33,17 @@
  */
 package fr.paris.lutece.plugins.search.solr.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.tika.config.TikaConfig;
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.AutoDetectParser;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.html.HtmlParser;
-import org.apache.tika.sax.BodyContentHandler;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-
-import fr.paris.lutece.plugins.search.solr.indexer.SolrItem;
-import fr.paris.lutece.portal.service.util.AppPathService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
 /**
  * Util class for use of tika methods.
+ * 
+ * Formerly, this class was parsing html content using Apache Tika. Since Lutece 8, Html parsing is performed by Jsoup.
+ * This class is replaced by SolrHtmlParserUtil class.
+ * 
+ * @see fr.paris.lutece.plugins.search.solr.util.SolrHtmlParserUtil
  */
+@Deprecated(forRemoval = true)
 public final class TikaIndexerUtil
 {
-    // 1Mo
-    private static final int DEFAULT_DOCUMENT_SIZE = 1048576;
-    private static final String CONFIG = AppPathService.getAbsolutePathFromRelativePath( "/WEB-INF/conf/tika.xml" );
 
-    private TikaIndexerUtil( )
-    {
-    }
-
-    /**
-     * Parse the xml content
-     * 
-     * @param strContentToIndex
-     * @param metadata
-     * @param parseContext
-     * @return the content handler containing the parsed content
-     * @throws LuteceSolrException
-     */
-    public static ContentHandler parseHtml( String strContentToIndex, Metadata metadata, ParseContext parseContext ) throws LuteceSolrException
-    {
-        try
-        {
-            ContentHandler handler = new BodyContentHandler( AppPropertiesService.getPropertyInt( "solr.document.max.size", DEFAULT_DOCUMENT_SIZE ) );
-            new HtmlParser( ).parse( new ByteArrayInputStream( strContentToIndex.getBytes( ) ), handler, metadata, parseContext );
-            return handler;
-        }
-        catch( IOException | SAXException | TikaException e )
-        {
-            throw new LuteceSolrException( "Error parsing content", e );
-        }
-    }
-
-    /**
-     * Identify the type of content and parse the stream
-     * 
-     * @param stream
-     * @return the content handler containing the parsed content
-     * @throws LuteceSolrException
-     */
-    public static ContentHandler parse( InputStream stream, Metadata metadata, ParseContext parseContext ) throws LuteceSolrException
-    {
-        try
-        {
-            ContentHandler handler = new BodyContentHandler( );
-            AutoDetectParser parser = new AutoDetectParser( new TikaConfig( CONFIG ) );
-            parser.parse( stream, handler, metadata, parseContext );
-            return handler;
-        }
-        catch( IOException | SAXException | TikaException e )
-        {
-            throw new LuteceSolrException( "Error parsing content", e );
-        }
-    }
-
-    /**
-     * Identify the type of content and parse the stream
-     * 
-     * @param stream
-     * @return the content handler containing the parsed content
-     * @throws LuteceSolrException
-     */
-    public static ContentHandler parse( InputStream stream ) throws LuteceSolrException
-    {
-        return parse( stream, new Metadata( ), new ParseContext( ) );
-    }
-
-    /**
-     * Parse the xml content
-     * 
-     * @param strContentToIndex
-     * @return the content handler containing the parsed content
-     * @throws LuteceSolrException
-     */
-    public static ContentHandler parseHtml( String strContentToIndex ) throws LuteceSolrException
-    {
-        return parseHtml( strContentToIndex, new Metadata( ), new ParseContext( ) );
-    }
-
-    /**
-     * Parse and add the content of a file to the solr item.
-     * 
-     * @param item
-     * @param fileContent
-     *            the content of the file
-     * @throws LuteceSolrException
-     */
-    public static void addFileContentToSolrItem( SolrItem item, byte [ ] fileContent ) throws LuteceSolrException
-    {
-        addFileContentToSolrItem( item, Collections.singletonList( fileContent ) );
-    }
-
-    /**
-     * Parse and add the content of multiples files to the solr item.
-     * 
-     * @param item
-     * @param fileContentList
-     *            the content of the files
-     * @throws LuteceSolrException
-     */
-    public static void addFileContentToSolrItem( SolrItem item, List<byte [ ]> fileContentList ) throws LuteceSolrException
-    {
-        StringBuilder content = new StringBuilder( );
-        for ( byte [ ] fileContent : fileContentList )
-        {
-            content.append( " " );
-            try ( InputStream bais = new ByteArrayInputStream( fileContent ) )
-            {
-                ContentHandler handler = parse( bais );
-                content.append( handler.toString( ) );
-            }
-            catch( IOException e )
-            {
-                throw new LuteceSolrException( "Error while parsing file for item " + item.getUid( ), e );
-            }
-        }
-        item.setFileContent( content.toString( ) );
-    }
 }

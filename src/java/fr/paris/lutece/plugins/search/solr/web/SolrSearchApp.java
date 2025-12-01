@@ -42,7 +42,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.event.Event;
+import jakarta.enterprise.inject.literal.NamedLiteral;
+import jakarta.enterprise.inject.spi.CDI;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -65,8 +71,6 @@ import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.search.QueryEvent;
-import fr.paris.lutece.portal.service.search.QueryListenersService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -83,6 +87,8 @@ import fr.paris.lutece.util.url.UrlItem;
  * This page shows some features of Solr like Highlights or Facets.
  *
  */
+@RequestScoped
+@Named( "solr.xpage.search-solr" )
 public class SolrSearchApp implements XPageApplication
 {
 
@@ -140,7 +146,10 @@ public class SolrSearchApp implements XPageApplication
     private static final String PROPERTY_ENCODE_URI = "search.encode.uri";
     private static final boolean DEFAULT_ENCODE_URI = false;
     private static final boolean SOLR_SPELLCHECK = AppPropertiesService.getPropertyBoolean( "solr.spellchecker", false );
-
+    
+    @Inject
+    private Event<QueryEvent> _queryEvent;
+    
     /**
      * Returns search results
      *
@@ -167,10 +176,10 @@ public class SolrSearchApp implements XPageApplication
             conf = SolrSearchAppConfService.loadConfiguration( null );
         }
 
-        Map<String, Object> model = getSearchResultModel( request, conf );
+        Map<String, Object> model = getSearchResultModel( request, conf, _queryEvent );
         for ( String beanName : conf.getAddonBeanNames( ) )
         {
-            ISolrSearchAppAddOn solrSearchAppAddon = SpringContextService.getBean( beanName );
+        	ISolrSearchAppAddOn solrSearchAppAddon = CDI.current( ).select( ISolrSearchAppAddOn.class, NamedLiteral.of( beanName ) ).get( );
             solrSearchAppAddon.buildPageAddOn( model, request );
         }
 
@@ -222,9 +231,9 @@ public class SolrSearchApp implements XPageApplication
      * @throws SiteMessageException
      *             if an error occurs
      */
-    public static Map<String, Object> getSearchResultModel( HttpServletRequest request ) throws SiteMessageException
+    public static Map<String, Object> getSearchResultModel( HttpServletRequest request, Event<QueryEvent> queryEvent ) throws SiteMessageException
     {
-        return getSearchResultModel( request, null );
+        return getSearchResultModel( request, null, queryEvent );
     }
 
     /**
@@ -238,7 +247,7 @@ public class SolrSearchApp implements XPageApplication
      * @throws SiteMessageException
      *             if an error occurs
      */
-    public static Map<String, Object> getSearchResultModel( HttpServletRequest request, SolrSearchAppConf conf ) throws SiteMessageException
+    public static Map<String, Object> getSearchResultModel( HttpServletRequest request, SolrSearchAppConf conf, Event<QueryEvent> queryEvent ) throws SiteMessageException
     {
         String strQuery = request.getParameter( PARAMETER_QUERY );
         String [ ] facetQuery = request.getParameterValues( PARAMETER_FACET_QUERY );
@@ -346,7 +355,7 @@ public class SolrSearchApp implements XPageApplication
 
         // The page should not be added to the cache
         // Notify results infos to QueryEventListeners
-        notifyQueryListeners( strQuery, listResults.size( ), request );
+        notifyQueryListeners( strQuery, listResults.size( ), request, queryEvent );
 
         UrlItem url = new UrlItem( strSearchPageUrl );
         String strQueryForPaginator = strQuery;
@@ -468,7 +477,7 @@ public class SolrSearchApp implements XPageApplication
                 }
                 catch( IOException e )
                 {
-                    AppLogService.error( "SolrSearchApp: error parsing geoloc JSON: " + strJson + ", exception " + e );
+                    AppLogService.error( "SolrSearchApp: error parsing geoloc JSON: {}, exception ", strJson, e );
                 }
 
                 if ( geolocItem != null )
@@ -508,12 +517,12 @@ public class SolrSearchApp implements XPageApplication
      * @param request
      *            The request
      */
-    private static void notifyQueryListeners( String strQuery, int nResultsCount, HttpServletRequest request )
+    private static void notifyQueryListeners( String strQuery, int nResultsCount, HttpServletRequest request, Event<QueryEvent> queryEvent )
     {
         QueryEvent event = new QueryEvent( );
         event.setQuery( strQuery );
         event.setResultsCount( nResultsCount );
         event.setRequest( request );
-        QueryListenersService.getInstance( ).notifyListeners( event );
+        queryEvent.fire( event );
     }
 }
