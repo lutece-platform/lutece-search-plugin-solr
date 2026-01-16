@@ -576,19 +576,7 @@ public final class SolrIndexerService
      */
     public static String getRootUrl( )
     {
-        String strBaseUrl = AppPropertiesService.getProperty( PROPERTY_BASE_URL );
-
-        if ( StringUtils.isBlank( strBaseUrl ) )
-        {
-            strBaseUrl = AppPropertiesService.getProperty( PROPERTY_PROD_URL );
-        }
-
-        if ( !strBaseUrl.endsWith( "/" ) )
-        {
-            strBaseUrl = strBaseUrl + "/";
-        }
-        strBaseUrl = StringUtils.isBlank( strBaseUrl ) ? "" : strBaseUrl;
-        return strBaseUrl;
+        return AppPathService.getProdUrl( "" );
     }
 
     /**
