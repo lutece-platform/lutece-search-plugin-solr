@@ -4,7 +4,7 @@
     <name>solr</name>
     <class>fr.paris.lutece.plugins.search.solr.service.SolrPlugin
     </class>
-    <version>5.0.0-SNAPSHOT</version>
+    <version>5.0.0</version>
     <documentation/>
     <installation/>
     <changes/>
