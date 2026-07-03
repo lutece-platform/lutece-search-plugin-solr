@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.search.solr.business;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -135,6 +136,11 @@ public class SolrSearchEngine implements SearchEngine
     private static final String DEF_TYPE = "edismax";
     private static final String[] TAB_COMPLEX_QUERY_CHAR = {"(",")","[","]", " OR ", " AND ", "-", "+", "=","^"};
 
+    // Security : white-list of the only parameters the public JSON search endpoint may forward to Solr.
+    private static final String SELECT_REQUEST_HANDLER = "/select";
+    private static final List<String> ALLOWED_JSON_SEARCH_PARAMETERS = Arrays.asList( "q", "fq", "fl", "start", "rows", "sort", "wt" );
+    private static final List<String> ALLOWED_JSON_SEARCH_PARAMETER_PREFIXES = Arrays.asList( "facet", "hl" );
+
     /**
      * Return search results
      * 
@@ -203,30 +209,77 @@ public class SolrSearchEngine implements SearchEngine
      *            The solrParam
      * @return Results as json
      */
+    /**
+     * Runs a search against the Solr /select handler and returns the raw JSON response.
+     *
+     * Only the parameters accepted by {@link #isJsonSearchParameterAllowed(String)} are forwarded to Solr, and the
+     * request handler is forced to {@value #SELECT_REQUEST_HANDLER}. This prevents an attacker from hijacking the
+     * request handler (for instance through the "qt" parameter and path traversal) to reach the administrative or
+     * CoreAdmin endpoints of the Solr backend.
+     *
+     * @param solrParam
+     *            the HTTP parameters of the incoming request
+     * @return the raw JSON response returned by Solr, or an empty string on error
+     */
     public String getJsonSearchResults( Map<String, String[] > solrParam )
     {
         SolrClient solrServer = SolrServerService.getInstance( ).getSolrServer( );
-        if ( ( solrServer != null )  )
+        if ( solrServer != null )
         {
-        	SolrQuery query = new SolrQuery();
-        	solrParam.forEach( (key, value) -> query.set(key, value) );
-        	QueryRequest req = new QueryRequest( query );
-        	NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser();
-        	rawJsonResponseParser.setWriterType("json");
-        	req.setResponseParser(rawJsonResponseParser);
-        	 try
-             {
-        		NamedList<Object> resp = solrServer.request(req);
-             	return  (String) resp.get("response");
-             
-             }
-             catch( SolrServerException | IOException e )
-             {
-                 AppLogService.error( e.getMessage( ), e );
-             }           
+            SolrQuery query = new SolrQuery( );
+            for ( Map.Entry<String, String[]> entry : solrParam.entrySet( ) )
+            {
+                if ( isJsonSearchParameterAllowed( entry.getKey( ) ) )
+                {
+                    query.set( entry.getKey( ), entry.getValue( ) );
+                }
+                else
+                {
+                    AppLogService.debug( "SolrSearchServlet : ignoring non whitelisted parameter {}", entry.getKey( ) );
+                }
+            }
+            query.setRequestHandler( SELECT_REQUEST_HANDLER );
+            QueryRequest req = new QueryRequest( query );
+            NoOpResponseParser rawJsonResponseParser = new NoOpResponseParser( );
+            rawJsonResponseParser.setWriterType( "json" );
+            req.setResponseParser( rawJsonResponseParser );
+            try
+            {
+                NamedList<Object> resp = solrServer.request( req );
+                return (String) resp.get( "response" );
+            }
+            catch( SolrServerException | IOException e )
+            {
+                AppLogService.error( e.getMessage( ), e );
+            }
         }
 
         return Strings.EMPTY;
+    }
+
+    /**
+     * Tells whether an HTTP parameter is allowed to be forwarded to the Solr /select handler.
+     *
+     * The endpoint is public and unauthenticated, so only a strict white-list of standard search parameters is
+     * accepted. Everything else (in particular "qt", "stream.*", "action", "command", "expr" and the administrative
+     * parameters) is dropped.
+     *
+     * @param strParameterName
+     *            the HTTP parameter name
+     * @return {@code true} if the parameter is safe to forward, {@code false} otherwise
+     */
+    private static boolean isJsonSearchParameterAllowed( String strParameterName )
+    {
+        if ( strParameterName == null )
+        {
+            return false;
+        }
+        if ( ALLOWED_JSON_SEARCH_PARAMETERS.contains( strParameterName ) )
+        {
+            return true;
+        }
+        return ALLOWED_JSON_SEARCH_PARAMETER_PREFIXES.stream( )
+                .anyMatch( strPrefix -> strParameterName.equals( strPrefix ) || strParameterName.startsWith( strPrefix + "." ) );
     }
 
 

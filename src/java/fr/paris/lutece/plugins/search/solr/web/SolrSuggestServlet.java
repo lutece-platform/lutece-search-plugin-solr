@@ -36,16 +36,20 @@ package fr.paris.lutece.plugins.search.solr.web;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.SpellCheckResponse.Collation;
 
 import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
+import fr.paris.lutece.portal.service.util.AppLogService;
 
 /**
  *
@@ -55,6 +59,9 @@ import fr.paris.lutece.plugins.search.solr.business.SolrSearchEngine;
 public class SolrSuggestServlet extends HttpServlet
 {
     private static final long serialVersionUID = -3273825949482572338L;
+
+    // Security : a JSONP callback is reflected into a JavaScript response, so it must be a safe identifier only.
+    private static final Pattern CALLBACK_PATTERN = Pattern.compile( "^[A-Za-z0-9_.]{1,64}$" );
 
     /**
      * Displays the indexing parameters
@@ -67,6 +74,13 @@ public class SolrSuggestServlet extends HttpServlet
     {
         String callback = request.getParameter( "callback" );
         String terms = request.getParameter( "q" );
+
+        if ( !isValidCallback( callback ) )
+        {
+            AppLogService.error( "SolrSuggestServlet : rejected invalid JSONP callback parameter" );
+
+            return StringUtils.EMPTY;
+        }
 
         SolrSearchEngine engine = SolrSearchEngine.getInstance( );
         StringBuilder result = new StringBuilder( );
@@ -87,7 +101,7 @@ public class SolrSuggestServlet extends HttpServlet
 
                 // iterate on each field
                 result.append( "{" );
-                result.append( "\"" ).append( "title" ).append( "\":\"" ).append( collation ).append( "\"" );
+                result.append( "\"" ).append( "title" ).append( "\":\"" ).append( StringEscapeUtils.escapeJavaScript( collation ) ).append( "\"" );
 
                 if ( ite.hasNext( ) )
                 {
@@ -104,6 +118,21 @@ public class SolrSuggestServlet extends HttpServlet
         result.append( "]}})" );
 
         return result.toString( );
+    }
+
+    /**
+     * Validates the JSONP callback parameter.
+     *
+     * The callback is reflected into a response served as JavaScript, so it must be restricted to a safe identifier
+     * pattern to prevent JSONP callback injection / reflected XSS.
+     *
+     * @param strCallback
+     *            the callback parameter provided by the caller
+     * @return {@code true} if the callback is a safe JavaScript identifier, {@code false} otherwise
+     */
+    private static boolean isValidCallback( String strCallback )
+    {
+        return StringUtils.isNotBlank( strCallback ) && CALLBACK_PATTERN.matcher( strCallback ).matches( );
     }
 
     @Override
