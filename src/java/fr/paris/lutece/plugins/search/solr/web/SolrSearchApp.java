@@ -161,6 +161,9 @@ public class SolrSearchApp extends MVCApplication
     
     @Inject
     private Event<QueryEvent> _queryEvent;
+
+    @Inject
+    private SolrSearchEngine _solrSearchEngine;
     
     /**
      * Returns search results
@@ -193,7 +196,7 @@ public class SolrSearchApp extends MVCApplication
             conf = SolrSearchAppConfService.loadConfiguration( null );
         }
 
-        Map<String, Object> model = getSearchResultModel( request, conf, _queryEvent );
+        Map<String, Object> model = getSearchResultModel( request, conf );
         for ( String beanName : conf.getAddonBeanNames( ) )
         {
             ISolrSearchAppAddOn solrSearchAppAddon = CDI.current( ).select( ISolrSearchAppAddOn.class, NamedLiteral.of( beanName ) ).get( );
@@ -251,7 +254,7 @@ public class SolrSearchApp extends MVCApplication
     @View( VIEW_JSON )
     public XPage getJsonResults( HttpServletRequest request )
     {
-        String strJson = SolrSearchEngine.getInstance( ).getJsonSearchResults( request.getParameterMap( ) );
+        String strJson = _solrSearchEngine.getJsonSearchResults( request.getParameterMap( ) );
 
         return responseJSON( strJson );
     }
@@ -267,7 +270,7 @@ public class SolrSearchApp extends MVCApplication
     public XPage getSuggest( HttpServletRequest request )
     {
         String strTerms = request.getParameter( PARAMETER_SUGGEST_TERMS );
-        List<String> listSuggestions = SolrSearchEngine.getInstance( ).getSuggestions( strTerms );
+        List<String> listSuggestions = _solrSearchEngine.getSuggestions( strTerms );
 
         List<Map<String, String>> listDocs = new ArrayList<>( );
         for ( String strSuggestion : listSuggestions )
@@ -325,20 +328,6 @@ public class SolrSearchApp extends MVCApplication
     }
 
     /**
-     * Performs a search and fills the model (useful when a page needs to remind search parameters/results) with the default conf
-     *
-     * @param request
-     *            the request
-     * @return the model
-     * @throws SiteMessageException
-     *             if an error occurs
-     */
-    public static Map<String, Object> getSearchResultModel( HttpServletRequest request, Event<QueryEvent> queryEvent ) throws SiteMessageException
-    {
-        return getSearchResultModel( request, null, queryEvent );
-    }
-
-    /**
      * Performs a search and fills the model (useful when a page needs to remind search parameters/results)
      *
      * @param request
@@ -349,7 +338,7 @@ public class SolrSearchApp extends MVCApplication
      * @throws SiteMessageException
      *             if an error occurs
      */
-    public static Map<String, Object> getSearchResultModel( HttpServletRequest request, SolrSearchAppConf conf, Event<QueryEvent> queryEvent ) throws SiteMessageException
+    public Map<String, Object> getSearchResultModel( HttpServletRequest request, SolrSearchAppConf conf ) throws SiteMessageException
     {
         String strQuery = request.getParameter( PARAMETER_QUERY );
         String [ ] facetQuery = request.getParameterValues( PARAMETER_FACET_QUERY );
@@ -442,7 +431,7 @@ public class SolrSearchApp extends MVCApplication
 
         strCurrentPageIndex = ( strCurrentPageIndex != null ) ? strCurrentPageIndex : DEFAULT_PAGE_INDEX;
 
-        SolrSearchEngine engine = SolrSearchEngine.getInstance( );
+        SolrSearchEngine engine = _solrSearchEngine;
 
         SolrFacetedResult facetedResult = engine.getFacetedSearchResults( strQuery, new String [] {conf.getFieldList()}, facetQuery, sort, order, nLimit, Integer.parseInt( strCurrentPageIndex ),
                 nItemsPerPage, SOLR_SPELLCHECK );
@@ -457,7 +446,7 @@ public class SolrSearchApp extends MVCApplication
 
         // The page should not be added to the cache
         // Notify results infos to QueryEventListeners
-        notifyQueryListeners( strQuery, listResults.size( ), request, queryEvent );
+        notifyQueryListeners( strQuery, listResults.size( ), request, _queryEvent );
 
         UrlItem url = new UrlItem( strSearchPageUrl );
         String strQueryForPaginator = strQuery;

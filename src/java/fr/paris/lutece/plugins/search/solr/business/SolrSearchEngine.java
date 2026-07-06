@@ -61,6 +61,10 @@ import org.apache.solr.client.solrj.response.SpellCheckResponse.Collation;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.spi.CDI;
+import jakarta.inject.Inject;
+
 import fr.paris.lutece.plugins.search.solr.business.facetintersection.FacetIntersection;
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
@@ -82,6 +86,7 @@ import fr.paris.lutece.portal.service.util.AppPropertiesService;
  * SolrSearchEngine
  *
  */
+@ApplicationScoped
 public class SolrSearchEngine implements SearchEngine
 {
     private static final String PROPERTY_SOLR_AUTOCOMPLETE_HANDLER = "solr.autocomplete.handler";
@@ -133,7 +138,8 @@ public class SolrSearchEngine implements SearchEngine
     public static final String SOLR_FACET_DATE_GAP = AppPropertiesService.getProperty( "solr.facet.date.gap", "+1YEAR" );
     public static final String SOLR_FACET_DATE_END = AppPropertiesService.getProperty( "solr.facet.date.end", "NOW" );
     public static final int SOLR_FACET_LIMIT = AppPropertiesService.getPropertyInt( "solr.facet.limit", 100 );
-    private static SolrSearchEngine _instance;
+    @Inject
+    private SolrServerService _solrServerService;
     private static final String DEF_TYPE = "edismax";
     private static final String[] TAB_COMPLEX_QUERY_CHAR = {"(",")","[","]", " OR ", " AND ", "-", "+", "=","^"};
 
@@ -155,7 +161,7 @@ public class SolrSearchEngine implements SearchEngine
     {
         List<SearchResult> results = new ArrayList<>( );
 
-        SolrClient solrServer = SolrServerService.getInstance( ).getSolrServer( );
+        SolrClient solrServer = _solrServerService.getSolrServer( );
 
         if ( ( solrServer != null ) && StringUtils.isNotEmpty( strQuery ) )
         {
@@ -224,7 +230,7 @@ public class SolrSearchEngine implements SearchEngine
      */
     public String getJsonSearchResults( Map<String, String[] > solrParam )
     {
-        SolrClient solrServer = SolrServerService.getInstance( ).getSolrServer( );
+        SolrClient solrServer = _solrServerService.getSolrServer( );
         if ( solrServer != null )
         {
             SolrQuery query = new SolrQuery( );
@@ -326,7 +332,7 @@ public class SolrSearchEngine implements SearchEngine
     {
         SolrFacetedResult facetedResult = new SolrFacetedResult( );
 
-        SolrClient solrServer = SolrServerService.getInstance( ).getSolrServer( );
+        SolrClient solrServer = _solrServerService.getSolrServer( );
         List<SolrSearchResult> results = new ArrayList<>( );
         Map<Field, List<String>> myValuesList = new HashMap<>( );
 
@@ -695,7 +701,7 @@ public class SolrSearchEngine implements SearchEngine
      */
     public List<SolrSearchResult> getGeolocSearchResults( String strQuery, String [ ] facetQueries, int nLimit )
     {
-        SolrClient solrServer = SolrServerService.getInstance( ).getSolrServer( );
+        SolrClient solrServer = _solrServerService.getSolrServer( );
 
         Map<Field, List<String>> myValuesList = new HashMap<>( );
         if ( solrServer == null )
@@ -786,7 +792,7 @@ public class SolrSearchEngine implements SearchEngine
     public SpellCheckResponse getSpellChecker( String term )
     {
         SpellCheckResponse spellCheck = null;
-        SolrClient solrServer = SolrServerService.getInstance( ).getSolrServer( );
+        SolrClient solrServer = _solrServerService.getSolrServer( );
 
         SolrQuery query = new SolrQuery( term );
         // Do not return results (optimization)
@@ -828,7 +834,7 @@ public class SolrSearchEngine implements SearchEngine
     public List<String> getSuggestions( String strTerms )
     {
         List<String> listSuggestions = new ArrayList<>( );
-        SolrClient solrServer = SolrServerService.getInstance( ).getSolrServer( );
+        SolrClient solrServer = _solrServerService.getSolrServer( );
 
         SolrQuery query = new SolrQuery( strTerms );
         query.setRows( 10 );
@@ -859,7 +865,7 @@ public class SolrSearchEngine implements SearchEngine
     {
         String strDocumentIdPrefixed = SolrIndexerService.getWebAppName( ) + SolrConstants.CONSTANT_UNDERSCORE + strDocumentId;
         String xmlContent = null;
-        SolrClient solrServer = SolrServerService.getInstance( ).getSolrServer( );
+        SolrClient solrServer = _solrServerService.getSolrServer( );
         SolrQuery query = new SolrQuery( terms );
         query.setHighlight( true );
         query.setHighlightSimplePre( SOLR_HIGHLIGHT_PRE );
@@ -921,17 +927,15 @@ public class SolrSearchEngine implements SearchEngine
 
     /**
      * Returns the instance
-     * 
+     *
      * @return the instance
+     * @deprecated This engine is now a CDI bean. Prefer dependency injection ({@code @Inject SolrSearchEngine})
+     *             instead of this static accessor. It is kept only for callers living in a non-CDI (static) context.
      */
+    @Deprecated
     public static SolrSearchEngine getInstance( )
     {
-        if ( _instance == null )
-        {
-            _instance = new SolrSearchEngine( );
-        }
-
-        return _instance;
+        return CDI.current( ).select( SolrSearchEngine.class ).get( );
     }
 
     private boolean isFieldDate( String fieldName )

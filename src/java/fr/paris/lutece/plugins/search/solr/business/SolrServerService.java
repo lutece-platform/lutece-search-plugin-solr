@@ -35,6 +35,9 @@ package fr.paris.lutece.plugins.search.solr.business;
 
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.spi.CDI;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.Http2SolrClient;
 
@@ -42,7 +45,8 @@ import org.apache.solr.client.solrj.impl.Http2SolrClient;
  * This service provides an instance of SolrServer.
  *
  */
-public final class SolrServerService
+@ApplicationScoped
+public class SolrServerService
 {
     private static final String PROPERTY_SOLR_SERVER_URL = "solr.server.address";
     private static final String PROPERTY_SOLR_TIMEOUT = "solr.server.timeout";
@@ -56,44 +60,37 @@ public final class SolrServerService
     private static final int SOLR_IDLE_TIMEOUT = AppPropertiesService.getPropertyInt( PROPERTY_SOLR_IDLE_TIMEOUT, 600000 );
 
     private static final boolean SOLR_USE_HTTP1_1 = AppPropertiesService.getPropertyBoolean( PROPERTY_SOLR_USE_HTTP1_1, Boolean.FALSE );
-    private static SolrServerService _instance;
     private SolrClient _solrServer;
 
     /**
-     * Private constructor that creates the SolrServer.
+     * Initializes the Solr client once, when the CDI bean is created.
      */
-    private SolrServerService( )
+    @PostConstruct
+    void init( )
     {
         _solrServer = createSolrServer( SOLR_SERVER_URL );
     }
 
     /**
-     * Return the instance.
-     * 
+     * Returns the CDI-managed instance.
+     *
      * @return the instance.
+     * @deprecated This service is now a CDI bean. Prefer dependency injection ({@code @Inject SolrServerService})
+     *             instead of this static accessor. It is kept only for callers living in a non-CDI (static) context.
      */
+    @Deprecated
     public static SolrServerService getInstance( )
     {
-        if ( _instance == null )
-        {
-            _instance = new SolrServerService( );
-        }
-
-        return _instance;
+        return CDI.current( ).select( SolrServerService.class ).get( );
     }
 
     /**
      * Returns the SolrServer.
-     * 
+     *
      * @return the SolrServer
      */
     public SolrClient getSolrServer( )
     {
-        if ( _solrServer == null )
-        {
-            _solrServer = createSolrServer( SOLR_SERVER_URL );
-        }
-
         return _solrServer;
     }
 
