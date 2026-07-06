@@ -45,7 +45,7 @@ import java.util.List;
  * This class provides Data Access methods for Field objects
  */
 @ApplicationScoped
-public final class FieldDAO implements IFieldDAO
+public class FieldDAO implements IFieldDAO
 {
     // Constants
     private static final String SQL_QUERY_SELECT = "SELECT id_field, name, label, description, is_facet, enable_facet, is_sort, enable_sort, default_sort, weight, facet_mincount, operator_type FROM solr_fields WHERE id_field = ?";

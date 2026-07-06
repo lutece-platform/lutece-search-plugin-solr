@@ -46,7 +46,7 @@ import java.util.List;
  * This class provides Data Access methods for Indexer Action objects
  */
 @ApplicationScoped
-public final class SolrIndexerActionDAO implements ISolrIndexerActionDAO
+public class SolrIndexerActionDAO implements ISolrIndexerActionDAO
 {
     // Constants
     public static final String CONSTANT_WHERE = " WHERE ";

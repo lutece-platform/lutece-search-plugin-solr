@@ -46,7 +46,7 @@ import java.util.List;
  * This class provides Data Access methods for FacetIntersection objects
  */
 @ApplicationScoped
-public final class FacetIntersectionDAO implements IFacetIntersectionDAO
+public class FacetIntersectionDAO implements IFacetIntersectionDAO
 {
     // Constants
     private static final String SQL_QUERY_INSERT = "INSERT INTO solr_facet_intersection ( id_field1, id_field2 ) VALUES ( ?, ? ) ";
