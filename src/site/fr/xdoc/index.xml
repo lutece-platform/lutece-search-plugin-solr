@@ -10,19 +10,9 @@
 			</subsection>
 			<subsection name="Configuration">
 			<p>
-            Configuration dans le web.xml
-            <pre>
-            
-    &lt;servlet&gt;
-        &lt;servlet-name&gt;SolrServlet&lt;/servlet-name&gt;
-        &lt;servlet-class&gt;fr.paris.lutece.plugins.search.solr.web.SolrSuggestServlet&lt;/servlet-class&gt;
-    &lt;/servlet&gt;
-    &lt;servlet-mapping&gt;
-        &lt;servlet-name&gt;SolrServlet&lt;/servlet-name&gt;
-        &lt;url-pattern&gt;/solrSuggest&lt;/url-pattern&gt;
-    &lt;/servlet-mapping&gt;
-            
-            </pre>
+            L'autocomplétion est exposée par l'application XPage <code>search-solr</code> via la vue <code>suggest</code>,
+            qui renvoie du JSON : <code>Portal.jsp?page=search-solr&amp;view=suggest&amp;q=...</code>.
+            Aucune configuration de servlet dans le web.xml n'est nécessaire.
 			</p>
             <p>
     Configuration à ajouter au solrconfig.xml

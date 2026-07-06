@@ -57,6 +57,7 @@ import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.SpellCheckResponse;
+import org.apache.solr.client.solrj.response.SpellCheckResponse.Collation;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 
@@ -815,27 +816,41 @@ public class SolrSearchEngine implements SearchEngine
         return spellCheck;
     }
 
-    public QueryResponse getJsonpSuggest( String terms, String callback )
+    /**
+     * Returns the autocomplete suggestions for the given search terms.
+     *
+     * @param strTerms
+     *            the search terms
+     * @return the list of suggestion strings, never {@code null}
+     */
+    public List<String> getSuggestions( String strTerms )
     {
-        QueryResponse response = null;
+        List<String> listSuggestions = new ArrayList<>( );
         SolrClient solrServer = SolrServerService.getInstance( ).getSolrServer( );
 
-        SolrQuery query = new SolrQuery( terms );
-        query.setParam( "wt", "json" );
-        query.setParam( "json.wrf", callback );
+        SolrQuery query = new SolrQuery( strTerms );
         query.setRows( 10 );
         query.setRequestHandler( "/" + SOLR_AUTOCOMPLETE_HANDLER );
 
         try
         {
-            response = solrServer.query( query );
+            QueryResponse response = solrServer.query( query );
+            SpellCheckResponse spellCheckResponse = response.getSpellCheckResponse( );
+
+            if ( spellCheckResponse != null && spellCheckResponse.getCollatedResults( ) != null )
+            {
+                for ( Collation collation : spellCheckResponse.getCollatedResults( ) )
+                {
+                    listSuggestions.add( collation.getCollationQueryString( ) );
+                }
+            }
         }
         catch( SolrServerException | IOException e )
         {
             AppLogService.error( e.getMessage( ), e );
         }
 
-        return response;
+        return listSuggestions;
     }
 
     public String getDocumentHighLighting( String strDocumentId, String terms )

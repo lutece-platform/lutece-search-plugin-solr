@@ -50,6 +50,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.solr.client.solrj.response.SpellCheckResponse;
@@ -75,6 +77,7 @@ import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.portal.util.mvc.xpage.MVCApplication;
 import fr.paris.lutece.portal.util.mvc.xpage.annotations.Controller;
+import fr.paris.lutece.util.json.JsonUtil;
 import fr.paris.lutece.portal.web.xpages.XPage;
 import fr.paris.lutece.util.html.AbstractPaginator;
 import fr.paris.lutece.util.html.DelegatePaginator;
@@ -117,6 +120,12 @@ public class SolrSearchApp extends MVCApplication
     private static final String VIEW_SEARCH = "search";
     private static final String VIEW_FRAGMENT = "fragment";
     private static final String VIEW_JSON = "json";
+    private static final String VIEW_SUGGEST = "suggest";
+    private static final String PARAMETER_SUGGEST_TERMS = "q";
+    private static final String MARK_RESPONSE = "response";
+    private static final String MARK_DOCS = "docs";
+    private static final String MARK_TITLE = "title";
+    private static final String EMPTY_SUGGEST_JSON = "{\"response\":{\"docs\":[]}}";
 
     private static final String PARAMETER_FACET_LABEL = "facetlabel";
     private static final String PARAMETER_FACET_NAME = "facetname";
@@ -245,6 +254,44 @@ public class SolrSearchApp extends MVCApplication
         String strJson = SolrSearchEngine.getInstance( ).getJsonSearchResults( request.getParameterMap( ) );
 
         return responseJSON( strJson );
+    }
+
+    /**
+     * Returns the autocomplete suggestions as JSON for the current terms, in the form <code>{"response":{"docs":[{"title":"..."}]}}</code>.
+     *
+     * @param request
+     *            The HTTP request.
+     * @return The suggestions as a JSON response.
+     */
+    @View( VIEW_SUGGEST )
+    public XPage getSuggest( HttpServletRequest request )
+    {
+        String strTerms = request.getParameter( PARAMETER_SUGGEST_TERMS );
+        List<String> listSuggestions = SolrSearchEngine.getInstance( ).getSuggestions( strTerms );
+
+        List<Map<String, String>> listDocs = new ArrayList<>( );
+        for ( String strSuggestion : listSuggestions )
+        {
+            Map<String, String> doc = new HashMap<>( );
+            doc.put( MARK_TITLE, strSuggestion );
+            listDocs.add( doc );
+        }
+
+        Map<String, Object> docsWrapper = new HashMap<>( );
+        docsWrapper.put( MARK_DOCS, listDocs );
+        Map<String, Object> jsonModel = new HashMap<>( );
+        jsonModel.put( MARK_RESPONSE, docsWrapper );
+
+        try
+        {
+            return responseJSON( JsonUtil.serialize( jsonModel ) );
+        }
+        catch( JsonProcessingException e )
+        {
+            AppLogService.error( e.getMessage( ), e );
+
+            return responseJSON( EMPTY_SUGGEST_JSON );
+        }
     }
 
     /**

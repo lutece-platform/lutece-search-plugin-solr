@@ -497,27 +497,17 @@ ${encoded_facets_queries}
 
 $(function() {
   $('#solr').autocomplete({
+    minLength: 3,
     source: function(request, response) {
-      $.ajax({
-        url: '@base_url@servlet/plugins/SolrSuggest',
-        dataType: 'jsonp',
-minLength: 3,
-data: {
-q: request.term,
-},
-success: function(data) {
-var formattedResponse = $.map(data.response.docs, function (item) {
-return {
-label: item.title,
-value: item.title,
-};
-});
-response( formattedResponse );
-}
-});
-},
-
-});
+      const url = '${fullUrl}?page=search-solr&view=suggest&q=' + encodeURIComponent(request.term);
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          response((data.response.docs || []).map(item => ({ label: item.title, value: item.title })));
+        })
+        .catch(() => response([]));
+    }
+  });
 });
 
 
