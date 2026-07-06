@@ -69,16 +69,15 @@ import fr.paris.lutece.plugins.search.solr.util.SolrConstants;
 import fr.paris.lutece.plugins.search.solr.util.SolrUtil;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
-import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.search.QueryEvent;
-import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
+import fr.paris.lutece.portal.util.mvc.xpage.MVCApplication;
+import fr.paris.lutece.portal.util.mvc.xpage.annotations.Controller;
 import fr.paris.lutece.portal.web.xpages.XPage;
-import fr.paris.lutece.portal.web.xpages.XPageApplication;
 import fr.paris.lutece.util.html.AbstractPaginator;
 import fr.paris.lutece.util.html.DelegatePaginator;
-import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.html.IPaginator;
 import fr.paris.lutece.util.string.StringUtil;
 import fr.paris.lutece.util.url.UrlItem;
@@ -89,7 +88,8 @@ import fr.paris.lutece.util.url.UrlItem;
  */
 @RequestScoped
 @Named( "solr.xpage.search-solr" )
-public class SolrSearchApp implements XPageApplication
+@Controller( xpageName = "search-solr" )
+public class SolrSearchApp extends MVCApplication
 {
 
     private static final long serialVersionUID = -2504409688612219166L;
@@ -114,6 +114,9 @@ public class SolrSearchApp implements XPageApplication
     private static final String PARAMETER_QUERY = "query";
     public static final String PARAMETER_CONF = "conf";
     private static final String PARAMETER_FACET_QUERY = "fq";
+    private static final String VIEW_SEARCH = "search";
+    private static final String VIEW_FRAGMENT = "fragment";
+    private static final String VIEW_JSON = "json";
 
     private static final String PARAMETER_FACET_LABEL = "facetlabel";
     private static final String PARAMETER_FACET_NAME = "facetname";
@@ -163,33 +166,85 @@ public class SolrSearchApp implements XPageApplication
      * @throws SiteMessageException
      *             exception
      */
-    @Override
-    public XPage getPage( HttpServletRequest request, int nMode, Plugin plugin ) throws SiteMessageException
+    /**
+     * Builds the search results page : loads the configuration, computes the model, applies the add-ons and renders the configured template.
+     *
+     * @param request
+     *            The HTTP request.
+     * @return The XPage holding the rendered search results.
+     * @throws SiteMessageException
+     *             exception
+     */
+    private XPage buildResultsPage( HttpServletRequest request ) throws SiteMessageException
     {
-        XPage page = new XPage( );
-
         String strConfCode = request.getParameter( PARAMETER_CONF );
         SolrSearchAppConf conf = SolrSearchAppConfService.loadConfiguration( strConfCode );
         if ( conf == null )
         {
-            // Use default conf if the requested one doesn't exist
             conf = SolrSearchAppConfService.loadConfiguration( null );
         }
 
         Map<String, Object> model = getSearchResultModel( request, conf, _queryEvent );
         for ( String beanName : conf.getAddonBeanNames( ) )
         {
-        	ISolrSearchAppAddOn solrSearchAppAddon = CDI.current( ).select( ISolrSearchAppAddOn.class, NamedLiteral.of( beanName ) ).get( );
+            ISolrSearchAppAddOn solrSearchAppAddon = CDI.current( ).select( ISolrSearchAppAddOn.class, NamedLiteral.of( beanName ) ).get( );
             solrSearchAppAddon.buildPageAddOn( model, request );
         }
 
-        HtmlTemplate template = AppTemplateService.getTemplate( conf.getTemplate( ), request.getLocale( ), model );
-
-        page.setPathLabel( I18nService.getLocalizedString( PROPERTY_PATH_LABEL, request.getLocale( ) ) );
-        page.setTitle( I18nService.getLocalizedString( PROPERTY_PAGE_TITLE, request.getLocale( ) ) );
-        page.setContent( template.getHtml( ) );
+        Locale locale = getLocale( request );
+        XPage page = getXPage( conf.getTemplate( ), locale, model );
+        page.setPathLabel( I18nService.getLocalizedString( PROPERTY_PATH_LABEL, locale ) );
+        page.setTitle( I18nService.getLocalizedString( PROPERTY_PAGE_TITLE, locale ) );
 
         return page;
+    }
+
+    /**
+     * Displays the full search results page, integrated in the portal skin.
+     *
+     * @param request
+     *            The HTTP request.
+     * @return The full search results page.
+     * @throws SiteMessageException
+     *             exception
+     */
+    @View( value = VIEW_SEARCH, defaultView = true )
+    public XPage getSearchPage( HttpServletRequest request ) throws SiteMessageException
+    {
+        return buildResultsPage( request );
+    }
+
+    /**
+     * Displays the search results as a standalone HTML fragment, without the portal header and footer.
+     *
+     * @param request
+     *            The HTTP request.
+     * @return The standalone search results fragment.
+     * @throws SiteMessageException
+     *             exception
+     */
+    @View( VIEW_FRAGMENT )
+    public XPage getSearchFragment( HttpServletRequest request ) throws SiteMessageException
+    {
+        XPage page = buildResultsPage( request );
+        page.setStandalone( true );
+
+        return page;
+    }
+
+    /**
+     * Returns the raw Solr JSON response for the current query, restricted to the whitelisted parameters.
+     *
+     * @param request
+     *            The HTTP request.
+     * @return The raw Solr JSON response.
+     */
+    @View( VIEW_JSON )
+    public XPage getJsonResults( HttpServletRequest request )
+    {
+        String strJson = SolrSearchEngine.getInstance( ).getJsonSearchResults( request.getParameterMap( ) );
+
+        return responseJSON( strJson );
     }
 
     /**

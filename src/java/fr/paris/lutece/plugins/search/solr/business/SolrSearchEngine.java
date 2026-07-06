@@ -235,7 +235,7 @@ public class SolrSearchEngine implements SearchEngine
                 }
                 else
                 {
-                    AppLogService.debug( "SolrSearchServlet : ignoring non whitelisted parameter {}", entry.getKey( ) );
+                    AppLogService.debug( "SolrSearch : ignoring non whitelisted parameter {}", entry.getKey( ) );
                 }
             }
             query.setRequestHandler( SELECT_REQUEST_HANDLER );
