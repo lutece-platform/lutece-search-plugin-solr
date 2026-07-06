@@ -71,7 +71,6 @@ import jakarta.enterprise.inject.spi.CDI;
  */
 public final class SolrIndexerService
 {
-    private static final SolrClient SOLR_SERVER = SolrServerService.getInstance( ).getSolrServer( );
     private static final List<SolrIndexer> INDEXERS = initIndexersList( );
     private static final String PARAM_TYPE_PAGE = "PAGE";
     private static StringBuilder _sbLogs;
@@ -87,6 +86,16 @@ public final class SolrIndexerService
      */
     private SolrIndexerService( )
     {
+    }
+
+    /**
+     * Returns the Solr client, resolving it lazily on first use so that no connection or credential lookup happens at class-load time.
+     *
+     * @return the Solr client
+     */
+    private static SolrClient getSolrServer( )
+    {
+        return SolrServerService.getInstance( ).getSolrServer( );
     }
 
     /**
@@ -120,7 +129,7 @@ public final class SolrIndexerService
             sbLogs.append( " - " );
             sbLogs.append( solrItem.getTitle( ) );
             SolrInputDocument solrInputDocument = solrItem2SolrInputDocument( solrItem );
-            SOLR_SERVER.add( solrInputDocument );
+            getSolrServer( ).add( solrInputDocument );
             sbLogs.append( "\r\n" );
         }
         catch( Exception e )
@@ -157,7 +166,7 @@ public final class SolrIndexerService
         try
         {
             writeNoCommit( solrItem, sbLogs );
-            SOLR_SERVER.commit( );
+            getSolrServer( ).commit( );
         }
         catch( Exception e )
         {
@@ -202,10 +211,10 @@ public final class SolrIndexerService
                 writeNoCommit( solrItem, sbLogs );
                 if ( count % commitSize == 0 )
                 {
-                    SOLR_SERVER.commit( );
+                    getSolrServer( ).commit( );
                 }
             }
-            SOLR_SERVER.commit( );
+            getSolrServer( ).commit( );
         }
         catch( Exception e )
         {
@@ -240,8 +249,8 @@ public final class SolrIndexerService
                 processIncrementalIndexing( strWebappNameEscaped );
             }
 
-            SOLR_SERVER.commit( );
-            SOLR_SERVER.optimize( );
+            getSolrServer( ).commit( );
+            getSolrServer( ).optimize( );
 
             Date end = new Date( );
             _sbLogs.append( "Duration of the treatment : " );
@@ -268,7 +277,7 @@ public final class SolrIndexerService
         _sbLogs.append( "\r\nIndexing all contents ...\r\n" );
 
         // Remove all indexed values of this site
-        SOLR_SERVER.deleteByQuery( SearchItem.FIELD_UID + ":" + strWebappNameEscaped + SolrConstants.CONSTANT_UNDERSCORE + SolrConstants.CONSTANT_WILDCARD );
+        getSolrServer( ).deleteByQuery( SearchItem.FIELD_UID + ":" + strWebappNameEscaped + SolrConstants.CONSTANT_UNDERSCORE + SolrConstants.CONSTANT_WILDCARD );
 
         for ( SolrIndexer solrIndexer : INDEXERS )
         {
@@ -314,7 +323,7 @@ public final class SolrIndexerService
         }
 
         // reindexing all pages.
-        SOLR_SERVER.deleteByQuery( SearchItem.FIELD_TYPE + ":" + PARAM_TYPE_PAGE + " AND " + SearchItem.FIELD_UID + ":" + strWebappNameEscaped
+        getSolrServer( ).deleteByQuery( SearchItem.FIELD_TYPE + ":" + PARAM_TYPE_PAGE + " AND " + SearchItem.FIELD_UID + ":" + strWebappNameEscaped
                 + SolrConstants.CONSTANT_UNDERSCORE + SolrConstants.CONSTANT_WILDCARD );
 
         for ( SolrIndexer indexer : INDEXERS )
@@ -351,14 +360,14 @@ public final class SolrIndexerService
                 if ( action.getIdPortlet( ) != IndexationService.ALL_DOCUMENT )
                 {
                     // delete only the index linked to this portlet
-                    SOLR_SERVER.deleteByQuery(
+                    getSolrServer( ).deleteByQuery(
                             SearchItem.FIELD_DOCUMENT_PORTLET_ID + ":" + action.getIdDocument( ) + "&" + Integer.toString( action.getIdPortlet( ) ) + " AND "
                                     + SearchItem.FIELD_UID + ":" + strWebappNameEscaped + SolrConstants.CONSTANT_UNDERSCORE + SolrConstants.CONSTANT_WILDCARD );
                 }
                 else
                 {
                     // delete all index linked to uid. We get the uid of the resource to prefix it like we do during the indexation
-                    SOLR_SERVER.deleteByQuery( SearchItem.FIELD_UID + ":" + strWebappNameEscaped + SolrConstants.CONSTANT_UNDERSCORE
+                    getSolrServer( ).deleteByQuery( SearchItem.FIELD_UID + ":" + strWebappNameEscaped + SolrConstants.CONSTANT_UNDERSCORE
                             + indexer.getResourceUid( action.getIdDocument( ), action.getTypeResource( ) ) );
                 }
 
@@ -410,8 +419,8 @@ public final class SolrIndexerService
                     _sbLogs.append( "Updating " );
                 }
 
-            SOLR_SERVER.add( solrItem2SolrInputDocument( item ) );
-            SOLR_SERVER.commit( );
+            getSolrServer( ).add( solrItem2SolrInputDocument( item ) );
+            getSolrServer( ).commit( );
 
             _sbLogs.append( item.getType( ) );
             _sbLogs.append( " #" );
@@ -617,9 +626,9 @@ public final class SolrIndexerService
 
         try
         {
-            SOLR_SERVER.deleteByQuery( SolrItem.FIELD_SITE + ":\"" + strSite + "\"" );
-            SOLR_SERVER.commit( );
-            SOLR_SERVER.optimize( );
+            getSolrServer( ).deleteByQuery( SolrItem.FIELD_SITE + ":\"" + strSite + "\"" );
+            getSolrServer( ).commit( );
+            getSolrServer( ).optimize( );
         }
         catch( Exception e )
         {
