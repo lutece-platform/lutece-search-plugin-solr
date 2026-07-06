@@ -534,11 +534,13 @@ public class SolrSearchEngine implements SearchEngine
             facetedResult.setFacetFields( response.getFacetFields( ) );
 
             // Facet intersection (facet tree)
-            NamedList<Object> resp = (NamedList<Object>) response.getResponse( ).get( "facet_counts" );
+            Object facetCountsObject = response.getResponse( ).get( "facet_counts" );
+            NamedList<Object> resp = ( facetCountsObject instanceof NamedList ) ? (NamedList<Object>) facetCountsObject : null;
 
             if ( resp != null )
             {
-                NamedList<NamedList<NamedList<Integer>>> trees = (NamedList<NamedList<NamedList<Integer>>>) resp.get( "trees" );
+                Object treesObject = resp.get( "trees" );
+                NamedList<NamedList<NamedList<Integer>>> trees = ( treesObject instanceof NamedList ) ? (NamedList<NamedList<NamedList<Integer>>>) treesObject : null;
                 Map<String, List<FacetField>> treesResult = new HashMap<>( );
 
                 if ( trees != null )
