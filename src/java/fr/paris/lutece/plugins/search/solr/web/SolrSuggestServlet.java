@@ -43,8 +43,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.SpellCheckResponse.Collation;
 
@@ -101,7 +101,7 @@ public class SolrSuggestServlet extends HttpServlet
 
                 // iterate on each field
                 result.append( "{" );
-                result.append( "\"" ).append( "title" ).append( "\":\"" ).append( StringEscapeUtils.escapeJavaScript( collation ) ).append( "\"" );
+                result.append( "\"" ).append( "title" ).append( "\":\"" ).append( StringEscapeUtils.escapeEcmaScript( collation ) ).append( "\"" );
 
                 if ( ite.hasNext( ) )
                 {
