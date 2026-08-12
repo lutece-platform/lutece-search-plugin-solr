@@ -35,6 +35,9 @@ package fr.paris.lutece.plugins.search.solr.business;
 
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
+
+import java.io.IOException;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.Http2SolrClient;
 
@@ -69,10 +72,10 @@ public final class SolrServerService
 
     /**
      * Return the instance.
-     * 
+     *
      * @return the instance.
      */
-    public static SolrServerService getInstance( )
+    public static synchronized SolrServerService getInstance( )
     {
         if ( _instance == null )
         {
@@ -84,10 +87,10 @@ public final class SolrServerService
 
     /**
      * Returns the SolrServer.
-     * 
+     *
      * @return the SolrServer
      */
-    public SolrClient getSolrServer( )
+    public synchronized SolrClient getSolrServer( )
     {
         if ( _solrServer == null )
         {
@@ -95,6 +98,47 @@ public final class SolrServerService
         }
 
         return _solrServer;
+    }
+
+    /**
+     * Close the SolrClient and release the instance.
+     *
+     * Http2SolrClient owns a Jetty HttpClient with its own thread pool ( threads named h2sc-N-thread-M ). Those threads are not tied to the web application : if
+     * the client is not closed when the context is destroyed, they outlive the undeployment, keep a reference to the stopped classloader and leak it. Repeated
+     * hot redeployments then end in OutOfMemoryError: Metaspace, with Tomcat logging "checkStateForResourceLoading" errors in the meantime.
+     *
+     * Called by SolrShutdownService, which the core runs from AppInitListener.contextDestroyed.
+     */
+    public static synchronized void shutdown( )
+    {
+        if ( _instance != null )
+        {
+            _instance.closeSolrServer( );
+            _instance = null;
+        }
+    }
+
+    /**
+     * Close the underlying SolrClient, if any.
+     */
+    private synchronized void closeSolrServer( )
+    {
+        if ( _solrServer != null )
+        {
+            try
+            {
+                _solrServer.close( );
+                AppLogService.info( "Solr connection closed" );
+            }
+            catch( IOException e )
+            {
+                AppLogService.error( "Unable to close the Solr client", e );
+            }
+            finally
+            {
+                _solrServer = null;
+            }
+        }
     }
 
     /**

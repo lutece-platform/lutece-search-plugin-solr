@@ -14,4 +14,10 @@
     <bean id="solr.solrPageIndexer"
         class="fr.paris.lutece.plugins.search.solr.indexer.SolrPageIndexer" />
 
+    <!-- Closes the Solr client on undeployment, so that the Jetty HTTP/2 client
+         threads do not outlive the web application and leak its classloader.
+         Discovered by ShutdownServiceManager via getBeansOfType( ShutdownService ). -->
+    <bean id="solr.solrShutdownService"
+        class="fr.paris.lutece.plugins.search.solr.service.SolrShutdownService" />
+
 </beans>
