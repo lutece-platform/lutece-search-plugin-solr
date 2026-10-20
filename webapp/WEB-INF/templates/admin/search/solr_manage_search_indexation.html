@@ -41,20 +41,34 @@
         <@p><@icon style='gear'/> #i18n{search.solr.adminFeature.operationInProgress} :</@p>
         <@p><#if command = "del"> #i18n{search.solr.adminFeature.buttonDoDel}<#elseif command = "total">#i18n{portal.search.manage_indexer.buttonDoIndex}<#elseif command = "incremental" >#i18n{portal.search.manage_indexer.buttonDoIncrementalIndex}<#else>${command}</#if> ...</@p>
         <pre>${logs}</pre>
+<@p>
+  <@button type='button' buttonIcon='refresh' title='#i18n{portal.util.labelRefresh}' params={ 'data-solr-action': 'reload' } color='primary' />
+</@p>
+<@checkBox name='solr_auto_refresh' id='solr_auto_refresh' labelKey='#i18n{search.solr.adminFeature.autoRefresh}' value='true' />
     </@pageColumn>
 </@pageContainer>
 <script>
-// Refresh the page every 3s
-var time = new Date().getTime();
-$(document.body).bind("mousemove keypress", function (e) {
-    time = new Date().getTime();
-});
-function refresh() {
-if (new Date().getTime() - time >= 3000)
-    window.location.reload(true);
-else
-    setTimeout(refresh, 3000);
-}
-setTimeout(refresh, 3000);
+// Refresh on demand; the automatic refresh every 3 s is opt-in (WCAG 2.2.2) and remembered for the session
+( function ( ) {
+  var storageKey = 'solr.autoRefresh';
+  var box = document.getElementById( 'solr_auto_refresh' );
+  var timer = null;
+  function stored( ) { try { return sessionStorage.getItem( storageKey ) === 'true'; } catch ( e ) { return false; } }
+  function store( value ) { try { sessionStorage.setItem( storageKey, value ? 'true' : 'false' ); } catch ( e ) { } }
+  function schedule( ) {
+    clearTimeout( timer );
+    if ( box && box.checked ) {
+      timer = setTimeout( function ( ) { window.location.reload( ); }, 3000 );
+    }
+  }
+  if ( box ) {
+    box.checked = stored( );
+    box.addEventListener( 'change', function ( ) { store( box.checked ); schedule( ); } );
+  }
+  document.querySelectorAll( '[data-solr-action="reload"]' ).forEach( function ( button ) {
+    button.addEventListener( 'click', function ( ) { window.location.reload( ); } );
+  } );
+  schedule( );
+} )( );
 </script>
 </#if>
