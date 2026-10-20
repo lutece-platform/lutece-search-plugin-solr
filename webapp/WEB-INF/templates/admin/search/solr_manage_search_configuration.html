@@ -18,9 +18,9 @@
           <@td>${field.label}</@td>
           <@td>${field.description}</@td>
           <@td>
-            <#assign sel1><#if field.enableFacet >true<#else>false</#if></#assign>
+            <#assign sel1 = field.enableFacet>
             <@formGroup>
-                <@checkBox orientation='switch' name='${field.idField}' id='${field.idField}' value="${field.idField}" labelKey='' labelFor='${field.idField}' hideLabel=['all'] checked=sel1?boolean />
+                <@checkBox orientation='switch' name='${field.idField}' id='${field.idField}' value="${field.idField}" labelKey='' labelFor='${field.idField}' hideLabel=['all'] checked=sel1 />
             </@formGroup>
           </@td>
         </@tr>

@@ -1,7 +1,7 @@
 <#setting url_escaping_charset="UTF-8">
 
 <#if conf_user_query??>
-<#assign conf_query = "&conf=${conf_user_query}">
+<#assign conf_query = "&conf=${conf_user_query?url}">
 <#else>
 <#assign conf_query = "">
 </#if>
@@ -51,16 +51,9 @@ ${encoded_facets_queries}
   <script type="text/javascript">
   $(window).on('load', function () {
         var map = L.map('map').setView([48.85632, 2.33272], 12);
-        var points = [
-            <#list points as point>
-            {
-                "type": "${point.type}",
-                "code": "${point.code}",
-                "id": "${point.id}",
-                "geojson": ${point.geojson}
-            }<#if point_has_next>,</#if>
-            </#list>
-        ];
+        var points = Array.prototype.map.call( document.querySelectorAll( '#solr-map-points [data-geojson]' ), function ( el ) {
+            return { "type": el.dataset.type, "code": el.dataset.code, "id": el.dataset.id, "geojson": JSON.parse( el.dataset.geojson ) };
+        });
 
         // create the tile layer with correct attribution
         var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -171,7 +164,8 @@ ${encoded_facets_queries}
                     marker.bindPopup(properties["popupContent"])
                 }
             } else {
-                popupContent = "<p>Loading " + points[i]["type"] + " " + points[i]["id"] + " " + points[i]["code"] + "...</p>";
+                popupContent = document.createElement( 'p' );
+                popupContent.textContent = "Loading " + points[i]["type"] + " " + points[i]["id"] + " " + points[i]["code"] + "...";
                 marker.bindPopup(popupContent)
                 marker.on('click', (function(point) {
                     return function(e) {
@@ -221,7 +215,7 @@ ${encoded_facets_queries}
         <table>
             <tr>
                 <td>
-                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}${conf_query}">#i18n{search.solr.display.result.raffinement.clear}</a>
+                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}${conf_query}">#i18n{search.solr.display.result.raffinement.clear}</a>
                 </td>
             </tr>
         </table>
@@ -252,9 +246,9 @@ ${encoded_facets_queries}
                         <li>
  			<#if sh?has_content >
 							${count.name}(${count.count})
-                            <a  class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}<@EncodeFQ facets_list sh?url />${conf_query}"></a>
+                            <a  class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}<@EncodeFQ facets_list sh?url />${conf_query}"></a>
             <#else>
-                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&facetlabel=${count.name}&facetname=${facet.name}&fq=${facet.name}:${count.name?url}<@EncodeFQ facets_list />${conf_query}">${count.name}(${count.count})</a>
+                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}&facetlabel=${count.name?url}&facetname=${facet.name?url}&fq=${facet.name?url}:${count.name?url}<@EncodeFQ facets_list />${conf_query}">${count.name}(${count.count})</a>
 			</#if>
                         </li>
                         </#list>
@@ -292,9 +286,9 @@ ${encoded_facets_queries}
                                 </#list>
                         <#if sh?has_content >
                                 ${toString}(${count.count})
-                            <a class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}<@EncodeFQ  facets_list sh?url true />${conf_query}"></a>
+                            <a class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}<@EncodeFQ  facets_list sh?url true />${conf_query}"></a>
                         <#else>
-                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&facetlabel=${toString}&facetname=${field.name}&fq=${daterange}<@EncodeFQ  facets_list />${conf_query}">${toString}(${count.count})</a>
+                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}&facetlabel=${toString?url}&facetname=${field.name?url}&fq=${daterange}<@EncodeFQ  facets_list />${conf_query}">${toString}(${count.count})</a>
                         </#if>
                         </li>
                         </#if>
@@ -323,7 +317,7 @@ ${encoded_facets_queries}
             <#-- when there is no result, facet is not null, but facet.values is -->
             <tr>
                 <td>
-                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&fq=${field1}:${facet.name?url}<@EncodeFQ  facets_list/>${conf_query}">${facet.name}</a>
+                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}&fq=${field1?url}:${facet.name?url}<@EncodeFQ  facets_list/>${conf_query}">${facet.name}</a>
                 </td>
             </tr>
             <tr>
@@ -331,7 +325,7 @@ ${encoded_facets_queries}
                     <ul>
                         <#list facet.values as count>
                         <li>
-                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}&query=${query?url}&fq=${field1}:${facet.name?url}&fq=${field2}:${count.name?url}<@EncodeFQ  facets_list/>${conf_query}">${count.name}(${count.count})</a>
+                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}&fq=${field1?url}:${facet.name?url}&fq=${field2?url}:${count.name?url}<@EncodeFQ  facets_list/>${conf_query}">${count.name}(${count.count})</a>
                         </li>
                         </#list>
                     </ul>
@@ -355,12 +349,12 @@ ${encoded_facets_queries}
             <#if field.enableSort>
             <tr>
                 <td>
-                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&query=${query?url}<@EncodeFQ  facets_list />&sort_name=${field.solrName}&sort_order=desc${conf_query}">${field.label} desc</a>
+                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&query=${query?url}<@EncodeFQ  facets_list />&sort_name=${field.solrName?url}&sort_order=desc${conf_query}">${field.label} desc</a>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&query=${query?url}<@EncodeFQ  facets_list />&sort_name=${field.solrName}&sort_order=asc${conf_query}">${field.label} asc</a>
+                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&query=${query?url}<@EncodeFQ  facets_list />&sort_name=${field.solrName?url}&sort_order=asc${conf_query}">${field.label} asc</a>
                 </td>
             </tr>
             </#if>
@@ -399,6 +393,11 @@ ${encoded_facets_queries}
 	    </div>
         <#if conf.extraMappingQuery>
         <div id="map" style="height: 400px; width: 100%"></div>
+        <div id="solr-map-points" hidden>
+        <#list points! as point>
+            <span data-type="${point.type}" data-code="${point.code}" data-id="${point.id}" data-geojson="${point.geojson}"></span>
+        </#list>
+        </div>
         </#if>
             <div>
                 <#-- Number of documents per page selector -->
@@ -438,15 +437,15 @@ ${encoded_facets_queries}
             <div>
                 <#list results_list as result>
                 <div id="item" >
-                    <!-- <img src="document?id=${result.id}&id_attribute=79" style="float:left; margin-right:12px"/> -->
-                    <div style="font-weight:bold; font-size:1.2em"><a href="${result.url}&terms=${query?url}&items_per_page=${nb_items_per_page}&sort_name=${sort_name!}&sort_order=${sort_order!}<@EncodeFQ  facets_list />">${result.title}</a></div>
+                    <#-- <img src="document?id=${result.id}&id_attribute=79" style="float:left; margin-right:12px"/> -->
+                    <div style="font-weight:bold; font-size:1.2em"><a href="${safeUrl(result.url)}&terms=${query?url}&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}<@EncodeFQ  facets_list />">${result.title}</a></div>
 
-                    <#if result.summary??>${(result.highlight.map["summary"][0])!result.summary}</#if>
+                    <#if result.summary??>${(result.highlight.markupMap["summary"][0])!result.summary}</#if>
                     <#if result.highlight??>
                     <#-- get a extract from the "content" field where there is one (or more) of the searched words -->
-                    <#if result.highlight.map["content"]??>
+                    <#if result.highlight.markupMap["content"]??>
                     #i18n{search.solr.display.result.summary.extract} : 
-                    <#list result.highlight.map["content"] as extrait>
+                    <#list result.highlight.markupMap["content"] as extrait>
                     ${extrait}
                     </#list>
                     </#if>
@@ -499,7 +498,7 @@ $(function() {
   $('#solr').autocomplete({
     minLength: 3,
     source: function(request, response) {
-      const url = '${fullUrl}?page=search-solr&view=suggest&q=' + encodeURIComponent(request.term);
+      const url = '${fullUrl?js_string?no_esc}?page=search-solr&view=suggest&q=' + encodeURIComponent(request.term);
       fetch(url)
         .then(res => res.json())
         .then(data => {
