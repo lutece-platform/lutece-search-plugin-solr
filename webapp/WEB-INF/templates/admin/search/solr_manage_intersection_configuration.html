@@ -1,7 +1,8 @@
 <@row>
 	<@columns>
 		<@box>
-		  <@boxHeader title='#i18n{search.solr.adminFeature.configuration.intersection.title} <small>#i18n{search.solr.adminFeature.configuration.intersection.description}</small>' />
+		  <#assign title>#i18n{search.solr.adminFeature.configuration.intersection.title} <small>#i18n{search.solr.adminFeature.configuration.intersection.description}</small></#assign>
+		  <@boxHeader title=title />
 			<@boxBody>
       <@table>
           <@tr>
@@ -17,7 +18,7 @@
               <@td>${intersect.field1.label}</@td>
               <@td>${intersect.field2.label}</@td>
               <@td>
-                <@button color='danger' type='submit' params='value="Delete" name="delete"'>
+                <@button color='danger' type='submit' value="Delete" name="delete">
                   <@icon style='trash' />
                 </@button>
               </@td>
@@ -41,7 +42,7 @@
               </@select>
             </@td>
             <@td>
-              <@button type='submit' buttonIcon='plus' params='name="add"' />
+              <@button type='submit' buttonIcon='plus' name="add" />
             </@td>
             </@tform>
         </@tr>
