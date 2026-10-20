@@ -3,7 +3,7 @@
 <@pageContainer>
   <@pageColumn>
 	  <@pageHeader title=title />
-		<@tform method='get' name='doFields' action='jsp/admin/search/solr/ManageSolrFields.jsp' params='enctype="text/plain" accept-charset="ISO-8859-1"'>
+		<@tform method='get' name='doFields' action='jsp/admin/search/solr/ManageSolrFields.jsp' enctype="text/plain" params={"accept-charset": "ISO-8859-1"}>
       <@input type='hidden' name='id' value='${field.idField}'/>
       <@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.name}' labelFor='name' mandatory=true>
         <@input type='text' id='name' name='name' maxlength=255 value=field.name />
@@ -28,27 +28,27 @@
         <@input type='text' id='description' name='description' maxlength=255 value=field.description/>
       </@formGroup>
       <@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.facet.mincount}' labelFor='facetMincount'>
-        <#assign selMincount1><#if field.facetMincount=1>true<#else>false</#if></#assign>
-        <#assign selMincount2><#if field.facetMincount=0>true<#else>false</#if></#assign>
+        <#assign selMincount1 = field.facetMincount == 1>
+        <#assign selMincount2 = field.facetMincount == 0>
         <@row>
           <@columns sm=2>
             <@select id='facetMincount' name='facetMincount'>
-              <@option label='#i18n{search.solr.adminFeature.fields.form.facet.mincount.onHere}' value='1' selected=selMincount1?boolean />
-              <@option label='#i18n{search.solr.adminFeature.fields.form.facet.mincount.allways}' value='0' selected=selMincount2?boolean />
+              <@option label='#i18n{search.solr.adminFeature.fields.form.facet.mincount.onHere}' value='1' selected=selMincount1 />
+              <@option label='#i18n{search.solr.adminFeature.fields.form.facet.mincount.allways}' value='0' selected=selMincount2 />
             </@select>
           </@columns>
         </@row>
       </@formGroup>
       <@formGroup labelKey='#i18n{search.solr.adminFeature.fields.form.facet.operator}' labelFor='operator'>
-        <#assign sel1><#if field.operator?upper_case=='OR'>true<#else>false</#if></#assign>
-        <#assign sel2><#if field.operator?upper_case=='SWITCH'>true<#else>false</#if></#assign>
-        <#assign sel3><#if field.operator?upper_case=='AND'>true<#else>false</#if></#assign>
+        <#assign sel1 = field.operator?upper_case == 'OR'>
+        <#assign sel2 = field.operator?upper_case == 'SWITCH'>
+        <#assign sel3 = field.operator?upper_case == 'AND'>
         <@row>
           <@columns sm=2>
             <@select id='operator' name='operator'>
-              <@option value='OR' selected=sel1?boolean label='#i18n{search.solr.adminFeature.fields.form.facet.or}' />
-              <@option value='SWITCH' selected=sel2?boolean label='#i18n{search.solr.adminFeature.fields.form.facet.switch}' />
-              <@option value='AND' selected=sel3?boolean label='#i18n{search.solr.adminFeature.fields.form.facet.and}' disabled=true />
+              <@option value='OR' selected=sel1 label='#i18n{search.solr.adminFeature.fields.form.facet.or}' />
+              <@option value='SWITCH' selected=sel2 label='#i18n{search.solr.adminFeature.fields.form.facet.switch}' />
+              <@option value='AND' selected=sel3 label='#i18n{search.solr.adminFeature.fields.form.facet.and}' disabled=true />
             </@select>
           </@columns>
         </@row>
