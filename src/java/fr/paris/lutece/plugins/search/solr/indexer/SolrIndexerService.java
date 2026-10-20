@@ -78,7 +78,7 @@ public final class SolrIndexerService
     private static final String PROPERTY_PROD_URL = "lutece.prod.url";
     private static final String PROPERTY_BASE_URL = "lutece.base.url";
     private static final String LOG_ERROR = " - ERROR : ";
-    private static final String LOG_CLOSE_STRONG = "</strong>\r\n";
+    private static final String LOG_END_OF_LINE = "\r\n";
     private static final String PROPERTY_COMMIT_SIZE = "solr.indexer.commit.size";
 
     /**
@@ -283,11 +283,11 @@ public final class SolrIndexerService
         {
             if ( solrIndexer.isEnable( ) )
             {
-                _sbLogs.append( "\r\n<strong>Indexer : " );
+                _sbLogs.append( "\r\nIndexer : " );
                 _sbLogs.append( solrIndexer.getName( ) );
                 _sbLogs.append( " - " );
                 _sbLogs.append( solrIndexer.getDescription( ) );
-                _sbLogs.append( LOG_CLOSE_STRONG );
+                _sbLogs.append( LOG_END_OF_LINE );
 
                 // the indexer will call write(doc)
                 List<String> lstErrors = solrIndexer.indexDocuments( );
@@ -296,9 +296,9 @@ public final class SolrIndexerService
                 {
                     for ( String strError : lstErrors )
                     {
-                        _sbLogs.append( "<strong>ERROR : " );
+                        _sbLogs.append( "ERROR : " );
                         _sbLogs.append( strError );
-                        _sbLogs.append( LOG_CLOSE_STRONG );
+                        _sbLogs.append( LOG_END_OF_LINE );
                     }
                 }
             }
@@ -350,7 +350,7 @@ public final class SolrIndexerService
             {
                 _sbLogs.append( LOG_ERROR );
                 _sbLogs.append( " No indexer found for the resource name : " ).append( action.getTypeResource( ) );
-                _sbLogs.append( LOG_CLOSE_STRONG );
+                _sbLogs.append( LOG_END_OF_LINE );
 
                 return;
             }
@@ -394,13 +394,13 @@ public final class SolrIndexerService
         }
         catch( Exception e )
         {
-            _sbLogs.append( "\r\n<strong>Action from indexer : " );
+            _sbLogs.append( "\r\nAction from indexer : " );
             _sbLogs.append( action.getIndexerName( ) );
             _sbLogs.append( " Action ID : " ).append( action.getIdAction( ) ).append( " - Document ID : " ).append( action.getIdDocument( ) );
             _sbLogs.append( LOG_ERROR );
             _sbLogs.append( e.getMessage( ) )
                     .append( ( e.getCause( ) != null ) ? ( " : " + e.getCause( ).getMessage( ) ) : SolrConstants.CONSTANT_EMPTY_STRING );
-            _sbLogs.append( LOG_CLOSE_STRONG );
+            _sbLogs.append( LOG_END_OF_LINE );
         }
     }
 
@@ -492,7 +492,7 @@ public final class SolrIndexerService
             sbLogs.append( exception.getCause( ).getMessage( ) );
         }
 
-        sbLogs.append( LOG_CLOSE_STRONG );
+        sbLogs.append( LOG_END_OF_LINE );
         AppLogService.error( exception.getMessage( ), exception );
     }
 
