@@ -9,7 +9,7 @@
         <@tr>
           <@th>#i18n{search.solr.adminFeature.fields.form.label}</@th>
           <@th>#i18n{search.solr.adminFeature.fields.form.description}</@th>
-          <@th></@th>
+          <@th>#i18n{search.solr.adminFeature.fields.form.facet}</@th>
         </@tr>
         <@tableHeadBodySeparator />
         <#list field_list as field>
@@ -20,7 +20,7 @@
           <@td>
             <#assign sel1 = field.enableFacet>
             <@formGroup>
-                <@checkBox orientation='switch' name='${field.idField}' id='${field.idField}' value="${field.idField}" labelKey='' labelFor='${field.idField}' hideLabel=['all'] checked=sel1 />
+                <@checkBox orientation='switch' name='${field.idField}' id='${field.idField}' value="${field.idField}" labelKey=i18n( 'search.solr.adminFeature.configuration.facet.enable', field.label ) labelClass='visually-hidden' checked=sel1 />
             </@formGroup>
           </@td>
         </@tr>
