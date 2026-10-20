@@ -212,13 +212,9 @@ ${encoded_facets_queries}
 
     <#-- Historique -->
     <div id="histoique" class="portlet -lutece-border-radius append-bottom">
-        <table>
-            <tr>
-                <td>
-                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}${conf_query}">#i18n{search.solr.display.result.raffinement.clear}</a>
-                </td>
-            </tr>
-        </table>
+        <p>
+            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}${conf_query}">#i18n{search.solr.display.result.raffinement.clear}</a>
+        </p>
     </div>
 
     <#-- facet refining -->
@@ -228,34 +224,25 @@ ${encoded_facets_queries}
         <#list facets as facet>
         <#if facet.values?? >
         <#-- when there is no result, facet is not null, but facet.values is -->
-        <table>
-            <th>
-                ${solr_fields[facet.name].label} 
-            </th>
-            <tr>
-                <td>
-                    <ul>
-                        <#list facet.values as count>
-				<#assign sh = "">
-            			<#list historique as fh>
-					<#if fh.name = facet.name+":"+count.name>
-						<#assign sh = facet.name+":"+count.name>
-					</#if>
-            			</#list>
-
-                        <li>
- 			<#if sh?has_content >
-							${count.name}(${count.count})
-                            <a  class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}<@EncodeFQ facets_list sh?url />${conf_query}"></a>
+        <h2 class="h6">${solr_fields[facet.name].label}</h2>
+        <ul>
+            <#list facet.values as count>
+            <#assign sh = "">
+            <#list historique as fh>
+                <#if fh.name = facet.name+":"+count.name>
+                    <#assign sh = facet.name+":"+count.name>
+                </#if>
+            </#list>
+            <li>
+            <#if sh?has_content >
+                ${count.name}(${count.count})
+                <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}<@EncodeFQ facets_list sh?url />${conf_query}"><span aria-hidden="true">&times;</span><span class="visually-hidden">${i18n('search.solr.display.result.removeFilter', count.name)}</span></a>
             <#else>
-                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}&facetlabel=${count.name?url}&facetname=${facet.name?url}&fq=${facet.name?url}:${count.name?url}<@EncodeFQ facets_list />${conf_query}">${count.name}(${count.count})</a>
-			</#if>
-                        </li>
-                        </#list>
-                    </ul>
-                </td>
-            </tr>
-        </table>
+                <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}&facetlabel=${count.name?url}&facetname=${facet.name?url}&fq=${facet.name?url}:${count.name?url}<@EncodeFQ facets_list />${conf_query}">${count.name}(${count.count})</a>
+            </#if>
+            </li>
+            </#list>
+        </ul>
         </#if>
         </#list>
         </#if>
@@ -265,75 +252,59 @@ ${encoded_facets_queries}
         <#list facets_date as field>
         <#if field.counts??>
         <#-- when there is no result, facet is not null, but facet.counts is -->
-        <table>
-            <th>
-                ${solr_fields[field.name].label}
-            </th>
-            <tr>
-                <td>
-                    <ul>
-                        <#list field.counts as count>
-                        <#if count.count != 0>
-                        <li>
-                            <#assign toDate = "${count.value}"?datetime("yyyy-MM-dd'T'HH:mm:ss'Z'")>
-                            <#assign daterange = "${field.name}:[${count.value} TO ${count.value}${facetDateGap}]"?url>
-                            <#assign toString = "${toDate?string('yyyy')}">
-                                <#assign sh = "">
-                                <#list historique as fh>
-                                        <#if fh.name?url = daterange>
-                                                <#assign sh = daterange>
-                                        </#if>
-                                </#list>
-                        <#if sh?has_content >
-                                ${toString}(${count.count})
-                            <a class="glyphicon glyphicon-remove" href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}<@EncodeFQ  facets_list sh?url true />${conf_query}"></a>
-                        <#else>
-                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}&facetlabel=${toString?url}&facetname=${field.name?url}&fq=${daterange}<@EncodeFQ  facets_list />${conf_query}">${toString}(${count.count})</a>
-                        </#if>
-                        </li>
-                        </#if>
-                        </#list>
-                    </ul>
-                </td>
-            </tr>
-        </table>
+        <h2 class="h6">${solr_fields[field.name].label}</h2>
+        <ul>
+            <#list field.counts as count>
+            <#if count.count != 0>
+            <li>
+                <#assign toDate = "${count.value}"?datetime("yyyy-MM-dd'T'HH:mm:ss'Z'")>
+                <#assign daterange = "${field.name}:[${count.value} TO ${count.value}${facetDateGap}]"?url>
+                <#assign toString = "${toDate?string('yyyy')}">
+                <#assign sh = "">
+                <#list historique as fh>
+                    <#if fh.name?url = daterange>
+                        <#assign sh = daterange>
+                    </#if>
+                </#list>
+            <#if sh?has_content >
+                ${toString}(${count.count})
+                <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}<@EncodeFQ  facets_list sh?url true />${conf_query}"><span aria-hidden="true">&times;</span><span class="visually-hidden">${i18n('search.solr.display.result.removeFilter', toString)}</span></a>
+            <#else>
+                <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}&facetlabel=${toString?url}&facetname=${field.name?url}&fq=${daterange}<@EncodeFQ  facets_list />${conf_query}">${toString}(${count.count})</a>
+            </#if>
+            </li>
+            </#if>
+            </#list>
+        </ul>
         </#if>
         </#list>
-        </#if>	
+        </#if>
     </div>
 
     <#-- facets Intersection -->
     <#if facet_tree??>
     <div id="intersection" class="portlet -lutece-border-radius append-bottom">
         <#list facet_tree?keys as key>
-        <table>
-            <th>
-                <#assign field1= "${key}"?split(",")[0] >
-                <#assign field2= "${key}"?split(",")[1] >
-                ${solr_fields[field1].label} / ${solr_fields[field2].label}
-            </th>
+        <#assign field1= "${key}"?split(",")[0] >
+        <#assign field2= "${key}"?split(",")[1] >
+        <h2 class="h6">${solr_fields[field1].label} / ${solr_fields[field2].label}</h2>
+        <ul>
             <#list facet_tree[key] as facet>
             <#if facet.values??>
             <#-- when there is no result, facet is not null, but facet.values is -->
-            <tr>
-                <td>
-                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}&fq=${field1?url}:${facet.name?url}<@EncodeFQ  facets_list/>${conf_query}">${facet.name}</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <ul>
-                        <#list facet.values as count>
-                        <li>
-                            <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}&fq=${field1?url}:${facet.name?url}&fq=${field2?url}:${count.name?url}<@EncodeFQ  facets_list/>${conf_query}">${count.name}(${count.count})</a>
-                        </li>
-                        </#list>
-                    </ul>
-                </td>
-            </tr>
+            <li>
+                <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}&fq=${field1?url}:${facet.name?url}<@EncodeFQ  facets_list/>${conf_query}">${facet.name}</a>
+                <ul>
+                    <#list facet.values as count>
+                    <li>
+                        <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}&query=${query?url}&fq=${field1?url}:${facet.name?url}&fq=${field2?url}:${count.name?url}<@EncodeFQ  facets_list/>${conf_query}">${count.name}(${count.count})</a>
+                    </li>
+                    </#list>
+                </ul>
+            </li>
             </#if>
             </#list>
-        </table>
+        </ul>
         </#list>
     </div>
     </#if>
@@ -341,25 +312,19 @@ ${encoded_facets_queries}
     <#-- sort order -->
     <#if sort_list??>
     <div id="tri" class="portlet -lutece-border-radius append-bottom">
-        <table>
-            <th>
-                #i18n{search.solr.display.result.sort}
-            </th>
+        <h2 class="h6">#i18n{search.solr.display.result.sort}</h2>
+        <ul>
             <#list sort_list as field>
             <#if field.enableSort>
-            <tr>
-                <td>
-                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&query=${query?url}<@EncodeFQ  facets_list />&sort_name=${field.solrName?url}&sort_order=desc${conf_query}">${field.label} desc</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&query=${query?url}<@EncodeFQ  facets_list />&sort_name=${field.solrName?url}&sort_order=asc${conf_query}">${field.label} asc</a>
-                </td>
-            </tr>
+            <li>
+                <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&query=${query?url}<@EncodeFQ  facets_list />&sort_name=${field.solrName?url}&sort_order=desc${conf_query}">${i18n('search.solr.display.result.sort.desc', field.label)}</a>
+            </li>
+            <li>
+                <a href="${fullUrl}?page=search-solr&items_per_page=${nb_items_per_page}&query=${query?url}<@EncodeFQ  facets_list />&sort_name=${field.solrName?url}&sort_order=asc${conf_query}">${i18n('search.solr.display.result.sort.asc', field.label)}</a>
+            </li>
             </#if>
             </#list>
-        </table>
+        </ul>
     </div>
     </#if>
 </div>
@@ -385,14 +350,15 @@ ${encoded_facets_queries}
 
 		    </div>
 		    <div style="text-align:center;">
-		        <input type="text" name="query" size="35" value="${query?if_exists}" id="solr" /> 
+		        <label for="solr_query" class="visually-hidden">#i18n{search.solr.display.result.labelQuery}</label>
+		        <input type="text" name="query" size="35" value="${query?if_exists}" id="solr_query" class="js-solr-autocomplete" /> 
 			<span>
 		        	<input type="submit" value="#i18n{portal.search.search_results.buttonSearch}" />
 			</span>
 		    </div>
 	    </div>
         <#if conf.extraMappingQuery>
-        <div id="map" style="height: 400px; width: 100%"></div>
+        <div id="map" style="height: 400px; width: 100%" role="region" aria-label="#i18n{search.solr.display.result.map}"></div>
         <div id="solr-map-points" hidden>
         <#list points! as point>
             <span data-type="${point.type}" data-code="${point.code}" data-id="${point.id}" data-geojson="${point.geojson}"></span>
@@ -401,13 +367,13 @@ ${encoded_facets_queries}
         </#if>
             <div>
                 <#-- Number of documents per page selector -->
-                #i18n{portal.search.search_results.labelNbDocsPerPage}: 
+                <label for="solr_items_per_page">#i18n{portal.search.search_results.labelNbDocsPerPage}</label>
                 <@NbItemsPerPageSelectorCombo nb_items_per_page?string />
             </div>
         </form>
     </div>
     <div id="resultList2" class="portlet -lutece-border-radius">
-        <legend>#i18n{portal.search.search_results.title}</legend>
+        <h2>#i18n{portal.search.search_results.title}</h2>
         <#if error?has_content>
         <div class="error">${error}</div>
         </#if>
@@ -436,7 +402,7 @@ ${encoded_facets_queries}
         <div id="resultItems" class="">
             <div>
                 <#list results_list as result>
-                <div id="item" >
+                <div class="solr-result-item">
                     <#-- <img src="document?id=${result.id}&id_attribute=79" style="float:left; margin-right:12px"/> -->
                     <div style="font-weight:bold; font-size:1.2em"><a href="${safeUrl(result.url)}&terms=${query?url}&items_per_page=${nb_items_per_page}&sort_name=${(sort_name!)?url}&sort_order=${(sort_order!)?url}<@EncodeFQ  facets_list />">${result.title}</a></div>
 
@@ -465,7 +431,7 @@ ${encoded_facets_queries}
 
 <#-- Number of items per page selector - Combo Box implementation -->
 <#macro NbItemsPerPageSelectorCombo nb_items_per_page>
-<select name="items_per_page">
+<select name="items_per_page" id="solr_items_per_page">
     <#list [ "10" , "20" , "50" , "100" ] as nb>
     <#if nb_items_per_page = nb >
     <option selected="selected" value="${nb}">${nb}</option>
@@ -495,7 +461,7 @@ ${encoded_facets_queries}
 <script>
 
 $(function() {
-  $('#solr').autocomplete({
+  $('.js-solr-autocomplete').autocomplete({
     minLength: 3,
     source: function(request, response) {
       const url = '${fullUrl?js_string?no_esc}?page=search-solr&view=suggest&q=' + encodeURIComponent(request.term);

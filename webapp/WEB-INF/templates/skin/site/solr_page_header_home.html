@@ -7,7 +7,8 @@
 		<form action="jsp/site/Portal.jsp" method="post">
 			<div class="hide"><input type="hidden" name="page" value="search" /></div>
 			<div>
-				<input class="-lutece-input -lutece-border-radius-mini" type="text" name="query" value="" id="solr"/>
+				<label for="solr" class="visually-hidden">#i18n{search.solr.display.result.labelQuery}</label>
+				<input class="-lutece-input -lutece-border-radius-mini js-solr-autocomplete" type="text" name="query" value="" id="solr"/>
 				<input id="buttonSubmit" class="-lutece-input -lutece-border-radius-mini" type="submit" value="#i18n{portal.site.page_menu_tools.labelSearch}" />
 			</div> 
 		</form>

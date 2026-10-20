@@ -26,7 +26,7 @@
         <@tr>
           <@td>${field.name}</@td>
           <@td>${field.label}</@td>
-          <@td>${field.isFacet?string}</@td>
+          <@td><#if field.isFacet>#i18n{portal.util.labelYes}<#else>#i18n{portal.util.labelNo}</#if></@td>
           <@td>
             <#if field.facetMincount==0>
               #i18n{search.solr.adminFeature.fields.form.facet.mincount.allways}
@@ -35,14 +35,14 @@
             </#if>
           </@td>
           <@td>${field.operator!}</@td>
-          <@td>${field.isSort?string}</@td>
+          <@td><#if field.isSort>#i18n{portal.util.labelYes}<#else>#i18n{portal.util.labelNo}</#if></@td>
           <@td>${field.weight}</@td>
           <@td>${field.description}</@td>
           <@td>
             <@tform type='inline' name='doFields' action='jsp/admin/search/solr/ManageSolrFields.jsp'>
               <@input type='hidden' value='${field.idField}' name='id' />
-              <@aButton href='jsp/admin/search/solr/SolrCreateUpdateFields.jsp?id=${field.idField}&update=update' buttonIcon='pencil' title='#i18n{portal.util.labelModify}' hideTitle=['all'] />
-              <@button type='submit' buttonIcon='trash' title='#i18n{portal.util.labelDelete}' color='danger' name="delete" hideTitle=['all'] />
+              <@aButton href='jsp/admin/search/solr/SolrCreateUpdateFields.jsp?id=${field.idField}&update=update' buttonIcon='pencil' title=i18n( 'portal.util.labelModify' ) + ' ' + field.label!field.name hideTitle=['all'] />
+              <@button type='submit' buttonIcon='trash' title=i18n( 'portal.util.labelDelete' ) + ' ' + field.label!field.name color='danger' name="delete" hideTitle=['all'] />
             </@tform>
           </@td>
         </@tr>

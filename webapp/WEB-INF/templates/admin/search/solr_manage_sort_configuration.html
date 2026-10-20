@@ -9,8 +9,8 @@
           <@tr>
             <@th>#i18n{search.solr.adminFeature.fields.form.label}</@th>
             <@th>#i18n{search.solr.adminFeature.fields.form.description}</@th>
-            <@th></@th>
-            <@th></@th>
+            <@th>#i18n{search.solr.adminFeature.fields.form.sort}</@th>
+            <@th>#i18n{search.solr.adminFeature.configuration.sort.default}</@th>
           </@tr>
           <@tableHeadBodySeparator />
           <#list field_list as field>
@@ -21,14 +21,14 @@
               <@td>
                 <#assign sel1 = field.enableSort>
                 <@formGroup>
-                    <@checkBox orientation='switch' name='${field.idField}' value="${field.idField}" id='${field.idField}' labelKey='' labelFor='${field.idField}' hideLabel=['all'] checked=sel1 />
+                    <@checkBox orientation='switch' name='${field.idField}' value="${field.idField}" id='${field.idField}' labelKey=i18n( 'search.solr.adminFeature.configuration.sort.enable', field.label ) labelClass='visually-hidden' checked=sel1 />
                 </@formGroup>
               </@td>
               <@td>
                 <#assign sel1 = field.defaultSort>
                 <@formGroup>
                     <#-- Par defaut bouton radio !! <input name="default_sort" class="radio" type="radio" value="${field.idField}" <#if field.defaultSort>checked="checked"</#if>> -->
-                    <@checkBox orientation='switch' name='default_sort' value="${field.idField}" id='${field.idField}' labelKey='' labelFor='${field.idField}' hideLabel=['all'] checked=sel1 />
+                    <@checkBox orientation='switch' name='default_sort' value="${field.idField}" id='default_sort_${field.idField}' labelKey=i18n( 'search.solr.adminFeature.configuration.sort.defaultField', field.label ) labelClass='visually-hidden' checked=sel1 />
                 </@formGroup>
               </@td>
             </@tr>
