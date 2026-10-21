@@ -72,6 +72,7 @@ public class SolrConfigurationJspBean extends PluginAdminPageJspBean
     private static final String MARK_INTERSECTION = "intersections";
     private static final String MESSAGE_VALID = "search.solr.adminFeature.configuration.valid";
     private static final String PARAMETER_DEFAULT_SORT = "default_sort";
+    private static final String JSP_MANAGE_SEARCH_CONFIGURATION = "jsp/admin/search/solr/ManageSearchConfiguration.jsp?plugin_name=solr";
 
     @Inject
     private Models model;
@@ -169,11 +170,23 @@ public class SolrConfigurationJspBean extends PluginAdminPageJspBean
 
         SolrFieldManager.reloadIntersection( );
 
-        return AppPathService.getBaseUrl( request ) + "jsp/admin/search/solr/ManageSearchConfiguration.jsp?plugin_name=solr";
+        return getJspManageSearchConfiguration( request );
     }
 
     private String validMessage( HttpServletRequest request )
     {
-        return AdminMessageService.getMessageUrl( request, MESSAGE_VALID, AdminMessage.TYPE_INFO );
+        return AdminMessageService.getMessageUrlReturningTo( request, MESSAGE_VALID, AdminMessage.TYPE_INFO, getJspManageSearchConfiguration( request ) );
+    }
+
+    /**
+     * Return the URL of the JSP manage search configuration
+     * 
+     * @param request
+     *            the request
+     * @return the URL of the JSP manage search configuration
+     */
+    private String getJspManageSearchConfiguration( HttpServletRequest request )
+    {
+        return AppPathService.getBaseUrl( request ) + JSP_MANAGE_SEARCH_CONFIGURATION;
     }
 }
