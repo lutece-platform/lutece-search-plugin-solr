@@ -12,3 +12,9 @@ INSERT INTO core_user_right VALUES ('SOLR_INDEX_MANAGEMENT',2);
 INSERT INTO core_user_right VALUES ('SOLR_CONFIGURATION_MANAGEMENT',2);
 INSERT INTO core_user_right VALUES ('SOLR_FIELDS_MANAGEMENT',1);
 INSERT INTO core_user_right VALUES ('SOLR_FIELDS_MANAGEMENT',2);
+
+-- changeset solr:init_core_solr.sql-rev1
+-- preconditions onFail:MARK_RAN onError:WARN
+-- The admin user of the core (id 1) gets the feature of the plugin on a fresh install (rights are never granted by an upgrade script)
+DELETE FROM core_user_right WHERE id_right = 'SOLR_CONFIGURATION_MANAGEMENT' AND id_user = 1;
+INSERT INTO core_user_right (id_right,id_user) VALUES ('SOLR_CONFIGURATION_MANAGEMENT',1);
