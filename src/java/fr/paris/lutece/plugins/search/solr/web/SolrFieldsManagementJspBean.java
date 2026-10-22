@@ -41,6 +41,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 import fr.paris.lutece.plugins.search.solr.business.field.Field;
 import fr.paris.lutece.plugins.search.solr.business.field.FieldHome;
 import fr.paris.lutece.plugins.search.solr.business.field.SolrFieldManager;
@@ -68,6 +70,7 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
     private static final String TEMPLATE_SOLR_FIELDS_FORM = "admin/search/solr_manage_fields_form.html";
     private static final String MARK_FIELD = "field_list";
     private static final String UTF_8 = "UTF-8";
+    private static final String PARAMETER_WEIGHT = "weight";
 
     @Inject
     private Models model;
@@ -184,7 +187,7 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
 
         field.setIsFacet( request.getParameter( "isfacet" ) != null );
         field.setIsSort( request.getParameter( "issort" ) != null );
-        field.setWeight( Double.parseDouble( request.getParameter( "weight" ) ) );
+        field.setWeight( getWeight( request, field.getWeight( ) ) );
         field.setFacetMincount( Integer.parseInt( request.getParameter( "facetMincount" ) ) );
         field.setOperator( request.getParameter( "operator" ) );
         FieldHome.update( field );
@@ -213,12 +216,26 @@ public class SolrFieldsManagementJspBean extends PluginAdminPageJspBean
         field.setIsSort( request.getParameter( "issort" ) != null );
         field.setEnableSort( false );
         field.setDefaultSort( false );
-        field.setWeight( Double.parseDouble( request.getParameter( "weight" ) ) );
+        field.setWeight( getWeight( request, field.getWeight( ) ) );
         field.setFacetMincount( Integer.parseInt( request.getParameter( "facetMincount" ) ) );
 
         FieldHome.create( field );
         SolrFieldManager.reloadField( );
 
         return getPage( request );
+    }
+
+    /**
+     * Reads the weight of a field from the request: an empty or invalid value keeps the given weight instead of failing with an error page
+     *
+     * @param request
+     *            the http request
+     * @param dDefaultWeight
+     *            the weight kept when the request gives no valid weight
+     * @return the weight
+     */
+    static double getWeight( HttpServletRequest request, double dDefaultWeight )
+    {
+        return NumberUtils.toDouble( request.getParameter( PARAMETER_WEIGHT ), dDefaultWeight );
     }
 }
