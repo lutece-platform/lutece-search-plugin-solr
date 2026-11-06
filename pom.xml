@@ -10,7 +10,7 @@
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>plugin-solr</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>5.0.2-SNAPSHOT</version>
+    <version>5.0.2-beta-01</version>
     <name>Lutece solr search plugin</name>
 
     <repositories>
