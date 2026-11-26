@@ -58,6 +58,7 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.SpellCheckResponse;
 import org.apache.solr.client.solrj.response.SpellCheckResponse.Collation;
+import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 
@@ -200,7 +201,7 @@ public class SolrSearchEngine implements SearchEngine
                 SolrDocumentList documentList = response.getResults( );
                 results = SolrUtil.transformSolrDocumentList( documentList );
             }
-            catch( SolrServerException | IOException e )
+            catch( SolrServerException | IOException | SolrException e )
             {
                 AppLogService.error( e.getMessage( ), e );
             }
@@ -255,7 +256,7 @@ public class SolrSearchEngine implements SearchEngine
                 NamedList<Object> resp = solrServer.request( req );
                 return (String) resp.get( "response" );
             }
-            catch( SolrServerException | IOException e )
+            catch( SolrServerException | IOException | SolrException e )
             {
                 AppLogService.error( e.getMessage( ), e );
             }
@@ -576,7 +577,7 @@ public class SolrSearchEngine implements SearchEngine
                 facetedResult.setFacetIntersection( treesResult );
             }
         }
-        catch( SolrServerException | IOException e )
+        catch( SolrServerException | IOException | SolrException e )
         {
             AppLogService.error( e.getMessage( ), e );
         }
@@ -772,7 +773,7 @@ public class SolrSearchEngine implements SearchEngine
         {
             response = solrServer.query( query );
         }
-        catch( SolrServerException | IOException e )
+        catch( SolrServerException | IOException | SolrException e )
         {
             AppLogService.error( "Solr getGeolocSearchResults error: {}", e.getMessage( ), e );
             return new ArrayList<>( );
@@ -816,7 +817,7 @@ public class SolrSearchEngine implements SearchEngine
             QueryResponse response = solrServer.query( query );
             spellCheck = response.getSpellCheckResponse( );
         }
-        catch( SolrServerException | IOException e )
+        catch( SolrServerException | IOException | SolrException e )
         {
             AppLogService.error( e.getMessage( ), e );
         }
@@ -853,7 +854,7 @@ public class SolrSearchEngine implements SearchEngine
                 }
             }
         }
-        catch( SolrServerException | IOException e )
+        catch( SolrServerException | IOException | SolrException e )
         {
             AppLogService.error( e.getMessage( ), e );
         }
@@ -890,7 +891,7 @@ public class SolrSearchEngine implements SearchEngine
                 }
             }
         }
-        catch( SolrServerException | IOException e )
+        catch( SolrServerException | IOException | SolrException e )
         {
             AppLogService.error( e.getMessage( ), e );
         }
